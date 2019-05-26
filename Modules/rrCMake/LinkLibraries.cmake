@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-04-15 – 2019-04-17
+# 2019-04-15 – 2019-05-26
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -86,7 +86,8 @@ function(post_build_copy_link_libraries _TARGET)
                   POST_BUILD
           COMMAND "${CMAKE_COMMAND}" "-E" "copy_if_different"
                   "$<TARGET_FILE:${sLib}>"
-                  "$<TARGET_FILE_DIR:${_TARGET}>")
+                  "$<TARGET_FILE_DIR:${_TARGET}>"
+          COMMENT "Import-copying ${sLib} DLL...")
       endif()
     elseif(EXISTS ${sLib})
       add_custom_command(
@@ -94,7 +95,8 @@ function(post_build_copy_link_libraries _TARGET)
                 POST_BUILD
         COMMAND "${CMAKE_COMMAND}" "-E" "copy_if_different"
                 "${sLib}"
-                "$<TARGET_FILE_DIR:${_TARGET}>")
+                "$<TARGET_FILE_DIR:${_TARGET}>"
+        COMMENT "Import-copying ${sLib}...")
     endif()
   endforeach()
 endfunction()
