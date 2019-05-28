@@ -184,12 +184,11 @@ if(WIN32)
     if(NOT TARGET Check::check)
       add_library_ex(
         Check::check        STATIC IMPORTED
-        PROPERTIES          IMPORTED_LOCATION_DEBUG       "${Check_check_LIBRARY_DEBUG}"
-                            IMPORTED_LOCATION_RELEASE     "${Check_check_LIBRARY_RELEASE}"
-        COMPILE_DEFINITIONS INTERFACE                     "$<$<BOOL:${HAVE_STDINT_H}>:HAVE_STDINT_H>"
-        INCLUDE_DIRECTORIES INTERFACE                     "${Check_INCLUDE_DIR}"
-        LINK_LIBRARIES      INTERFACE                     Check::compat)
-
+        PROPERTIES          IMPORTED_LOCATION_DEBUG   "${Check_check_LIBRARY_DEBUG}"
+                            IMPORTED_LOCATION_RELEASE "${Check_check_LIBRARY_RELEASE}"
+        COMPILE_DEFINITIONS INTERFACE                 "$<$<BOOL:${HAVE_STDINT_H}>:HAVE_STDINT_H>"
+        INCLUDE_DIRECTORIES INTERFACE                 "${Check_INCLUDE_DIR}"
+        LINK_LIBRARIES      INTERFACE                 Check::compat)
     endif()
 
     mark_as_advanced(FORCE Check_ROOT)
