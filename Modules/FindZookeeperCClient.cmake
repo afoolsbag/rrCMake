@@ -201,7 +201,7 @@ if(WIN32)
     endif()
 
     if(NOT TARGET ZookeeperCClient::zookeeper)
-      add_library(
+      add_library_ex(
         ZookeeperCClient::zookeeper STATIC IMPORTED
         PROPERTIES                  IMPORTED_LOCATION_DEBUG   "${ZookeeperCClient_zookeeper_LIBRARY_DEBUG}"
                                     IMPORTED_LOCATION_RELEASE "${ZookeeperCClient_zookeeper_LIBRARY_RELEASE}"
