@@ -52,6 +52,8 @@ Conan
 
 `Conan <https://conan.io/>`_
 
+- `CONAN_USER_HOME <https://docs.conan.io/en/latest/reference/env_vars.html#conan-user-home>`_
+
 `CMake-Conan <https://github.com/conan-io/cmake-conan>`_
 
 reStructuredText
