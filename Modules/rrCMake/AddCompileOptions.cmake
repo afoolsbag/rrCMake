@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-04-17
+# 2016-10-08 – 2019-06-05
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -21,6 +21,7 @@ include_guard()
 #       [HIGHEST_WARNING_LEVEL|RECOMMENDED_WARNING_LEVEL]
 #       [MULTIPLE_PROCESSES]
 #       [UTF-8]
+#       [VISIBLE_DEFAULT_HIDDEN]
 #       [WARNING_AS_ERROR]
 #     )
 #
@@ -40,6 +41,7 @@ function(add_compile_options_ex)
                  MULTIPLE_PROCESSES
                  RECOMMENDED_WARNING_LEVEL
                  UTF-8
+                 VISIBLE_DEFAULT_HIDDEN
                  WARNING_AS_ERROR)
   cmake_parse_arguments(PARSE_ARGV 0 "" "${zOptKws}" "${}" "${}")
 
@@ -97,10 +99,20 @@ function(add_compile_options_ex)
     endif()
   endif()
 
+  if(_VISIBLE_DEFAULT_HIDDEN)
+    foreach(sL IN LISTS zLangs)
+      if(CMAKE_${sL}_COMPILER_ID STREQUAL "GNU")
+        add_compile_options("-fvisibility=hidden")
+        break()
+      endif()
+    endforeach()
+  endif()
+
   if(_WARNING_AS_ERROR)
     foreach(sL IN LISTS zLangs)
       if(CMAKE_${sL}_COMPILER_ID STREQUAL "GNU")
         add_compile_options("-Werror")
+        break()
       endif()
     endforeach()
     if(MSVC)
