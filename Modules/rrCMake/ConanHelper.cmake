@@ -8,10 +8,10 @@ cmake_policy(VERSION 3.10)
 include_guard()
 
 #.rst:
-# .. command:: include_conan
+# .. command:: include_conan_script
 #
 #   检查、下载并包含 `conan` 脚本。
-function(include_conan)
+function(include_conan_script)
   if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
     message(STATUS "Downloading conan.cmake script")
     file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/v0.14/conan.cmake"
