@@ -2,7 +2,7 @@
 # |  ___(_)         | /  __ \ |             | |
 # | |_   _ _ __   __| | /  \/ |__   ___  ___| | __
 # |  _| | | '_ \ / _` | |   | '_ \ / _ \/ __| |/ / zhengrr
-# | |   | | | | | (_| | \__/\ | | |  __/ (__|   <  2018-02-02 – 2019-05-05
+# | |   | | | | | (_| | \__/\ | | |  __/ (__|   <  2018-02-02 – 2019-06-20
 # \_|   |_|_| |_|\__,_|\____/_| |_|\___|\___|_|\_\ Unlicense
 
 cmake_minimum_required(VERSION 3.12)
@@ -60,12 +60,19 @@ endif()
 #   The root directory of the Check installation (may also be set as an environment variable)::
 #
 #     v Check_ROOT
+#       > vc141x32
+#       > vc141x32d
+#       > vc141x64
+#       > vc141x64d
+#       > ...
+#       v cmake
+#           check.cmake
+#           check-debug.cmake
 #       v include
 #           check.h
-#           ...
+#           check_stdint.h
+#           libcompat.h
 #       v lib
-#         > vc141x32d
-#         > ...
 #           check.lib
 #           compat.lib
 
@@ -130,35 +137,62 @@ endif()
 # Windows
 
 if(WIN32)
+  get_toolset_architecture_address_model_tag(sTag)
+
   # <prefix>/include
   find_path(
     Check_INCLUDE_DIR
-    NAMES         "check.h")
+    NAMES "check.h"
+    HINTS "${Check_ROOT}/${sTag}d/include"
+          "$ENV{Check_ROOT}/${sTag}d/include"
+          "${Check_ROOT}/${sTag}/include"
+          "$ENV{Check_ROOT}/${sTag}/include"
+          "${Check_ROOT}/include"
+          "$ENV{Check_ROOT}/include"
+    NO_DEFAULT_PATH)
   mark_as_advanced(Check_INCLUDE_DIR)
 
   # <prefix>/lib
-  get_toolset_architecture_address_model_tag(sTag)
-
   find_library(
     Check_check_LIBRARY_DEBUG
-    NAMES         "check"
-    PATH_SUFFIXES "${sTag}d" "${sTag}")
+    NAMES "check"
+    HINTS "${Check_ROOT}/${sTag}d/lib"
+          "$ENV{Check_ROOT}/${sTag}d/lib"
+          "${Check_ROOT}/${sTag}/lib"
+          "$ENV{Check_ROOT}/${sTag}/lib"
+          "${Check_ROOT}/lib"
+          "$ENV{Check_ROOT}/lib"
+    NO_DEFAULT_PATH)
   mark_as_advanced(Check_check_LIBRARY_DEBUG)
   find_library(
     Check_check_LIBRARY_RELEASE
-    NAMES         "check"
-    PATH_SUFFIXES "${sTag}")
+    NAMES "check"
+    HINTS "${Check_ROOT}/${sTag}/lib"
+          "$ENV{Check_ROOT}/${sTag}/lib"
+          "${Check_ROOT}/lib"
+          "$ENV{Check_ROOT}/lib"
+    NO_DEFAULT_PATH)
   mark_as_advanced(Check_check_LIBRARY_RELEASE)
 
   find_library(
     Check_compat_LIBRARY_DEBUG
-    NAMES         "compat"
-    PATH_SUFFIXES "${sTag}d" "${sTag}")
+    NAMES "compat"
+    HINTS "${Check_ROOT}/${sTag}d/lib"
+          "$ENV{Check_ROOT}/${sTag}d/lib"
+          "${Check_ROOT}/${sTag}/lib"
+          "$ENV{Check_ROOT}/${sTag}/lib"
+          "${Check_ROOT}/lib"
+          "$ENV{Check_ROOT}/lib"
+    NO_DEFAULT_PATH)
   mark_as_advanced(Check_compat_LIBRARY_DEBUG)
   find_library(
     Check_compat_LIBRARY_RELEASE
-    NAMES         "compat"
-    PATH_SUFFIXES "${sTag}")
+    NAMES "compat"
+    HINTS "${Check_ROOT}/${sTag}/lib"
+          "$ENV{Check_ROOT}/${sTag}/lib"
+          "${Check_ROOT}/lib"
+          "$ENV{Check_ROOT}/lib"
+    NO_DEFAULT_PATH)
   mark_as_advanced(Check_compat_LIBRARY_RELEASE)
 
   # package
