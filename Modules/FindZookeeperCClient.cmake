@@ -5,7 +5,7 @@
 # | |   | | | | | (_| |./ /__| (_) | (_) |   <  __/  __/ |_) |  __/ |  | \__/\| \__/\ | |  __/ | | | |_ 
 # \_|   |_|_| |_|\__,_|\_____/\___/ \___/|_|\_\___|\___| .__/ \___|_|   \____/ \____/_|_|\___|_| |_|\__|
 # zhengrr                                              | |                                              
-# 2018-12-29 – 2019-05-28                              |_|                                              
+# 2018-12-29 – 2019-07-08                              |_|                                              
 # Unlicense
 
 cmake_minimum_required(VERSION 3.12)
@@ -194,7 +194,6 @@ if(WIN32)
     if(NOT TARGET ZookeeperCClient::hashtable)
       add_library_ex(
         ZookeeperCClient::hashtable STATIC IMPORTED
-        ZookeeperCClient::hashtable
         PROPERTIES                  IMPORTED_LOCATION_DEBUG   "${ZookeeperCClient_hashtable_LIBRARY_DEBUG}"
                                     IMPORTED_LOCATION_RELEASE "${ZookeeperCClient_hashtable_LIBRARY_RELEASE}"
         INCLUDE_DIRECTORIES         INTERFACE                 "${ZookeeperCClient_INCLUDE_DIR}")
@@ -205,9 +204,9 @@ if(WIN32)
         ZookeeperCClient::zookeeper STATIC IMPORTED
         PROPERTIES                  IMPORTED_LOCATION_DEBUG   "${ZookeeperCClient_zookeeper_LIBRARY_DEBUG}"
                                     IMPORTED_LOCATION_RELEASE "${ZookeeperCClient_zookeeper_LIBRARY_RELEASE}"
-         COMPILE_DEFINITIONS        INTERFACE                 "USE_STATIC_LIB"
-         INCLUDE_DIRECTORIES        INTERFACE                 "${ZookeeperCClient_INCLUDE_DIR}"
-         LINK_LIBRARIES             INTERFACE                 WS2_32
+        COMPILE_DEFINITIONS         INTERFACE                 "USE_STATIC_LIB"
+        INCLUDE_DIRECTORIES         INTERFACE                 "${ZookeeperCClient_INCLUDE_DIR}"
+        LINK_LIBRARIES              INTERFACE                 WS2_32
                                                               ZookeeperCClient::hashtable)
     endif()
 
