@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-06-05 – 2019-06-05
+# 2019-06-05 – 2019-07-18
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -47,7 +47,12 @@ macro(include_hunter_gate_script)
     message(STATUS "Downloading HunterGate.cmake script - done")
   endif()
   include("${CMAKE_BINARY_DIR}/HunterGate.cmake")
+  # 在 CMake 3.14.0-rc3 中，PROJECT_NAME 的缺省值为 "Project" 而非 ""
   if(PROJECT_NAME STREQUAL "Project")
+    set(PROJECT_NAME)
+  endif()
+  # 我知道我在做什么：允许在子目录的 project 前使用 HunterGate
+  if(NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR AND PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
     set(PROJECT_NAME)
   endif()
   HunterGate(
