@@ -56,6 +56,13 @@ Conan
 
 `CMake-Conan <https://github.com/conan-io/cmake-conan>`_
 
+Hunter
+-----
+
+`Hunter <https://docs.hunter.sh/>`_
+
+- `HUNTER_ROOT <https://github.com/hunter-packages/gate#effects>`_
+
 reStructuredText
 ----------------
 
