@@ -47,6 +47,9 @@ function(include_hunter_gate_script)
     message(STATUS "Downloading HunterGate.cmake script - done")
   endif()
   include("${CMAKE_BINARY_DIR}/HunterGate.cmake")
+  if(PROJECT_NAME STREQUAL "Project")
+    set(PROJECT_NAME)
+  endif()
   HunterGate(
     URL  "https://github.com/ruslo/hunter/archive/v0.23.204.tar.gz"
     SHA1 "32cfed254da901f6f184027d530d8da47e035b85")
