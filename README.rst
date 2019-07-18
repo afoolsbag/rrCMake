@@ -52,6 +52,7 @@ Conan
 
 `Conan <https://conan.io/>`_
 
+- `conan-center <https://bintray.com/conan/conan-center>`_
 - `CONAN_USER_HOME <https://docs.conan.io/en/latest/reference/env_vars.html#conan-user-home>`_
 
 `CMake-Conan <https://github.com/conan-io/cmake-conan>`_
@@ -61,6 +62,7 @@ Hunter
 
 `Hunter <https://docs.hunter.sh/>`_
 
+- `All packages <https://docs.hunter.sh/en/latest/packages/all.html>`_
 - `HUNTER_ROOT <https://github.com/hunter-packages/gate#effects>`_
 
 reStructuredText
