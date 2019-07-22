@@ -57,6 +57,7 @@ macro(include_hunter_gate_script)
   endif()
   # 计算工具链标识着实有些慢，将它默认禁用，需要时再手动开启
   option(HUNTER_NO_TOOLCHAIN_ID_RECALCULATION "No Toolchain-ID recalculation" ON)
+  # https://github.com/ruslo/hunter/releases
   HunterGate(
     URL  "https://github.com/ruslo/hunter/archive/v0.23.204.tar.gz"
     SHA1 "32cfed254da901f6f184027d530d8da47e035b85")
