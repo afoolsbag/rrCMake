@@ -51,14 +51,22 @@ macro(include_hunter_gate_script)
   if(PROJECT_NAME STREQUAL "Project")
     set(PROJECT_NAME)
   endif()
-  # 我知道我在做什么：允许在子目录的 project 前使用 HunterGate
+  # 允许在子目录的 project 指令前使用 HunterGate
   if(NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR AND PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
     set(PROJECT_NAME)
   endif()
-  # 计算工具链标识着实有些慢，将它默认禁用，需要时再手动开启
+  # 默认禁用“重复计算工具链标识”
   option(HUNTER_NO_TOOLCHAIN_ID_RECALCULATION "No Toolchain-ID recalculation" ON)
   # https://github.com/ruslo/hunter/releases
   HunterGate(
     URL  "https://github.com/ruslo/hunter/archive/v0.23.204.tar.gz"
     SHA1 "32cfed254da901f6f184027d530d8da47e035b85")
+  # 默认将 Hunter 参数隐藏到 Advanced
+  mark_as_advanced(HUNTER_CONFIGURATION_TYPES
+                   HUNTER_ENABLED
+                   HUNTER_MSVC_VCVARSALL
+                   HUNTER_NO_TOOLCHAIN_ID_RECALCULATION
+                   HUNTER_STATUS_DEBUG
+                   HUNTER_STATUS_PRINT
+                   HUNTER_TLS_VERIFY)
 endmacro()
