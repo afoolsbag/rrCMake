@@ -23,8 +23,8 @@ if(NOT COMMAND get_toolset_architecture_address_model_tag)
 endif()
 
 #.rst:
-# FindCheck
-# ---------
+# FindS3
+# ------
 #
 # Find the `S3 <https://github.com/bji/libs3>`_ headers and libraries.
 #
@@ -72,7 +72,7 @@ if(UNIX)
     S3_s3_LIBRARY
     S3_INCLUDE_DIR)
 
-  if(Check_FOUND)
+  if(S3_FOUND)
     # targets
     if(NOT TARGET S3::s3)
       add_library_ex(
