@@ -18,10 +18,6 @@ if(NOT COMMAND add_library_ex)
   include("${CMAKE_CURRENT_LIST_DIR}/rrCMake/AddLibrary.cmake")
 endif()
 
-if(NOT COMMAND get_toolset_architecture_address_model_tag)
-  include("${CMAKE_CURRENT_LIST_DIR}/rrCMake/LibraryTag.cmake")
-endif()
-
 #.rst:
 # FindS3
 # ------
@@ -72,8 +68,8 @@ if(UNIX)
     S3_s3_LIBRARY
     S3_INCLUDE_DIR)
 
+  # targets
   if(S3_FOUND)
-    # targets
     if(NOT TARGET S3::s3)
       add_library_ex(
         S3::s3              SHARED IMPORTED

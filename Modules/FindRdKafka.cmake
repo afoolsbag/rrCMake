@@ -2,7 +2,7 @@
 # |  ___(_)         | | ___ \  | | | / /      / _| |
 # | |_   _ _ __   __| | |_/ /__| | |/ /  __ _| |_| | ____ _
 # |  _| | | '_ \ / _` |    // _` |    \ / _` |  _| |/ / _` | zhengrr
-# | |   | | | | | (_| | |\ \ (_| | |\  \ (_| | | |   < (_| | 2019-06-03 – 2019-06-03
+# | |   | | | | | (_| | |\ \ (_| | |\  \ (_| | | |   < (_| | 2019-06-03 – 2019-07-30
 # \_|   |_|_| |_|\__,_\_| \_\__,_\_| \_/\__,_|_| |_|\_\__,_| Unlicense
 
 cmake_minimum_required(VERSION 3.12)
@@ -17,6 +17,32 @@ endif()
 if(NOT COMMAND add_library_ex)
   include("${CMAKE_CURRENT_LIST_DIR}/rrCMake/AddLibrary.cmake")
 endif()
+
+#.rst:
+# FindRdKafka
+# -----------
+#
+# Find the `RdKafka <https://github.com/edenhill/librdkafka>`_ headers and libraries.
+#
+# IMPORTED Targets
+# ^^^^^^^^^^^^^^^^
+#
+# This module defines the following :prop_tgt:`IMPORTED` targets:
+#
+# ``RdKafka::rdkafka``
+#   The rdkafka library, if found.
+#
+# ``RdKafka::rdkafka++``
+#   The rdkafka++ library, if found.
+#
+# Result Variables
+# ^^^^^^^^^^^^^^^^
+#
+# This module defines the following variables:
+#
+# ``RdKafka_FOUND``
+#   Found the RdKafka.
+#
 
 if(RdKafka_FOUND)
   return()
@@ -70,8 +96,5 @@ if(UNIX)
     endif()
 
   endif()
-
-  # return
-  return()
 
 endif()
