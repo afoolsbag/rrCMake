@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-06-05 – 2019-07-18
+# 2019-06-05 – 2019-07-30
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -47,20 +47,25 @@ macro(include_hunter_gate_script)
     message(STATUS "Downloading HunterGate.cmake script - done")
   endif()
   include("${CMAKE_BINARY_DIR}/HunterGate.cmake")
+
   # 在 CMake 3.14.0-rc3 中，PROJECT_NAME 的缺省值为 "Project" 而非 ""
   if(PROJECT_NAME STREQUAL "Project")
     set(PROJECT_NAME)
   endif()
+
   # 允许在子目录的 project 指令前使用 HunterGate
   if(NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR AND PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
     set(PROJECT_NAME)
   endif()
+
   # 默认禁用“重复计算工具链标识”
   option(HUNTER_NO_TOOLCHAIN_ID_RECALCULATION "No Toolchain-ID recalculation" ON)
+
   # https://github.com/ruslo/hunter/releases
   HunterGate(
-    URL  "https://github.com/ruslo/hunter/archive/v0.23.204.tar.gz"
-    SHA1 "32cfed254da901f6f184027d530d8da47e035b85")
+    URL  "https://github.com/ruslo/hunter/archive/v0.23.205.tar.gz"
+    SHA1 "eba80d3028c856c6bedb5d8d9627b1b3bba19634")
+
   # 默认将 Hunter 参数隐藏到 Advanced
   mark_as_advanced(HUNTER_CONFIGURATION_TYPES
                    HUNTER_ENABLED
