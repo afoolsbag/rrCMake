@@ -1,11 +1,11 @@
 # zhengrr
-# 2016-10-08 – 2019-07-18
+# 2016-10-08 – 2019-08-05
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
 cmake_policy(VERSION 3.10)
 
-include_guard()
+include_guard()  # 3.10
 
 #.rst:
 # .. command:: project_ex
@@ -16,6 +16,7 @@ include_guard()
 #
 #     project_ex(
 #       <argument>...
+#       [TIME_AS_VERSION]
 #       [AUTHORS <author>...]
 #       [LICENSE <license>]
 #     )
@@ -24,12 +25,25 @@ include_guard()
 #
 #   - `preject <https://cmake.org/cmake/help/latest/command/project.html>`_
 macro(project_ex)
-  set(zOptKws)
-  set(zOneValKws LICENSE)
+  set(zOptKws    TIME_AS_VERSION)
+  set(zOneValKws VERSION
+                 LICENSE)
   set(zMutValKws AUTHORS)
   cmake_parse_arguments("" "${zOptKws}" "${zOneValKws}" "${zMutValKws}" ${ARGV})
 
-  project(${_UNPARSED_ARGUMENTS})
+  if(_TIME_AS_VERSION)
+    if(NOT DEFINED _VERSION)
+      string(TIMESTAMP _VERSION "%Y.%m.%d.%H%M%S")
+    else()
+      message(WARNING "Keyword VERSION is used, ignore keyword TIME_AS_VERSION.")
+    endif()
+  endif()
+
+  if(DEFINED _VERSION)
+    list(INSERT _VERSION 0 VERSION)
+  endif()
+
+  project(${_UNPARSED_ARGUMENTS} ${_VERSION})
 
   if(DEFINED _AUTHORS)
     set(PROJECT_AUTHORS ${_AUTHORS})
