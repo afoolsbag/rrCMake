@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-08-05
+# 2016-10-08 – 2019-08-07
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -33,7 +33,7 @@ macro(project_ex)
 
   if(_TIME_AS_VERSION)
     if(NOT DEFINED _VERSION)
-      string(TIMESTAMP _VERSION "%Y.%m.%d.%H%M%S")
+      string(TIMESTAMP _VERSION "%Y.%m.%d.%H%M")
     else()
       message(WARNING "Keyword VERSION is used, ignore keyword TIME_AS_VERSION.")
     endif()
