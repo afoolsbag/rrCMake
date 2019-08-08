@@ -519,8 +519,16 @@ function(add_library_swig _NAME)
 
   #-----------------------------------------------------------------------------
   # 调用 SWIG 生成
+  #
+  # 在 CMake 配置时初步生成，并为目标加入前置构建，在每次编译前自动重新生成
 
   find_package(SWIG REQUIRED)  # CMP0074 3.12
+
+  if(sSwigLanguage STREQUAL CSHARP)
+    if(NOT "-dllimport" IN_LIST zSwigArguments)
+      list(APPEND zSwigArguments "-dllimport" "${sName}$<$<CONFIG:Debug>:d>")
+    endif()
+  endif()
 
   if(sSwigLanguage STREQUAL GO)
     if(NOT "-intgosize" IN_LIST zSwigArguments)
@@ -573,5 +581,13 @@ function(add_library_swig _NAME)
     ${zLinkLibraries}
     ${zLinkOptions}
     ${zSources})
+
+  add_custom_command(
+    TARGET "${sName}" PRE_BUILD
+    COMMAND "${SWIG_EXECUTABLE}"
+            "-c++"                   "-o"      "${sSwigCxxWrap}"
+            "-${sSwigLanguageLower}" "-outdir" "${sSwigOutputDir}"
+            ${zSwigArguments}
+            "${sSwigInterface}")
 
 endfunction()
