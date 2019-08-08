@@ -1,11 +1,11 @@
 # zhengrr
-# 2016-10-08 – 2019-06-05
+# 2016-10-08 – 2019-08-07
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
 cmake_policy(VERSION 3.10)
 
-include_guard()
+include_guard()  # 3.10
 
 #.rst:
 # .. command:: add_compile_options_ex

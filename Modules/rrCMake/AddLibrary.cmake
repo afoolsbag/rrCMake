@@ -1,11 +1,11 @@
 # zhengrr
-# 2016-10-08 – 2019-05-10
+# 2016-10-08 – 2019-08-08
 # Unlicense
 
-cmake_minimum_required(VERSION 3.10)
-cmake_policy(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
+cmake_policy(VERSION 3.12)
 
-include_guard()
+include_guard()  # 3.10
 
 if(NOT COMMAND get_toolset_architecture_address_model_tag)
   include("${CMAKE_CURRENT_LIST_DIR}/LibraryTag.cmake")
@@ -15,6 +15,7 @@ if(NOT COMMAND post_build_copy_link_libraries)
   include("${CMAKE_CURRENT_LIST_DIR}/LinkLibraries.cmake")
 endif()
 
+#===============================================================================
 #.res:
 # .. command:: add_library_ex
 #
@@ -23,16 +24,16 @@ endif()
 #   .. code-block:: cmake
 #
 #     add_library_ex(
-#       <name> <argument>...
-#       [PROPERTIES          <property-key> <property-value> ...]
-#       [COMPILE_DEFINITIONS <INTERFACE|PUBLIC|PRIVATE> <definition>... ...]
-#       [COMPILE_FEATURES    <INTERFACE|PUBLIC|PRIVATE> <feature>... ...]
-#       [COMPILE_OPTIONS     <INTERFACE|PUBLIC|PRIVATE> <option>... ...]
-#       [INCLUDE_DIRECTORIES <INTERFACE|PUBLIC|PRIVATE> <directory>... ...]
-#       [LINK_DIRECTORIES    <INTERFACE|PUBLIC|PRIVATE> <directory>... ...]
-#       [LINK_LIBRARIES      <INTERFACE|PUBLIC|PRIVATE> <library>... ...]
-#       [LINK_OPTIONS        <INTERFACE|PUBLIC|PRIVATE> <option>... ...]
-#       [SOURCES             <INTERFACE|PUBLIC|PRIVATE> <source>... ...]
+#       <name> <argument-of-add-library>...
+#       [PROPERTIES          < <property-key> <property-value> >...]
+#       [COMPILE_DEFINITIONS < <INTERFACE|PUBLIC|PRIVATE> <definition>... >...]
+#       [COMPILE_FEATURES    < <INTERFACE|PUBLIC|PRIVATE> <feature>... >...]
+#       [COMPILE_OPTIONS     < <INTERFACE|PUBLIC|PRIVATE> <option>... >...]
+#       [INCLUDE_DIRECTORIES < <INTERFACE|PUBLIC|PRIVATE> <directory>... >...]
+#       [LINK_DIRECTORIES    < <INTERFACE|PUBLIC|PRIVATE> <directory>... >...]
+#       [LINK_LIBRARIES      < <INTERFACE|PUBLIC|PRIVATE> <library>... >...]
+#       [LINK_OPTIONS        < <INTERFACE|PUBLIC|PRIVATE> <option>... >...]
+#       [SOURCES             < <INTERFACE|PUBLIC|PRIVATE> <source>... >...]
 #     )
 #
 #   参见：
@@ -59,91 +60,139 @@ function(add_library_ex _NAME)
                  SOURCES)
   cmake_parse_arguments(PARSE_ARGV 1 "" "" "" "${zMutValKws}")
 
-  # add_library
-  add_library(${_NAME} ${_UNPARSED_ARGUMENTS})
+  #-----------------------------------------------------------------------------
+  # 规整化参数
 
-  # set_target_properties
+  # NAME
+  set(sName "${_NAME}")
+
+  # ARGUMENTS_OF_ADD_LIBRARY
+  set(zArgumentsOfAddLibrary ${_UNPARSED_ARGUMENTS})
+
+  # PROPERTIES
+  unset(zProperties)
   if(DEFINED _PROPERTIES)
     list(LENGTH _PROPERTIES sLen)
     if(sLen EQUAL 0)
       message(WARNING "Keyword PROPERTIES is used, but without value.")
     endif()
-    set_target_properties(${_NAME} PROPERTIES ${_PROPERTIES})
+    set(zProperties PROPERTIES ${_PROPERTIES})
   endif()
 
-  # target_compile_definitions
+  # COMPILE_DEFINITIONS
+  unset(zCompileDefinitions)
   if(DEFINED _COMPILE_DEFINITIONS)
     list(LENGTH _COMPILE_DEFINITIONS sLen)
     if(sLen EQUAL 0)
       message(WARNING "Keyword COMPILE_DEFINITIONS is used, but without value.")
     endif()
-    target_compile_definitions(${_NAME} ${_COMPILE_DEFINITIONS})
+    set(zCompileDefinitions ${_COMPILE_DEFINITIONS})
   endif()
 
-  # target_compile_features
+  # COMPILE_FEATURES
+  unset(zCompileFeatures)
   if(DEFINED _COMPILE_FEATURES)
     list(LENGTH _COMPILE_FEATURES sLen)
     if(sLen EQUAL 0)
       message(WARNING "Keyword COMPILE_FEATURES is used, but without value.")
     endif()
-    target_compile_features(${_NAME} ${_COMPILE_FEATURES})
+    set(zCompileFeatures ${_COMPILE_FEATURES})
   endif()
 
-  # target_compile_options
+  # COMPILE_OPTIONS
+  unset(zCompileOptions)
   if(DEFINED _COMPILE_OPTIONS)
     list(LENGTH _COMPILE_OPTIONS sLen)
     if(sLen EQUAL 0)
       message(WARNING "Keyword COMPILE_OPTIONS is used, but without value.")
     endif()
-    target_compile_options(${_NAME} ${_COMPILE_OPTIONS})
+    set(zCompileOptions ${_COMPILE_OPTIONS})
   endif()
 
-  # target_include_directories
+  # INCLUDE_DIRECTORIES
+  unset(zIncludeDirectories)
   if(DEFINED _INCLUDE_DIRECTORIES)
     list(LENGTH _INCLUDE_DIRECTORIES sLen)
     if(sLen EQUAL 0)
       message(WARNING "Keyword INCLUDE_DIRECTORIES is used, but without value.")
     endif()
-    target_include_directories(${_NAME} ${_INCLUDE_DIRECTORIES})
+    set(zIncludeDirectories ${_INCLUDE_DIRECTORIES})
   endif()
 
-  # target_link_libraries
-  if(DEFINED _LINK_LIBRARIES)
-    list(LENGTH _LINK_LIBRARIES sLen)
-    if(sLen EQUAL 0)
-      message(WARNING "Keyword LINK_LIBRARIES is used, but without value.")
-    endif()
-    target_link_libraries(${_NAME} ${_LINK_LIBRARIES})
-  endif()
-
-  # target_link_directories
+  # LINK_DIRECTORIES
+  unset(zLinkDirectories)
   if(DEFINED _LINK_DIRECTORIES)
     list(LENGTH _LINK_DIRECTORIES sLen)
     if(sLen EQUAL 0)
       message(WARNING "Keyword LINK_DIRECTORIES is used, but without value.")
     endif()
-    target_link_directories(${_NAME} ${_LINK_DIRECTORIES})
+    set(zLinkDirectories ${_LINK_DIRECTORIES})
   endif()
 
-  # target_link_options
+  # LINK_LIBRARIES
+  unset(zLinkLibraries)
+  if(DEFINED _LINK_LIBRARIES)
+    list(LENGTH _LINK_LIBRARIES sLen)
+    if(sLen EQUAL 0)
+      message(WARNING "Keyword LINK_LIBRARIES is used, but without value.")
+    endif()
+    set(zLinkLibraries ${_LINK_LIBRARIES})
+  endif()
+
+  # LINK_OPTIONS
+  unset(zLinkOptions)
   if(DEFINED _LINK_OPTIONS)
     list(LENGTH _LINK_OPTIONS sLen)
     if(sLen EQUAL 0)
       message(WARNING "Keyword LINK_OPTIONS is used, but without value.")
     endif()
-    target_link_options(${_NAME} ${_LINK_OPTIONS})
+    set(zLinkOptions ${_LINK_OPTIONS})
   endif()
 
-  # target_sources
+  # SOURCES
+  unset(zSources)
   if(DEFINED _SOURCES)
     list(LENGTH _SOURCES sLen)
     if(sLen EQUAL 0)
       message(WARNING "Keyword SOURCES is used, but without value.")
     endif()
-    target_sources(${_NAME} ${_SOURCES})
+    set(zSources ${_SOURCES})
+  endif()
+
+  #-----------------------------------------------------------------------------
+  # 添加目标并配置
+
+  add_library("${sName}" ${zArgumentsOfAddLibrary})
+  if(DEFINED zProperties)
+    set_target_properties("${sName}" ${zProperties})
+  endif()
+  if(DEFINED zCompileDefinitions)
+    target_compile_definitions("${sName}" ${zCompileDefinitions})
+  endif()
+  if(DEFINED zCompileFeatures)
+    target_compile_features("${sName}" ${zCompileFeatures})
+  endif()
+  if(DEFINED zCompileOptions)
+    target_compile_options("${sName}" ${zCompileOptions})
+  endif()
+  if(DEFINED zIncludeDirectories)
+    target_include_directories("${sName}" ${zIncludeDirectories})
+  endif()
+  if(DEFINED zLinkDirectories)
+    target_link_directories("${sName}" ${zLinkDirectories})
+  endif()
+  if(DEFINED zLinkLibraries)
+    target_link_libraries("${sName}" ${zLinkLibraries})
+  endif()
+  if(DEFINED zLinkOptions)
+    target_link_options("${sName}" ${zLinkOptions})
+  endif()
+  if(DEFINED zSources)
+    target_sources("${sName}" ${zSources})
   endif()
 endfunction()
 
+#===============================================================================
 #.res:
 # .. command:: add_library_con
 #
@@ -152,13 +201,22 @@ endfunction()
 #   .. code-block:: cmake
 #
 #     add_library_con(
-#       <argument>...
+#       <name> <argument-of-add-library>...
+#       [PROPERTIES          < <property-key> <property-value> >...]
+#       [COMPILE_DEFINITIONS < <INTERFACE|PUBLIC|PRIVATE> <definition>... >...]
+#       [COMPILE_FEATURES    < <INTERFACE|PUBLIC|PRIVATE> <feature>... >...]
+#       [COMPILE_OPTIONS     < <INTERFACE|PUBLIC|PRIVATE> <option>... >...]
+#       [INCLUDE_DIRECTORIES < <INTERFACE|PUBLIC|PRIVATE> <directory>... >...]
+#       [LINK_DIRECTORIES    < <INTERFACE|PUBLIC|PRIVATE> <directory>... >...]
+#       [LINK_LIBRARIES      < <INTERFACE|PUBLIC|PRIVATE> <library>... >...]
+#       [LINK_OPTIONS        < <INTERFACE|PUBLIC|PRIVATE> <option>... >...]
+#       [SOURCES             < <INTERFACE|PUBLIC|PRIVATE> <source>... >...]
 #     )
 #
 #   参见：
 #
-#   - `option <https://cmake.org/cmake/help/latest/command/option.html>`_
 #   - :command:`add_library_ex`
+#   - `option <https://cmake.org/cmake/help/latest/command/option.html>`_
 #   - `install <https://cmake.org/cmake/help/latest/command/install.html>`_
 function(add_library_con _NAME)
   set(zMutValKws PROPERTIES
@@ -172,110 +230,348 @@ function(add_library_con _NAME)
                  SOURCES)
   cmake_parse_arguments(PARSE_ARGV 1 "" "" "" "${zMutValKws}")
 
-  if(MODULE IN_LIST _UNPARSED_ARGUMENTS)
-    set(_TYPE MODULE)
-  elseif(SHARED IN_LIST _UNPARSED_ARGUMENTS)
-    set(_TYPE SHARED)
-  elseif(STATIC IN_LIST _UNPARSED_ARGUMENTS)
-    set(_TYPE STATIC)
-  elseif(BUILD_SHARED_LIBS)
-    set(_TYPE SHARED)
-  else()
-    set(_TYPE STATIC)
+  #-----------------------------------------------------------------------------
+  # 规整化参数
+
+  # NAME
+  set(sName "${_NAME}")
+
+  string(TOUPPER "${sName}" sNameUpper)
+
+  # ARGUMENTS_OF_ADD_LIBRARY
+  set(zArgumentsOfAddLibrary ${_UNPARSED_ARGUMENTS})
+
+  # PROPERTIES
+  unset(zProperties)
+  if(DEFINED _PROPERTIES)
+    set(zProperties PROPERTIES ${_PROPERTIES})
   endif()
 
-  string(TOUPPER ${PROJECT_NAME} _PROJECT_NAME_UPPER)
-  string(TOUPPER ${_NAME}        _NAME_UPPER)
-  string(TOUPPER ${_TYPE}        _TYPE_UPPER)
-  string(TOLOWER ${_TYPE}        _TYPE_LOWER)
+  # COMPILE_DEFINITIONS
+  unset(zCompileDefinitions)
+  if(DEFINED _COMPILE_DEFINITIONS)
+    set(zCompileDefinitions COMPILE_DEFINITIONS ${_COMPILE_DEFINITIONS})
+  endif()
 
-  # option
-  string(REGEX REPLACE "^${_PROJECT_NAME_UPPER}" "" sTrimmedNameUpper "${_NAME_UPPER}")
+  # COMPILE_FEATURES
+  unset(zCompileFeatures)
+  if(DEFINED _COMPILE_FEATURES)
+    set(zCompileFeatures COMPILE_FEATURES ${_COMPILE_FEATURES})
+  endif()
+
+  # COMPILE_OPTIONS
+  unset(zCompileOptions)
+  if(DEFINED _COMPILE_OPTIONS)
+    set(zCompileOptions COMPILE_OPTIONS ${_COMPILE_OPTIONS})
+  endif()
+
+  # INCLUDE_DIRECTORIES
+  unset(zIncludeDirectories)
+  if(DEFINED _INCLUDE_DIRECTORIES)
+    set(zIncludeDirectories INCLUDE_DIRECTORIES ${_INCLUDE_DIRECTORIES})
+  endif()
+
+  # LINK_DIRECTORIES
+  unset(zLinkDirectories)
+  if(DEFINED _LINK_DIRECTORIES)
+    set(zLinkDirectories LINK_DIRECTORIES ${_LINK_DIRECTORIES})
+  endif()
+
+  # LINK_LIBRARIES
+  unset(zLinkLibraries)
+  if(DEFINED _LINK_LIBRARIES)
+    set(zLinkLibraries LINK_LIBRARIES ${_LINK_LIBRARIES})
+  endif()
+
+  # LINK_OPTIONS
+  unset(zLinkOptions)
+  if(DEFINED _LINK_OPTIONS)
+    set(zLinkOptions LINK_OPTIONS ${_LINK_OPTIONS})
+  endif()
+
+  # SOURCES
+  unset(zSources)
+  if(DEFINED _SOURCES)
+    set(zSources SOURCES ${_SOURCES})
+  endif()
+
+  #-----------------------------------------------------------------------------
+  # 启停配置
+
+  if(MODULE IN_LIST zArgumentsOfAddLibrary)
+    set(sType MODULE)
+  elseif(SHARED IN_LIST zArgumentsOfAddLibrary)
+    set(sType SHARED)
+  elseif(STATIC IN_LIST zArgumentsOfAddLibrary)
+    set(sType STATIC)
+  elseif(BUILD_SHARED_LIBS)
+    set(sType SHARED)
+  else()
+    set(sType STATIC)
+  endif()
+
+  string(TOUPPER "${sType}" sTypeUpper)
+  string(TOLOWER "${sType}" sTypeLower)
+  string(TOUPPER "${PROJECT_NAME}" sProjectNameUpper)
+  string(REGEX REPLACE "^${sProjectNameUpper}" "" sTrimmedNameUpper "${sNameUpper}")
   string(LENGTH "${sTrimmedNameUpper}" sLen)
   if(0 LESS sLen)
-    set(vOptVar ${_PROJECT_NAME_UPPER}_${sTrimmedNameUpper}_${_TYPE_UPPER}_LIBRARY)
+    set(vOptVar ${sProjectNameUpper}_${sTrimmedNameUpper}_${sTypeUpper}_LIBRARY)
   else()
-    set(vOptVar ${_PROJECT_NAME_UPPER}_${_TYPE_UPPER}_LIBRARY)
+    set(vOptVar ${sProjectNameUpper}_${sTypeUpper}_LIBRARY)
   endif()
-  option(${vOptVar} "Build ${_NAME} ${_TYPE_LOWER} library." ON)
+
+  option(${vOptVar} "Build ${sName} ${sTypeLower} library." ON)
   if(NOT ${vOptVar})
     return()
   endif()
 
-  # PROPERTIES
-  list(INSERT _PROPERTIES 0 PROPERTIES)
-  if(NOT DEBUG_POSTFIX IN_LIST _PROPERTIES)
-    list(APPEND _PROPERTIES DEBUG_POSTFIX "d")
+  #-----------------------------------------------------------------------------
+  # 添加目标并配置
+
+  if(NOT DEFINED zProperties)
+    set(zProperties PROPERTIES)
   endif()
-  if(NOT OUTPUT_NAME IN_LIST _PROPERTIES)
-    list(APPEND _PROPERTIES OUTPUT_NAME "${_NAME}")
+  if(NOT DEBUG_POSTFIX IN_LIST zProperties)
+    list(APPEND zProperties DEBUG_POSTFIX "d")
   endif()
-  if(NOT PREFIX IN_LIST _PROPERTIES AND _STATIC)
-    list(APPEND _PROPERTIES PREFIX "lib")
+  if(NOT OUTPUT_NAME IN_LIST zProperties)
+    list(APPEND zProperties OUTPUT_NAME "${sName}")
+  endif()
+  if(NOT PREFIX IN_LIST zProperties AND sType STREQUAL STATIC)
+    list(APPEND zProperties PREFIX "lib")
   endif()
 
-  # COMPILE_DEFINITIONS
-  if(DEFINED _COMPILE_DEFINITIONS)
-    list(INSERT _COMPILE_DEFINITIONS 0 COMPILE_DEFINITIONS)
-  endif()
-
-  # COMPILE_FEATURES
-  if(DEFINED _COMPILE_FEATURES)
-    list(INSERT _COMPILE_FEATURES 0 COMPILE_FEATURES)
-  endif()
-
-  # COMPILE_OPTIONS
-  if(DEFINED _COMPILE_OPTIONS)
-    list(INSERT _COMPILE_OPTIONS 0 COMPILE_OPTIONS)
-  endif()
-
-  # INCLUDE_DIRECTORIES
-  if(DEFINED _INCLUDE_DIRECTORIES)
-    list(INSERT _INCLUDE_DIRECTORIES 0 INCLUDE_DIRECTORIES)
-  endif()
-
-  # LINK_DIRECTORIES
-  if(DEFINED _LINK_DIRECTORIES)
-    list(INSERT _LINK_DIRECTORIES 0 LINK_DIRECTORIES)
-  endif()
-
-  # LINK_LIBRARIE
-  if(DEFINED _LINK_LIBRARIES)
-    list(INSERT _LINK_LIBRARIES 0 LINK_LIBRARIES)
-  endif()
-
-  # LINK_OPTIONS
-  if(DEFINED _LINK_OPTIONS)
-    list(INSERT _LINK_OPTIONS 0 LINK_OPTIONS)
-  endif()
-
-  # SOURCES
-  if(DEFINED _SOURCES)
-    list(INSERT _SOURCES 0 SOURCES)
-  endif()
-
-  # add_library_ex
   add_library_ex(
-    ${_NAME} ${_UNPARSED_ARGUMENTS}
-    ${_PROPERTIES}
-    ${_COMPILE_DEFINITIONS}
-    ${_COMPILE_FEATURES}
-    ${_COMPILE_OPTIONS}
-    ${_INCLUDE_DIRECTORIES}
-    ${_LINK_DIRECTORIES}
-    ${_LINK_LIBRARIES}
-    ${_LINK_OPTIONS}
-    ${_SOURCES}
-  )
+    "${sName}" ${zArgumentsOfAddLibrary}
+    ${zProperties}
+    ${zCompileDefinitions}
+    ${zCompileFeatures}
+    ${zCompileOptions}
+    ${zIncludeDirectories}
+    ${zLinkDirectories}
+    ${zLinkLibraries}
+    ${zLinkOptions}
+    ${zSources})
 
-  # post_build_copy_link_libraries
-  post_build_copy_link_libraries(${_NAME} RECURSE)
+  post_build_copy_link_libraries("${sName}" RECURSE)
 
-  # install
   get_toolset_architecture_address_model_tag(sTag)
   install(
-    TARGETS             ${_NAME}
+    TARGETS             ${sName}
     ARCHIVE DESTINATION "lib/${sTag}$<$<CONFIG:Debug>:d>/"
     LIBRARY DESTINATION "lib/${sTag}$<$<CONFIG:Debug>:d>/"
     RUNTIME DESTINATION "bin/${sTag}$<$<CONFIG:Debug>:d>/")
+endfunction()
+
+#===============================================================================
+#.res:
+# .. command:: add_library_swig
+#
+#   添加库目标到项目（add library），扩展 SWIG 功能。
+#
+#   .. code-block:: cmake
+#
+#     add_library_swig(
+#       <name> <argument-of-add-library>...
+#       <SWIG_LANGUAGE        <CSHARP|D|GO|GUILE|JAVA|JAVASCRIPT|LUA|OCTAVE|PERL5|PHP7|PYTHON|R|RUBY|SCILAB|TCL8|XML> >
+#       <SWIG_INTERFACE       <path-to-interface.swg>>
+#       [SWIG_OUTPUT_DIR      <path-to-output-diractory>]
+#       [SWIG_ARGUMENTS       <arguments>...]
+#       [PROPERTIES           < <property-key> <property-value> >...]
+#       [COMPILE_DEFINITIONS  < <INTERFACE|PUBLIC|PRIVATE> <definition>... >...]
+#       [COMPILE_FEATURES     < <INTERFACE|PUBLIC|PRIVATE> <feature>... >...]
+#       [COMPILE_OPTIONS      < <INTERFACE|PUBLIC|PRIVATE> <option>... >...]
+#       [INCLUDE_DIRECTORIES  < <INTERFACE|PUBLIC|PRIVATE> <directory>... >...]
+#       [LINK_DIRECTORIES     < <INTERFACE|PUBLIC|PRIVATE> <directory>... >...]
+#       [LINK_LIBRARIES       < <INTERFACE|PUBLIC|PRIVATE> <library>... >...]
+#       [LINK_OPTIONS         < <INTERFACE|PUBLIC|PRIVATE> <option>... >...]
+#       [SOURCES              < <INTERFACE|PUBLIC|PRIVATE> <source>... >...]
+#     )
+#
+#   参见：
+#
+#   - :command:`add_library_con`
+function(add_library_swig _NAME)
+  set(zOneValKws SWIG_LANGUAGE
+                 SWIG_INTERFACE
+                 SWIG_OUTPUT_DIR)
+  set(zMutValKws SWIG_ARGUMENTS
+                 PROPERTIES
+                 COMPILE_DEFINITIONS
+                 COMPILE_FEATURES
+                 COMPILE_OPTIONS
+                 INCLUDE_DIRECTORIES
+                 LINK_DIRECTORIES
+                 LINK_LIBRARIES
+                 LINK_OPTIONS
+                 SOURCES)
+  cmake_parse_arguments(PARSE_ARGV 1 "" "" "${zOneValKws}" "${zMutValKws}")
+
+  #-----------------------------------------------------------------------------
+  # 规整化参数
+
+  # NAME
+  set(sName "${_NAME}")
+
+  # ARGUMENTS_OF_ADD_LIBRARY
+  set(zArgumentsOfAddLibrary ${_UNPARSED_ARGUMENTS})
+
+  # SWIG_LANGUAGE
+  if(DEFINED _SWIG_LANGUAGE)
+    set(sSwigLanguage "${_SWIG_LANGUAGE}")
+  else()
+    message(FATAL_ERROR "Missing SWIG_LANGUAGE argument")
+  endif()
+
+  string(TOLOWER ${sSwigLanguage} sSwigLanguageLower)
+
+  # SWIG_INTERFACE
+  if(DEFINED _SWIG_INTERFACE)
+    set(sSwigInterface "${_SWIG_INTERFACE}")
+  else()
+    message(FATAL_ERROR "Missing SWIG_INTERFACE argument")
+  endif()
+
+  if(NOT IS_ABSOLUTE "${sSwigInterface}")
+    set(sSwigInterface "${CMAKE_CURRENT_SOURCE_DIR}/${sSwigInterface}")
+  endif()
+
+  if(NOT EXISTS "${sSwigInterface}")
+    message(FATAL_ERROR "The SWIG interface file isn't exists: ${_SWIG_INTERFACE}.")
+  endif()
+
+  get_filename_component(sSwigInterfaceWle "${sSwigInterface}" NAME_WLE)
+
+  # SWIG_OUTPUT_DIR
+  if(DEFINED _SWIG_OUTPUT_DIR)
+    set(sSwigOutputDir "${_SWIG_OUTPUT_DIR}")
+  else()
+    file(RELATIVE_PATH sRelPath "${CMAKE_CURRENT_SOURCE_DIR}" "${sSwigInterface}")
+    set(sSwigOutputDir "${CMAKE_CURRENT_BINARY_DIR}/${sRelPath}/${sSwigLanguageLower}")
+    file(MAKE_DIRECTORY "${sSwigOutputDir}")
+  endif()
+
+  if(NOT IS_ABSOLUTE "${sSwigOutputDir}")
+    set(sSwigOutputDir "${CMAKE_CURRENT_BINARY_DIR}/${sSwigOutputDir}")
+  endif()
+
+  if(NOT IS_DIRECTORY "${sSwigOutputDir}")
+    message(WARNING "The SWIG output directory isn't a directory: ${_SWIG_OUTPUT_DIR}.")
+  endif()
+
+  # SWIG_ARGUMENTS
+  set(zSwigArguments ${SWIG_ARGUMENTS})
+
+  # PROPERTIES
+  unset(zProperties)
+  if(DEFINED _PROPERTIES)
+    set(zProperties PROPERTIES ${_PROPERTIES})
+  endif()
+
+  # COMPILE_DEFINITIONS
+  unset(zCompileDefinitions)
+  if(DEFINED _COMPILE_DEFINITIONS)
+    set(zCompileDefinitions COMPILE_DEFINITIONS ${_COMPILE_DEFINITIONS})
+  endif()
+
+  # COMPILE_FEATURES
+  unset(zCompileFeatures)
+  if(DEFINED _COMPILE_FEATURES)
+    set(zCompileFeatures COMPILE_FEATURES ${_COMPILE_FEATURES})
+  endif()
+
+  # COMPILE_OPTIONS
+  unset(zCompileOptions)
+  if(DEFINED _COMPILE_OPTIONS)
+    set(zCompileOptions COMPILE_OPTIONS ${_COMPILE_OPTIONS})
+  endif()
+
+  # INCLUDE_DIRECTORIES
+  unset(zIncludeDirectories)
+  if(DEFINED _INCLUDE_DIRECTORIES)
+    set(zIncludeDirectories INCLUDE_DIRECTORIES ${_INCLUDE_DIRECTORIES})
+  endif()
+
+  # LINK_DIRECTORIES
+  unset(zLinkDirectories)
+  if(DEFINED _LINK_DIRECTORIES)
+    set(zLinkDirectories LINK_DIRECTORIES ${_LINK_DIRECTORIES})
+  endif()
+
+  # LINK_LIBRARIES
+  unset(zLinkLibraries)
+  if(DEFINED _LINK_LIBRARIES)
+    set(zLinkLibraries LINK_LIBRARIES ${_LINK_LIBRARIES})
+  endif()
+
+  # LINK_OPTIONS
+  unset(zLinkOptions)
+  if(DEFINED _LINK_OPTIONS)
+    set(zLinkOptions LINK_OPTIONS ${_LINK_OPTIONS})
+  endif()
+
+  # SOURCES
+  unset(zSources)
+  if(DEFINED _SOURCES)
+    set(zSources SOURCES ${_SOURCES})
+  endif()
+
+  #-----------------------------------------------------------------------------
+  # 调用 SWIG 生成
+
+  find_package(SWIG REQUIRED)  # CMP0074 3.12
+
+  if(sSwigLanguage STREQUAL GO)
+    if(NOT "-intgosize" IN_LIST zSwigArguments)
+      math(EXPR sIntGoZize "8 * ${CMAKE_SIZEOF_VOID_P}")
+      list(APPEND zSwigArguments "-intgosize" "${sIntGoZize}")
+    endif()
+  endif()
+
+  if(sSwigLanguage STREQUAL JAVASCRIPT)
+    if(NOT "-node" IN_LIST zSwigArguments)
+      list(APPEND zSwigArguments "-node")
+    endif()
+  endif()
+
+  set(sSwigCxxWrap "${sSwigOutputDir}/${sSwigInterfaceWle}_wrap.cxx")
+  execute_process(
+    COMMAND "${SWIG_EXECUTABLE}"
+            "-c++"                   "-o"      "${sSwigCxxWrap}"
+            "-${sSwigLanguageLower}" "-outdir" "${sSwigOutputDir}"
+            ${zSwigArguments}
+            "${sSwigInterface}"
+    RESULTS_VARIABLE sResultCode)
+  if(NOT sResultCode EQUAL 0)
+    message(FATAL_ERROR "Gennerate SWIG ${sSwigLanguage} files failed: ${sResultCode}")
+  endif()
+
+  #-----------------------------------------------------------------------------
+  # 添加目标并配置
+
+  if(NOT DEFINED zIncludeDirectories)
+    set(zIncludeDirectories INCLUDE_DIRECTORIES)
+  endif()
+  list(APPEND zIncludeDirectories PRIVATE "${sSwigOutputDir}")
+
+  if(NOT DEFINED zSources)
+    set(zSources SOURCES)
+  endif()
+  list(APPEND zSources PRIVATE "${sSwigInterface}" "${sSwigCxxWrap}")
+  source_group("generated" FILES "${sSwigCxxWrap}")
+
+  # add_library_con
+  add_library_con(
+    "${sName}" ${zArgumentsOfAddLibrary}
+    ${zProperties}
+    ${zCompileDefinitions}
+    ${zCompileFeatures}
+    ${zCompileOptions}
+    ${zIncludeDirectories}
+    ${zLinkDirectories}
+    ${zLinkLibraries}
+    ${zLinkOptions}
+    ${zSources})
+
 endfunction()
