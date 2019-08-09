@@ -343,7 +343,7 @@ function(add_executable_con _NAME)
     ${zSources}
   )
 
-  post_build_copy_link_files("${sName}" RECURSE)
+  post_build_copy_link_files("${sName}" INCLUDE_ITSELF RECURSE)
 
   get_toolset_architecture_address_model_tag(sTag)
   install(

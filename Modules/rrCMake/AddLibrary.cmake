@@ -360,7 +360,7 @@ function(add_library_con _NAME)
     ${zLinkOptions}
     ${zSources})
 
-  post_build_copy_link_files("${sName}" RECURSE)
+  post_build_copy_link_files("${sName}" INCLUDE_ITSELF RECURSE)
 
   get_toolset_architecture_address_model_tag(sTag)
   install(
@@ -607,6 +607,6 @@ function(add_library_swig _NAME)
             ${zSwigArguments}
             "${sSwigInterface}")
 
-  post_build_copy_link_files("${sName}" RECURSE DESTINATION "${sSwigOutputDir}")
+  post_build_copy_link_files("${sName}" INCLUDE_ITSELF RECURSE DESTINATION "${sSwigOutputDir}")
 
 endfunction()

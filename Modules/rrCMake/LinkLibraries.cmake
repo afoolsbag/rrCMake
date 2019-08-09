@@ -16,10 +16,11 @@ include_guard()  # 3.10
 #   .. code-block:: cmake
 #
 #     get_link_libraries(
-#       <variable> <target> [RECURSE]
+#       <variable> <target> [INCLUDE_ITSELF] [RECURSE]
 #     )
 function(get_link_libraries _VARIABLE _TARGET)
-  set(zOptKws    RECURSE)
+  set(zOptKws    INCLUDE_ITSELF
+                 RECURSE)
   set(zOneValKws)
   set(zMutValKws)
   cmake_parse_arguments(PARSE_ARGV 2 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
@@ -42,6 +43,9 @@ function(get_link_libraries _VARIABLE _TARGET)
     message(FATAL_ERROR "The name isn't a target: ${_TARGET}.")
   endif()
 
+  # INCLUDE_ITSELF
+  set(sIncludeItself ${_INCLUDE_ITSELF})
+
   # RECURSE
   set(sRecurse ${_RECURSE})
 
@@ -50,9 +54,13 @@ function(get_link_libraries _VARIABLE _TARGET)
 
   if(sRecurse)
 
-    set(zRecItems)                                              # recursive
     get_target_property(zNonItems "${sTarget}" LINK_LIBRARIES)  # non-recursive
+    if(sIncludeItself)
+      list(APPEND zNonItems "${sTarget}")
+    endif()
     list(REMOVE_DUPLICATES zNonItems)
+
+    set(zRecItems)                                              # recursive
 
     while(zNonItems)
       foreach(sNonItem IN LISTS zNonItems)
@@ -77,6 +85,9 @@ function(get_link_libraries _VARIABLE _TARGET)
   else()
 
     get_target_property(zItems "${sTarget}" LINK_LIBRARIES)
+    if(sIncludeItself)
+      list(APPEND zItems "${sTarget}")
+    endif()
     list(REMOVE_DUPLICATES zItems)
 
     set("${vVariable}" ${zItems} PARENT_SCOPE)
@@ -93,10 +104,11 @@ endfunction()
 #   .. code-block:: cmake
 #
 #     get_link_files(
-#       <variable> <target> [RECURSE]
+#       <variable> <target> [INCLUDE_ITSELF] [RECURSE]
 #     )
 function(get_link_files _VARIABLE _TARGET)
-  set(zOptKws    RECURSE)
+  set(zOptKws    INCLUDE_ITSELF
+                 RECURSE)
   set(zOneValKws)
   set(zMutValKws)
   cmake_parse_arguments(PARSE_ARGV 2 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
@@ -119,6 +131,12 @@ function(get_link_files _VARIABLE _TARGET)
     message(FATAL_ERROR "The name isn't a target: ${_TARGET}.")
   endif()
 
+  # INCLUDE_ITSELF
+  unset(sIncludeItself)
+  if(DEFINED _INCLUDE_ITSELF)
+    set(sIncludeItself INCLUDE_ITSELF)
+  endif()
+
   # RECURSE
   unset(sRecurse)
   if(DEFINED _RECURSE)
@@ -128,7 +146,7 @@ function(get_link_files _VARIABLE _TARGET)
   #-----------------------------------------------------------------------------
   # 查找链接文件
 
-  get_link_libraries(zLibs ${sTarget} ${sRecurse})
+  get_link_libraries(zLibs "${sTarget}" ${sIncludeItself} ${sRecurse})
   unset(zFiles)
 
   foreach(sLib IN LISTS zLibs)
@@ -160,11 +178,13 @@ endfunction()
 #
 #     post_build_copy_link_files(
 #       <target>
+#       [INCLUDE_ITSELF]
 #       [RECURSE]
 #       [DESTINATION <directory>...]
 #     )
 function(post_build_copy_link_files _TARGET)
-  set(zOptKws    RECURSE)
+  set(zOptKws    INCLUDE_ITSELF
+                 RECURSE)
   set(zOneValKws)
   set(zMutValKws DESTINATION)
   cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
@@ -184,6 +204,12 @@ function(post_build_copy_link_files _TARGET)
     message(FATAL_ERROR "The name isn't a target: ${_TARGET}.")
   endif()
 
+  # INCLUDE_ITSELF
+  unset(sIncludeItself)
+  if(DEFINED _INCLUDE_ITSELF)
+    set(sIncludeItself INCLUDE_ITSELF)
+  endif()
+
   # RECURSE
   unset(sRecurse)
   if(DEFINED _RECURSE)
@@ -200,7 +226,7 @@ function(post_build_copy_link_files _TARGET)
   #-----------------------------------------------------------------------------
   # 构建后复制链接库
 
-  get_link_files(zFiles "${sTarget}" ${sRecurse})
+  get_link_files(zFiles "${sTarget}" ${sIncludeItself} ${sRecurse})
   if(zFiles)
     foreach(sDest IN LISTS zDestination)
       add_custom_command(
