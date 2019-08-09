@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-08-08
+# 2016-10-08 – 2019-08-09
 # Unlicense
 
 cmake_minimum_required(VERSION 3.12)
@@ -11,7 +11,7 @@ if(NOT COMMAND get_toolset_architecture_address_model_tag)
   include("${CMAKE_CURRENT_LIST_DIR}/LibraryTag.cmake")
 endif()
 
-if(NOT COMMAND post_build_copy_link_libraries)
+if(NOT COMMAND post_build_copy_link_files)
   include("${CMAKE_CURRENT_LIST_DIR}/LinkLibraries.cmake")
 endif()
 
@@ -19,7 +19,7 @@ endif()
 #.res:
 # .. command:: add_library_ex
 #
-#   添加库目标到项目（add library），扩展功能（extend）。
+#   添加库目标到项目，扩展功能（extend）。
 #
 #   .. code-block:: cmake
 #
@@ -49,6 +49,8 @@ endif()
 #   - `target_link_options <https://cmake.org/cmake/help/latest/command/target_link_options.html>`_
 #   - `target_sources <https://cmake.org/cmake/help/latest/command/target_sources.html>`_
 function(add_library_ex _NAME)
+  set(zOptKws)
+  set(zOneValKws)
   set(zMutValKws PROPERTIES
                  COMPILE_DEFINITIONS
                  COMPILE_FEATURES
@@ -58,7 +60,7 @@ function(add_library_ex _NAME)
                  LINK_LIBRARIES
                  LINK_OPTIONS
                  SOURCES)
-  cmake_parse_arguments(PARSE_ARGV 1 "" "" "" "${zMutValKws}")
+  cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
   #-----------------------------------------------------------------------------
   # 规整化参数
@@ -196,7 +198,7 @@ endfunction()
 #.res:
 # .. command:: add_library_con
 #
-#   添加库目标到项目（add library），遵循惯例（convention）。
+#   添加库目标到项目，遵循惯例（convention）。
 #
 #   .. code-block:: cmake
 #
@@ -219,6 +221,8 @@ endfunction()
 #   - `option <https://cmake.org/cmake/help/latest/command/option.html>`_
 #   - `install <https://cmake.org/cmake/help/latest/command/install.html>`_
 function(add_library_con _NAME)
+  set(zOptKws)
+  set(zOneValKws)
   set(zMutValKws PROPERTIES
                  COMPILE_DEFINITIONS
                  COMPILE_FEATURES
@@ -228,7 +232,7 @@ function(add_library_con _NAME)
                  LINK_LIBRARIES
                  LINK_OPTIONS
                  SOURCES)
-  cmake_parse_arguments(PARSE_ARGV 1 "" "" "" "${zMutValKws}")
+  cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
   #-----------------------------------------------------------------------------
   # 规整化参数
@@ -332,13 +336,15 @@ function(add_library_con _NAME)
   if(NOT DEFINED zProperties)
     set(zProperties PROPERTIES)
   endif()
+  # 在 Debug 构建下，循惯例以 d 后缀。
   if(NOT DEBUG_POSTFIX IN_LIST zProperties)
     list(APPEND zProperties DEBUG_POSTFIX "d")
   endif()
   if(NOT OUTPUT_NAME IN_LIST zProperties)
     list(APPEND zProperties OUTPUT_NAME "${sName}")
   endif()
-  if(NOT PREFIX IN_LIST zProperties AND sType STREQUAL STATIC)
+  # 在 UN*X 系统上，库循惯例以 lib 前缀；在 Windows 系统上，静态库循 Boost 风格以 lib 前缀。
+  if((UNIX OR sType STREQUAL STATIC) AND NOT PREFIX IN_LIST zProperties)
     list(APPEND zProperties PREFIX "lib")
   endif()
 
@@ -354,11 +360,11 @@ function(add_library_con _NAME)
     ${zLinkOptions}
     ${zSources})
 
-  post_build_copy_link_libraries("${sName}" RECURSE)
+  post_build_copy_link_files("${sName}" RECURSE)
 
   get_toolset_architecture_address_model_tag(sTag)
   install(
-    TARGETS             ${sName}
+    TARGETS             "${sName}"
     ARCHIVE DESTINATION "lib/${sTag}$<$<CONFIG:Debug>:d>/"
     LIBRARY DESTINATION "lib/${sTag}$<$<CONFIG:Debug>:d>/"
     RUNTIME DESTINATION "bin/${sTag}$<$<CONFIG:Debug>:d>/")
@@ -368,7 +374,7 @@ endfunction()
 #.res:
 # .. command:: add_library_swig
 #
-#   添加库目标到项目（add library），扩展 SWIG 功能。
+#   添加库目标到项目，扩展 SWIG 功能。
 #
 #   .. code-block:: cmake
 #
@@ -393,6 +399,7 @@ endfunction()
 #
 #   - :command:`add_library_con`
 function(add_library_swig _NAME)
+  set(zOptKws)
   set(zOneValKws SWIG_LANGUAGE
                  SWIG_INTERFACE
                  SWIG_OUTPUT_DIR)
@@ -406,7 +413,7 @@ function(add_library_swig _NAME)
                  LINK_LIBRARIES
                  LINK_OPTIONS
                  SOURCES)
-  cmake_parse_arguments(PARSE_ARGV 1 "" "" "${zOneValKws}" "${zMutValKws}")
+  cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
   #-----------------------------------------------------------------------------
   # 规整化参数
@@ -457,7 +464,7 @@ function(add_library_swig _NAME)
   endif()
 
   if(NOT IS_DIRECTORY "${sSwigOutputDir}")
-    message(WARNING "The SWIG output directory isn't a directory: ${_SWIG_OUTPUT_DIR}.")
+    message(FATAL_ERROR "The SWIG output directory isn't a directory: ${_SWIG_OUTPUT_DIR}.")
   endif()
 
   # SWIG_ARGUMENTS
@@ -537,6 +544,16 @@ function(add_library_swig _NAME)
     endif()
   endif()
 
+  if(sSwigLanguage STREQUAL JAVA)
+    find_package(JNI)
+    if(JNI_FOUND)
+      if(NOT DEFINED zIncludeDirectories)
+        set(zIncludeDirectories INCLUDE_DIRECTORIES)
+      endif()
+      list(APPEND zIncludeDirectories PRIVATE "${JAVA_INCLUDE_PATH}" "${JAVA_INCLUDE_PATH2}")
+    endif()
+  endif()
+
   if(sSwigLanguage STREQUAL JAVASCRIPT)
     if(NOT "-node" IN_LIST zSwigArguments)
       list(APPEND zSwigArguments "-node")
@@ -589,5 +606,7 @@ function(add_library_swig _NAME)
             "-${sSwigLanguageLower}" "-outdir" "${sSwigOutputDir}"
             ${zSwigArguments}
             "${sSwigInterface}")
+
+  post_build_copy_link_files("${sName}" RECURSE DESTINATION "${sSwigOutputDir}")
 
 endfunction()
