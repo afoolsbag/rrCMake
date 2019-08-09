@@ -43,7 +43,7 @@ function(get_link_libraries _VARIABLE _TARGET)
   endif()
 
   # RECURSE
-  set(sRecurse "${_RECURSE}")
+  set(sRecurse ${_RECURSE})
 
   #-----------------------------------------------------------------------------
   # 查找链接库
@@ -201,13 +201,14 @@ function(post_build_copy_link_files _TARGET)
   # 构建后复制链接库
 
   get_link_files(zFiles "${sTarget}" ${sRecurse})
-
-  foreach(sDest IN LISTS zDestination)
-    add_custom_command(
-      TARGET "${sTarget}" POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" "-E" "copy_if_different"
-              ${zFiles}
-              "${sDest}"
-      COMMENT "Copying link files to ${sDest}...")
-  endforeach()
+  if(zFiles)
+    foreach(sDest IN LISTS zDestination)
+      add_custom_command(
+        TARGET "${sTarget}" POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" "-E" "copy_if_different"
+                ${zFiles}
+                "${sDest}"
+        COMMENT "Copying link files to ${sDest}...")
+    endforeach()
+  endif()
 endfunction()
