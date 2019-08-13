@@ -468,7 +468,7 @@ function(add_library_swig _NAME)
   endif()
 
   # SWIG_ARGUMENTS
-  set(zSwigArguments ${SWIG_ARGUMENTS})
+  set(zSwigArguments ${_SWIG_ARGUMENTS})
 
   # PROPERTIES
   unset(zProperties)
@@ -531,12 +531,14 @@ function(add_library_swig _NAME)
 
   find_package(SWIG REQUIRED)  # CMP0074 3.12
 
+  # C#
   if(sSwigLanguage STREQUAL CSHARP)
     if(NOT "-dllimport" IN_LIST zSwigArguments)
       list(APPEND zSwigArguments "-dllimport" "${sName}$<$<CONFIG:Debug>:d>")
     endif()
   endif()
 
+  # Go
   if(sSwigLanguage STREQUAL GO)
     if(NOT "-intgosize" IN_LIST zSwigArguments)
       math(EXPR sIntGoZize "8 * ${CMAKE_SIZEOF_VOID_P}")
@@ -544,6 +546,7 @@ function(add_library_swig _NAME)
     endif()
   endif()
 
+  # Java
   if(sSwigLanguage STREQUAL JAVA)
     find_package(JNI)
     if(JNI_FOUND)
@@ -554,6 +557,7 @@ function(add_library_swig _NAME)
     endif()
   endif()
 
+  # JavaScript
   if(sSwigLanguage STREQUAL JAVASCRIPT)
     if(NOT "-node" IN_LIST zSwigArguments)
       list(APPEND zSwigArguments "-node")
@@ -586,7 +590,6 @@ function(add_library_swig _NAME)
   list(APPEND zSources PRIVATE "${sSwigInterface}" "${sSwigCxxWrap}")
   source_group("generated" FILES "${sSwigCxxWrap}")
 
-  # add_library_con
   add_library_con(
     "${sName}" ${zArgumentsOfAddLibrary}
     ${zProperties}
