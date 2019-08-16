@@ -27,25 +27,24 @@ CMake
 风格
 ----
 
-变量名
+**变量**
 
-- 内容为字符串，前缀 ``s`` 小驼峰（``sStrVar``）
+变量名采用小驼峰、匈牙利风格（``tLowerCamelCase``）；
+除非特别说明，取变量值一般建议括上引号（``"${tLowerCamelCase}"``），空值会被解析为空字符串（``""``）占位而不是忽略；
+前缀一般含义如下：
 
-- 内容为字符串列表，前缀 ``z`` 小驼峰（``zStrsVar``）
+- 前缀 ``b`` 暗示变量值用作真假值（``bBoolean``）
+- 前缀 ``e`` 暗示变量值用作表达式（``eExpression``）
+- 前缀 ``n`` 暗示变量值用作数字（``nNumber``）
+- 前缀 ``o`` 暗示变量值用作选项（``oOption``），若为空则应被忽略，在解引用时不应括上引号（``${oOption}``）
+- 前缀 ``r`` 暗示变量值用作正则表达式（``rRegularExpression``）
+- 前缀 ``s`` 暗示变量值用作字符串（``sString``）
+- 前缀 ``p`` 暗示变量值用作路径（``pPath``）
+- 前缀 ``t`` 暗示变量值用作目标（``tTarget``）
+- 前缀 ``v`` 暗示变量值用作变量名（``vVariable``）
+- 前缀 ``z`` 暗示变量值用作字符串列表（``zStringList``），在解引用时一般不括上引号（``${zStringList}``）
 
-- 内容为变量名，前缀 ``v`` 小驼峰（``vVarVar``）
-
-- 内容为变量名列表，前缀 ``w`` 小驼峰（``wVarsVar``）
-
-变量值
-
-- 取字符串变量的值建议括上引号（``"${sStrVar}"``），空值会被正确解析为空字符串（``""``）
-
-  相应的，若希望忽略空值，则不要括起（``${sOptionalProperty}``）
-
-- 取变量名变量的值也建议括上引号（``${vVarVar}``），空值会被解析为空字符串作为占位符，利于参数检查
-
-- 取列表变量的值避免括上引号（``${zStrsVar}``），除非刻意将列表字符串化
+任何变量值都是字符串，前缀用于暗示该字符串接受的处理方式，并无强制性。
 
 Conan
 -----
@@ -58,7 +57,7 @@ Conan
 `CMake-Conan <https://github.com/conan-io/cmake-conan>`_
 
 Hunter
------
+------
 
 `Hunter <https://docs.hunter.sh/>`_
 
@@ -71,9 +70,7 @@ reStructuredText
 `reStructuredText <http://docutils.sourceforge.net/rst.html>`_
 
 - `Quick reStructuredText <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_
-
 - `reStructuredText Markup Specification <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html>`_
-
 - `Online reStructuredText editor <http://rst.ninjs.org/>`_
 
 许可

@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-04-15 – 2019-08-09
+# 2019-04-15 – 2019-08-16
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -133,13 +133,13 @@ function(get_link_files _VARIABLE _TARGET)
 
   # INCLUDE_ITSELF
   unset(sIncludeItself)
-  if(DEFINED _INCLUDE_ITSELF)
+  if(_INCLUDE_ITSELF)
     set(sIncludeItself INCLUDE_ITSELF)
   endif()
 
   # RECURSE
   unset(sRecurse)
-  if(DEFINED _RECURSE)
+  if(_RECURSE)
     set(sRecurse RECURSE)
   endif()
 
@@ -206,13 +206,13 @@ function(post_build_copy_link_files _TARGET)
 
   # INCLUDE_ITSELF
   unset(sIncludeItself)
-  if(DEFINED _INCLUDE_ITSELF)
+  if(_INCLUDE_ITSELF)
     set(sIncludeItself INCLUDE_ITSELF)
   endif()
 
   # RECURSE
   unset(sRecurse)
-  if(DEFINED _RECURSE)
+  if(_RECURSE)
     set(sRecurse RECURSE)
   endif()
 

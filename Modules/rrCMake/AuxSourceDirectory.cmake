@@ -1,19 +1,17 @@
 # zhengrr
-# 2016-10-08 – 2019-04-16
+# 2016-10-08 – 2019-08-16
 # Unlicense
 
 cmake_minimum_required(VERSION 3.14)
 cmake_policy(VERSION 3.14)
 
-include_guard()
+include_guard()  # 3.10
 
 if(NOT COMMAND check_name_with_fext_rules)
   include("${CMAKE_CURRENT_LIST_DIR}/CheckName.cmake")
 endif()
 
-#-------------------------------------------------------------------------------
-# FUNCTIONS
-
+#===============================================================================
 #.rst
 # .. command:: aux_source_directory_ex
 #
@@ -54,106 +52,172 @@ function(aux_source_directory_ex _DIRECTORY _VARIABLE)
                  EXTENSIONS
                  PROPERTIES)
   cmake_parse_arguments(PARSE_ARGV 2 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
+
+  #-----------------------------------------------------------------------------
+  # 规整化参数
+
+  # UNPARSED_ARGUMENTS 
   if(DEFINED _UNPARSED_ARGUMENTS)
     message(FATAL_ERROR "Unexpected arguments: ${_UNPARSED_ARGUMENTS}.")
   endif()
 
-  if(NOT IS_ABSOLUTE "${_DIRECTORY}")
-    set(_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/${_DIRECTORY}")
-  endif()
-  if(NOT IS_DIRECTORY "${_DIRECTORY}")
-    message(WARNING "The path isn't a directory: ${_DIRECTORY}.")
+  # DIRECTORY
+  set(pDirectory "${_DIRECTORY}")
+
+  if(NOT IS_ABSOLUTE "${pDirectory}")
+    set(pDirectory "${CMAKE_CURRENT_SOURCE_DIR}/${pDirectory}")
   endif()
 
+  if(NOT IS_DIRECTORY "${pDirectory}")
+    message(WARNING "The directory isn't a directory: ${_DIRECTORY}.")
+  endif()
+
+  # VARIABLE
+  set(vVariable "${_VARIABLE}")
+
+  # RECURSE
   if(_RECURSE)
-    set(_RECURSE GLOB_RECURSE)
+    set(oRecurse GLOB_RECURSE)
   else()
-    set(_RECURSE GLOB)
+    set(oRecurse GLOB)
   endif()
 
-  set(zExts)
-  if(NOT _EXPLICIT)
-    list(APPEND zExts ".in" ".dox" ".md")
-    get_property(zLangs GLOBAL PROPERTY ENABLED_LANGUAGES)
-    if(C IN_LIST zLangs)
-      list(APPEND zExts ".h" ".c" ".inl")
-    endif()
-    if(CXX IN_LIST zLangs)
-      list(APPEND zExts ".hpp" ".cpp" ".hh"  ".cc"  ".hxx" ".cxx" ".hp"  ".cp"
-                        ".HPP" ".CPP" ".H"   ".C"   ".h++" ".c++" ".h"   ".inl")
-    endif()
-  endif()
-  if(DEFINED _EXTENSIONS)
-    foreach(sExt ${_EXTENSIONS})
-      check_name_with_fext_rules("${sExt}" SEND_ERROR)
-      list(APPEND zExts "${sExt}")
-    endforeach()
-  endif()
-  list(REMOVE_DUPLICATES zExts)
-
-  if(NOT DEFINED _PREFIX)
-    set(_PREFIX "/")
+  # MATCHES
+  unset(zMatches)
+  if(DEFINED _MATCHES)
+    set(zMatches "${_MATCHES}")
   endif()
 
-  set(zResults)
-  foreach(sExt ${zExts})
-    file(${_RECURSE} zFiles CONFIGURE_DEPENDS "${_DIRECTORY}/*${sExt}")
-    foreach(sFile IN LISTS zFiles)
-      if(DEFINED _MATCHES OR DEFINED _CLASHES)
-        get_filename_component(sBase "${sFile}" NAME_WLE)
+  # CLASHES
+  unset(zClashes)
+  if(DEFINED _CLASHES)
+    set(zClashes "${_CLASHES}")
+  endif()
 
-        if(DEFINED _MATCHES)
-          set(sPass FALSE)
-          foreach(sRegex IN LISTS _MATCHES)
-            if(sBase MATCHES "${sRegex}")
-              set(sPass TRUE)
-              break()
-            endif()
-          endforeach()
-          if(NOT sPass)
-            continue()
-          endif()
-        endif()
+  # EXPLICIT
+  set(bExplicit "${_EXPLICIT}")
 
-        if(DEFINED _CLASHES)
-          set(sPass TRUE)
-          foreach(sRegex IN LISTS _CLASHES)
-            if(sBase MATCHES "${sRegex}")
-              set(sPass FALSE)
-              break()
-            endif()
-          endforeach()
-          if(NOT sPass)
-            continue()
-          endif()
-        endif()
-      endif()
+  # EXTENSIONS
+  set(zExtensions ${_EXTENSIONS})
 
-      if(_FLAT)
-        source_group("${_PREFIX}" FILES "${sFile}")
-      else()
-        source_group(TREE "${_DIRECTORY}" PREFIX "${_PREFIX}" FILES "${sFile}")
-      endif()
-
-      list(APPEND zResults "${sFile}")
-
-    endforeach()
+  foreach(sExt IN LISTS zExtensions)
+    check_name_with_fext_rules("${sExt}" FATAL_ERROR)
   endforeach()
-  if(zResults)
-    list(REMOVE_DUPLICATES zResults)
+
+  # FLAT
+  set(bFlat "${_FLAT}")
+
+  # PREFIX
+  if(DEFINED _PREFIX)
+    set(sPrefix "${_PREFIX}")
+  else()
+    set(sPrefix "/")
   endif()
 
+  # PROPERTIES
+  unset(zProperties)
   if(DEFINED _PROPERTIES)
     list(LENGTH _PROPERTIES sLen)
     if(sLen EQUAL 0)
       message(WARNING "Keyword PROPERTIES is used, but without value.")
     endif()
-    set_source_files_properties(${zResults} PROPERTIES ${_PROPERTIES})
+    set(zProperties PROPERTIES ${_PROPERTIES})
   endif()
 
-  set(${_VARIABLE} ${zResults} PARENT_SCOPE)
+  #-----------------------------------------------------------------------------
+  # 扩展名
+
+  if(NOT bExplicit)
+    get_property(zLangs GLOBAL PROPERTY ENABLED_LANGUAGES)
+
+    list(APPEND zExtensions ".in"   # 配置文件输入文件
+                            ".dox"  # Doxygen 文档文件
+                            ".md")  # Markdown 文档文件
+
+    # C
+    if(C IN_LIST zLangs)
+      list(APPEND zExtensions ".h"    # 头文件
+                              ".c"    # 源文件
+                              ".inl") # 内联实现文件
+    endif()
+
+    # C++
+    if(CXX IN_LIST zLangs)
+      list(APPEND zExtensions ".hpp" ".hxx" ".hp" ".hh" ".h++" ".H" ".h"    # 头文件
+                              ".cpp" ".cxx" ".cp" ".cc" ".c++" ".C"         # 源文件
+                              ".tpp"                                ".inc"  # 模板实现文件
+                                                                    ".inl") # 内联实现文件
+    endif()
+  endif()
+
+  if(zExtensions)
+    list(REMOVE_DUPLICATES zExtensions)
+  endif()
+
+  #-----------------------------------------------------------------------------
+  # 文件搜集
+
+  set(zResults)
+  foreach(sExt IN LISTS zExtensions)
+    file(${oRecurse} zFiles CONFIGURE_DEPENDS "${pDirectory}/*${sExt}")
+    foreach(pFile IN LISTS zFiles)
+
+      if(DEFINED zMatches OR DEFINED zClashes)
+        get_filename_component(sBase "${pFile}" NAME_WLE)
+      endif()
+
+      if(DEFINED zMatches)
+        set(bPass FALSE)
+        foreach(rMatch IN LISTS zMatches)
+          if(sBase MATCHES "${rMatch}")
+            set(bPass TRUE)
+            break()
+          endif()
+        endforeach()
+        if(NOT bPass)
+          continue()
+        endif()
+      endif()
+
+      if(DEFINED zClashes)
+        set(bPass TRUE)
+        foreach(rClash IN LISTS zClashes)
+          if(sBase MATCHES "${rClash}")
+            set(bPass FALSE)
+            break()
+          endif()
+        endforeach()
+        if(NOT bPass)
+          continue()
+        endif()
+      endif()
+
+      list(APPEND zResults "${pFile}")
+
+    endforeach()
+  endforeach()
+
+  if(zResults)
+    list(REMOVE_DUPLICATES zResults)
+  endif()
+
+  #-----------------------------------------------------------------------------
+  # 收尾
+
+  if(bFlat)
+    source_group("${sPrefix}" FILES ${zResults})
+  else()
+    source_group(TREE "${pDirectory}" PREFIX "${sPrefix}" FILES ${zResults})
+  endif()
+
+  if(DEFINED zProperties)
+    set_source_files_properties(${zResults} PROPERTIES ${zProperties})
+  endif()
+
+  set("${vVariable}" ${zResults} PARENT_SCOPE)
 endfunction()
 
+#===============================================================================
 #.rst
 # .. command:: aux_source_directory_con
 #
