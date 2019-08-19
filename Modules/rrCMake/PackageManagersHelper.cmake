@@ -63,8 +63,8 @@ macro(include_hunter_gate_script)
 
   # https://github.com/ruslo/hunter/releases
   HunterGate(
-    URL  "https://github.com/ruslo/hunter/archive/v0.23.205.tar.gz"
-    SHA1 "eba80d3028c856c6bedb5d8d9627b1b3bba19634")
+    URL "https://github.com/ruslo/hunter/archive/v0.23.211.tar.gz"
+    SHA1 "c022f0c2480e835a6bafdd734035ec2071b51897")
 
   # 默认将 Hunter 参数隐藏到 Advanced
   mark_as_advanced(HUNTER_CONFIGURATION_TYPES

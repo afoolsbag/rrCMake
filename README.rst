@@ -46,24 +46,6 @@ CMake
 
 任何变量值都是字符串，前缀用于暗示该字符串接受的处理方式，并无强制性。
 
-Conan
------
-
-`Conan <https://conan.io/>`_
-
-- `conan-center <https://bintray.com/conan/conan-center>`_
-- `CONAN_USER_HOME <https://docs.conan.io/en/latest/reference/env_vars.html#conan-user-home>`_
-
-`CMake-Conan <https://github.com/conan-io/cmake-conan>`_
-
-Hunter
-------
-
-`Hunter <https://docs.hunter.sh/>`_
-
-- `All packages <https://docs.hunter.sh/en/latest/packages/all.html>`_
-- `HUNTER_ROOT <https://github.com/hunter-packages/gate#effects>`_
-
 reStructuredText
 ----------------
 
@@ -72,6 +54,48 @@ reStructuredText
 - `Quick reStructuredText <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_
 - `reStructuredText Markup Specification <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html>`_
 - `Online reStructuredText editor <http://rst.ninjs.org/>`_
+
+C/C++ 包管理工具
+----------------
+
+`The State of Package Management in C++ - Mathieu Ropert [ACCU 2019] <https://youtube.com/watch?v=k99_qbB2FvM>`_
+
+cget
+````
+
+`cget <https://cget.readthedocs.io/>`_
+
+Conan
+`````
+
+`Conan <https://conan.io/>`_ 采用非侵入式设计，需要安装；
+
+Conan 通过指定 ``conanfile.txt`` 的 ``[generators]`` 为 ``cmake_paths``，
+并设定 CMake 的 ``CMAKE_TOOLCHAIN_FILE`` 变量为 ``/.../conan_paths.cmake`` 实现非侵入式设计；
+
+Conan 通过设定 `CONAN_USER_HOME <https://docs.conan.io/en/latest/reference/env_vars.html#conan-user-home>`_ 环境变量指定库存储位置；
+
+Conan 提供 `CMake-Conan <https://github.com/conan-io/cmake-conan>`_ 脚本，侵入式地包装 Conan 命令为 CMake 命令；
+
+Conan 提供 `conan-center <https://bintray.com/conan/conan-center>`_ 资源库。
+
+Hunter
+``````
+
+`Hunter <https://hunter.sh/>`_ 使用纯 CMake 实现，采用侵入式设计，无需安装；
+
+Hunter 通过设定 `HUNTER_ROOT <https://github.com/hunter-packages/gate#effects>`_ 环境变量指定库存储位置；
+
+Hunter 支持的库列表可以在 `All packages <https://hunter.sh/en/latest/packages/all.html>`_ 找到。
+
+vcpkg
+`````
+
+`vcpkg <https://vcpkg.readthedocs.io/>`_ 采用非侵入式设计，需要安装。
+
+vcpkg 通过设定 CMake 的 ``CMAKE_TOOLCHAIN_FILE`` 变量为 ``/.../vcpkg/scripts/buildsystems/vcpkg.cmake`` 实现非侵入式设计；
+
+vcpkg 通过设定 `VCPKG_DOWNLOADS <https://vcpkg.readthedocs.io/en/latest/users/config-environment/>`_ 环境变量指定库下载位置。
 
 许可
 ----
