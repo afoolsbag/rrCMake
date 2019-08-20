@@ -5,7 +5,7 @@
 # | |   | | | | | (_| | |   | | | | | | | | |_) |  __/ (_| |
 # \_|   |_|_| |_|\__,_\_|   \_| |_| |_| |_| .__/ \___|\__, |
 # zhengrr                                 | |          __/ |
-# 2019-08-19 – 2019-08-19                 |_|         |___/
+# 2019-08-19 – 2019-08-20                 |_|         |___/
 # Unlicense
 
 cmake_minimum_required(VERSION 3.12)
@@ -38,8 +38,8 @@ endif()
 # ``FFmpeg::avdevice``
 #   The avdevice library, if found.
 #
-# ``FFmpeg::libavfilter``
-#   The libavfilter library, if found.
+# ``FFmpeg::avfilter``
+#   The avfilter library, if found.
 #
 # ``FFmpeg::avformat``
 #   The avformat library, if found.
