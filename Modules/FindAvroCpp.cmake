@@ -5,13 +5,13 @@
 # | |   | | | | | (_| | | | |\ V /| | | (_) | \__/\ |_) | |_) |
 # \_|   |_|_| |_|\__,_\_| |_/ \_/ |_|  \___/ \____/ .__/| .__/
 # zhengrr                                         | |   | |
-# 2018-04-02 – 2019-07-08                         |_|   |_|
+# 2018-04-02 – 2019-09-16                         |_|   |_|
 # Unlicense
 
 cmake_minimum_required(VERSION 3.12)
 cmake_policy(VERSION 3.12)
 
-include_guard()
+include_guard()  # 3.10
 
 if(NOT COMMAND find_package_handle_standard_args)
   include(FindPackageHandleStandardArgs)
