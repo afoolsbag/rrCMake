@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-04-15 – 2019-08-16
+# 2019-04-15 – 2019-09-18
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -28,7 +28,7 @@ function(get_link_libraries _VARIABLE _TARGET)
   #-----------------------------------------------------------------------------
   # 规整化参数
 
-  # UNPARSED_ARGUMENTS 
+  # UNPARSED_ARGUMENTS
   if(DEFINED _UNPARSED_ARGUMENTS)
     message(FATAL_ERROR "Unexpected arguments: ${_UNPARSED_ARGUMENTS}.")
   endif()
@@ -37,62 +37,67 @@ function(get_link_libraries _VARIABLE _TARGET)
   set(vVariable "${_VARIABLE}")
 
   # TARGET
-  set(sTarget "${_TARGET}")
-
-  if(NOT TARGET "${sTarget}")
+  set(tTarget "${_TARGET}")
+  if(NOT TARGET "${tTarget}")
     message(FATAL_ERROR "The name isn't a target: ${_TARGET}.")
   endif()
 
   # INCLUDE_ITSELF
-  set(sIncludeItself ${_INCLUDE_ITSELF})
+  set(bIncludeItself ${_INCLUDE_ITSELF})
 
   # RECURSE
-  set(sRecurse ${_RECURSE})
+  set(bRecurse ${_RECURSE})
 
   #-----------------------------------------------------------------------------
   # 查找链接库
 
-  if(sRecurse)
+  # 获取直接依赖
+  get_target_property(sType "${tTarget}" TYPE)
+  if(sType STREQUAL INTERFACE_LIBRARY)
+    get_target_property(zItems "${tTarget}" INTERFACE_LINK_LIBRARIES)
+  else()
+    get_target_property(zTemps1 "${tTarget}" INTERFACE_LINK_LIBRARIES)
+    get_target_property(zTemps2 "${tTarget}" LINK_LIBRARIES)
+	set(zItems ${zTemps1} ${zTemps2})
+  endif()
 
-    get_target_property(zNonItems "${sTarget}" LINK_LIBRARIES)  # non-recursive
-    if(sIncludeItself)
-      list(APPEND zNonItems "${sTarget}")
-    endif()
-    list(REMOVE_DUPLICATES zNonItems)
+  if(bIncludeItself)
+    list(APPEND zItems "${tTarget}")
+  endif()
 
-    set(zRecItems)                                              # recursive
+  list(REMOVE_DUPLICATES zItems)
 
-    while(zNonItems)
-      foreach(sNonItem IN LISTS zNonItems)
-        if(TARGET "${sNonItem}")
-          get_target_property(sType "${sNonItem}" TYPE)
+  # 获取间接依赖
+  if(bRecurse)
+    set(zTodos ${zItems})
+    set(zDones)
+
+	list(LENGTH zTodos nLen)
+    while(NOT nLen EQUAL 0)
+      foreach(sTodo IN LISTS zTodos)
+        if(TARGET "${sTodo}")
+          get_target_property(sType "${sTodo}" TYPE)
           if(sType STREQUAL INTERFACE_LIBRARY)
-            get_target_property(zTmpItems "${sNonItem}" INTERFACE_LINK_LIBRARIES)
-            list(APPEND zNonItems ${zTmpItems})
+            get_target_property(zTemps "${sTodo}" INTERFACE_LINK_LIBRARIES)
+            list(APPEND zTodos ${zTemps})
           else()
-            get_target_property(zTmpItems "${sNonItem}" LINK_LIBRARIES)
-            list(APPEND zNonItems ${zTmpItems})
+            get_target_property(zTemps1 "${sTodo}" INTERFACE_LINK_LIBRARIES)
+            get_target_property(zTemps2 "${sTodo}" LINK_LIBRARIES)
+            list(APPEND zTodos ${zTemps1} ${zTemps2})
           endif()
         endif()
-        list(APPEND zRecItems "${sNonItem}")
+        list(APPEND zDones "${sTodo}")
       endforeach()
-      list(REMOVE_DUPLICATES zNonItems)
-      list(REMOVE_ITEM zNonItems ${zRecItems})
+
+      list(REMOVE_DUPLICATES zTodos)
+      list(REMOVE_ITEM zTodos ${zDones})
+	  list(LENGTH zTodos nLen)
     endwhile()
 
-    set("${vVariable}" ${zRecItems} PARENT_SCOPE)
-
-  else()
-
-    get_target_property(zItems "${sTarget}" LINK_LIBRARIES)
-    if(sIncludeItself)
-      list(APPEND zItems "${sTarget}")
-    endif()
-    list(REMOVE_DUPLICATES zItems)
-
-    set("${vVariable}" ${zItems} PARENT_SCOPE)
-
+	set(zItems ${zDones})
   endif()
+
+  set("${vVariable}" ${zItems} PARENT_SCOPE)
 endfunction()
 
 #===============================================================================
@@ -125,28 +130,28 @@ function(get_link_files _VARIABLE _TARGET)
   set(vVariable "${_VARIABLE}")
 
   # TARGET
-  set(sTarget "${_TARGET}")
-
-  if(NOT TARGET "${sTarget}")
+  set(tTarget "${_TARGET}")
+  if(NOT TARGET "${tTarget}")
     message(FATAL_ERROR "The name isn't a target: ${_TARGET}.")
   endif()
 
   # INCLUDE_ITSELF
-  unset(sIncludeItself)
+  unset(oIncludeItself)
   if(_INCLUDE_ITSELF)
-    set(sIncludeItself INCLUDE_ITSELF)
+    set(oIncludeItself INCLUDE_ITSELF)
   endif()
 
   # RECURSE
-  unset(sRecurse)
+  unset(oRecurse)
   if(_RECURSE)
-    set(sRecurse RECURSE)
+    set(oRecurse RECURSE)
   endif()
 
   #-----------------------------------------------------------------------------
   # 查找链接文件
 
-  get_link_libraries(zLibs "${sTarget}" ${sIncludeItself} ${sRecurse})
+  get_link_libraries(zLibs "${sTarget}" ${oIncludeItself} ${oRecurse})
+
   unset(zFiles)
 
   foreach(sLib IN LISTS zLibs)
@@ -165,6 +170,7 @@ function(get_link_files _VARIABLE _TARGET)
   endforeach()
 
   list(REMOVE_DUPLICATES zFiles)
+
   set("${vVariable}" ${zFiles} PARENT_SCOPE)
 endfunction()
 
