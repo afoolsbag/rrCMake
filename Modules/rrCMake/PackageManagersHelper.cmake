@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-06-05 – 2019-07-30
+# 2019-06-05 – 2019-10-14
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -63,8 +63,8 @@ macro(include_hunter_gate_script)
 
   # https://github.com/ruslo/hunter/releases
   HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.23.211.tar.gz"
-    SHA1 "c022f0c2480e835a6bafdd734035ec2071b51897")
+    URL  "https://github.com/ruslo/hunter/archive/v0.23.214.tar.gz"
+    SHA1 "e14bc153a7f16d6a5eeec845fb0283c8fad8c358")
 
   # 默认将 Hunter 参数隐藏到 Advanced
   mark_as_advanced(HUNTER_CONFIGURATION_TYPES
