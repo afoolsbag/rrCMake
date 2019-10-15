@@ -1,16 +1,17 @@
 # zhengrr
-# 2017-12-18 – 2019-04-17
+# 2017-12-18 – 2019-10-15
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
 cmake_policy(VERSION 3.10)
 
-include_guard()
+include_guard()  # 3.10
 
 if(NOT COMMAND check_name_with_cmake_rules)
   include("${CMAKE_CURRENT_LIST_DIR}/CheckName.cmake")
 endif()
 
+#===============================================================================
 #.rst:
 # .. command:: add_subdirectory_con
 #
@@ -19,34 +20,70 @@ endif()
 #   .. code-block:: cmake
 #
 #     add_subdirectory_con(
-#       <argument>...
-#       [PREFIX <option-prefix>]
+#       <argument-of-add-subdirectory>...
+#       [OPTION_PREFIX  <option-prefix>]
+#       [OPTION_INITIAL <option-initial>]
 #     )
 #
 #   参见：
 #
 #   - `add_subdirectory <https://cmake.org/cmake/help/latest/command/add_subdirectory.html>`_
 function(add_subdirectory_con _SOURCE_DIRECTORY)
-  set(zOneValKws PREFIX)
-  cmake_parse_arguments(PARSE_ARGV 1 "" "" "${zOneValKws}" "")
+  set(zOptKws)
+  set(zOneValKws OPTION_PREFIX
+                 OPTION_INITIAL)
+  set(zMutValKws)
+  cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  string(TOUPPER ${_SOURCE_DIRECTORY} _SOURCE_DIRECTORY_UPPER)
+  #-----------------------------------------------------------------------------
+  # 规整化参数
 
-  set(vOptName ${_SOURCE_DIRECTORY_UPPER})
-  if(DEFINED _PREFIX)
-    set(vOptName ${_PREFIX}_${vOptName})
+  # SOURCE_DIRECTORY
+  set(pSourceDirectory "${_SOURCE_DIRECTORY}")
+
+  string(TOUPPER "${pSourceDirectory}" sSourceDirectoryUpper)
+
+  # ARGUMENTS_OF_ADD_SUBDIRECTORY
+  set(zArgumentsOfAddSubdirectory ${_UNPARSED_ARGUMENTS})
+
+  # OPTION_PREFIX
+  unset(sOptionPrefix)
+  if(DEFINED _OPTION_PREFIX)
+    if(_OPTION_PREFIX MATCHES "_$")
+      set(sOptionPrefix "${_OPTION_PREFIX}")
+    else()
+      set(sOptionPrefix "${_OPTION_PREFIX}_")
+    endif()
   endif()
 
+  # OPTION_INITIAL
+  set(bOptionInitial)
+  if(DEFINED _OPTION_INITIAL)
+    if(_OPTION_INITIAL)
+      set(bOptionInitial ON)
+    else()
+      set(bOptionInitial OFF)
+    endif()
+  endif()
+
+  #-----------------------------------------------------------------------------
+  # 启停配置
+
+  set(vOptName "${sOptionPrefix}${sSourceDirectoryUpper}")
   check_name_with_cmake_rules("${vOptName}" WARNING)
 
-  option(${vOptName} "Sub-directory ${_SOURCE_DIRECTORY}." OFF)
+  option(${vOptName} "Sub-directory ${pSourceDirectory}." ${bOptionInitial})
   if(NOT ${vOptName})
     return()
   endif()
 
-  add_subdirectory(${_SOURCE_DIRECTORY} ${_UNPARSED_ARGUMENTS})
+  #-----------------------------------------------------------------------------
+  # 添加子目录
+
+  add_subdirectory("${pSourceDirectory}" ${zArgumentsOfAddSubdirectory})
 endfunction()
 
+#===============================================================================
 # .rst
 # .. command:: add_aux_subdirectories_con
 #
@@ -55,22 +92,21 @@ endfunction()
 #   .. code-block:: cmake
 #
 #     add_aux_subdirectories_con(
-#       <argument>...
+#       <argument-of-add-subdirectory-con>...
 #     )
 function(add_aux_subdirectories_con)
   file(
     GLOB     zSubDirs
     RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
-             "${CMAKE_CURRENT_LIST_DIR}/*"
-  )
+             "${CMAKE_CURRENT_LIST_DIR}/*")
 
-  foreach(sSubDir IN LISTS zSubDirs)
-    if(NOT IS_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/${sSubDir}")
+  foreach(pSubDir IN LISTS zSubDirs)
+    if(NOT IS_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/${pSubDir}")
       continue()
     endif()
-    if(NOT EXISTS "${CMAKE_CURRENT_LIST_DIR}/${sSubDir}/CMakeLists.txt")
+    if(NOT EXISTS "${CMAKE_CURRENT_LIST_DIR}/${pSubDir}/CMakeLists.txt")
       continue()
     endif()
-    add_subdirectory_con("${sSubDir}" ${ARGV})
+    add_subdirectory_con("${pSubDir}" ${ARGV})
   endforeach()
 endfunction()

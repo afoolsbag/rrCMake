@@ -2,7 +2,7 @@
 # |  ___(_)         | /  __ \ |             | |
 # | |_   _ _ __   __| | /  \/ |__   ___  ___| | __
 # |  _| | | '_ \ / _` | |   | '_ \ / _ \/ __| |/ / zhengrr
-# | |   | | | | | (_| | \__/\ | | |  __/ (__|   <  2018-02-02 – 2019-09-16
+# | |   | | | | | (_| | \__/\ | | |  __/ (__|   <  2018-02-02 – 2019-10-14
 # \_|   |_|_| |_|\__,_|\____/_| |_|\___|\___|_|\_\ Unlicense
 
 cmake_minimum_required(VERSION 3.12)
@@ -98,35 +98,22 @@ if(UNIX)
     NAMES "check")
   mark_as_advanced(Check_check_LIBRARY)
 
-  find_library(
-    Check_compat_LIBRARY
-    NAMES "compat")
-  mark_as_advanced(Check_compat_LIBRARY)
-
   # package
   find_package_handle_standard_args(
     Check
     DEFAULT_MSG
     Check_check_LIBRARY
-    Check_INCLUDE_DIR
-    Check_compat_LIBRARY)
+    Check_INCLUDE_DIR)
 
   if(Check_FOUND)
     # targets
-    if(NOT TARGET Check::compat)
-      add_library_ex(
-        Check::compat       STATIC IMPORTED
-        PROPERTIES          IMPORTED_LOCATION "${Check_compat_LIBRARY}"
-        INCLUDE_DIRECTORIES INTERFACE         "${Check_INCLUDE_DIR}")
-    endif()
-
     if(NOT TARGET Check::check)
       add_library_ex(
         Check::check        STATIC IMPORTED
         PROPERTIES          IMPORTED_LOCATION "${Check_check_LIBRARY}"
         COMPILE_DEFINITIONS INTERFACE         "$<$<BOOL:${HAVE_STDINT_H}>:HAVE_STDINT_H>"
         INCLUDE_DIRECTORIES INTERFACE         "${Check_INCLUDE_DIR}"
-        LINK_LIBRARIES      INTERFACE         m rt subunit Check::compat)
+        LINK_LIBRARIES      INTERFACE         m rt)
     endif()
 
   endif()
