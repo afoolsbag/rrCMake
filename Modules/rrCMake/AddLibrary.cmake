@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-08-09
+# 2016-10-08 – 2019-10-15
 # Unlicense
 
 cmake_minimum_required(VERSION 3.12)
@@ -317,7 +317,7 @@ function(add_library_con _NAME)
   string(TOUPPER "${sType}" sTypeUpper)
   string(TOLOWER "${sType}" sTypeLower)
   string(TOUPPER "${PROJECT_NAME}" sProjectNameUpper)
-  string(REGEX REPLACE "^${sProjectNameUpper}" "" sTrimmedNameUpper "${sNameUpper}")
+  string(REGEX REPLACE "^${sProjectNameUpper}_?" "" sTrimmedNameUpper "${sNameUpper}")
   string(LENGTH "${sTrimmedNameUpper}" sLen)
   if(0 LESS sLen)
     set(vOptVar ${sProjectNameUpper}_${sTrimmedNameUpper}_${sTypeUpper}_LIBRARY)

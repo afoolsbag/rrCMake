@@ -1,5 +1,5 @@
 # zhengrr
-# 2017-12-18 – 2019-08-09
+# 2017-12-18 – 2019-10-15
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -303,7 +303,7 @@ function(add_executable_con _NAME)
   # 启停配置
 
   string(TOUPPER "${PROJECT_NAME}" sProjectNameUpper)
-  string(REGEX REPLACE "^${sProjectNameUpper}" "" sTrimmedNameUpper "${sNameUpper}")
+  string(REGEX REPLACE "^${sProjectNameUpper}_?" "" sTrimmedNameUpper "${sNameUpper}")
   string(LENGTH "${sTrimmedNameUpper}" sLen)
   if(0 LESS sLen)
     set(vOptVar ${sProjectNameUpper}_${sTrimmedNameUpper}_EXECUTABLE)
