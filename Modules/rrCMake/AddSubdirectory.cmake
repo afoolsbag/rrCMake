@@ -21,6 +21,7 @@ endif()
 #
 #     add_subdirectory_con(
 #       <argument-of-add-subdirectory>...
+#       [WITHOUT_OPTION]
 #       [OPTION_PREFIX  <option-prefix>]
 #       [OPTION_INITIAL <option-initial>]
 #     )
@@ -29,7 +30,7 @@ endif()
 #
 #   - `add_subdirectory <https://cmake.org/cmake/help/latest/command/add_subdirectory.html>`_
 function(add_subdirectory_con _SOURCE_DIRECTORY)
-  set(zOptKws)
+  set(zOptKws    WITHOUT_OPTION)
   set(zOneValKws OPTION_PREFIX
                  OPTION_INITIAL)
   set(zMutValKws)
@@ -45,6 +46,9 @@ function(add_subdirectory_con _SOURCE_DIRECTORY)
 
   # ARGUMENTS_OF_ADD_SUBDIRECTORY
   set(zArgumentsOfAddSubdirectory ${_UNPARSED_ARGUMENTS})
+
+  # WITHOUT_OPTION
+  set(bWithoutOption ${_WITHOUT_OPTION})
 
   # OPTION_PREFIX
   unset(sOptionPrefix)
@@ -69,12 +73,16 @@ function(add_subdirectory_con _SOURCE_DIRECTORY)
   #-----------------------------------------------------------------------------
   # 启停配置
 
-  set(vOptName "${sOptionPrefix}${sSourceDirectoryUpper}")
-  check_name_with_cmake_rules("${vOptName}" WARNING)
+  if(NOT bWithoutOption)
 
-  option(${vOptName} "Sub-directory ${pSourceDirectory}." ${bOptionInitial})
-  if(NOT ${vOptName})
-    return()
+    set(vOptName "${sOptionPrefix}${sSourceDirectoryUpper}")
+    check_name_with_cmake_rules("${vOptName}" WARNING)
+
+    option(${vOptName} "Sub-directory ${pSourceDirectory}." ${bOptionInitial})
+    if(NOT ${vOptName})
+      return()
+    endif()
+
   endif()
 
   #-----------------------------------------------------------------------------
