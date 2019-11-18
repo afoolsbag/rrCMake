@@ -71,7 +71,7 @@ Conan
 `Conan <https://conan.io/>`_ 采用非侵入式设计，需要安装；
 
 Conan 通过指定 ``conanfile.txt`` 的 ``[generators]`` 为 ``cmake_paths``，
-并设定 CMake 的 ``CMAKE_TOOLCHAIN_FILE`` 变量为 ``/.../conan_paths.cmake`` 实现非侵入式设计；
+并设定 CMake 的 ``CMAKE_TOOLCHAIN_FILE`` 变量为 ``/path/to/conan_paths.cmake`` 实现非侵入式设计；
 
 Conan 通过设定 `CONAN_USER_HOME <https://docs.conan.io/en/latest/reference/env_vars.html#conan-user-home>`_ 环境变量指定库存储位置；
 
@@ -91,9 +91,9 @@ Hunter 支持的库列表可以在 `All packages <https://hunter.sh/en/latest/pa
 vcpkg
 `````
 
-`vcpkg <https://vcpkg.readthedocs.io/>`_ 采用非侵入式设计，需要安装。
+`vcpkg <https://vcpkg.readthedocs.io/>`_ 采用非侵入式设计，需要安装；
 
-vcpkg 通过设定 CMake 的 ``CMAKE_TOOLCHAIN_FILE`` 变量为 ``/.../vcpkg/scripts/buildsystems/vcpkg.cmake`` 实现非侵入式设计；
+vcpkg 通过设定 CMake 的 ``CMAKE_TOOLCHAIN_FILE`` 变量为 ``/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake`` 实现非侵入式设计；
 
 vcpkg 通过设定 `VCPKG_DOWNLOADS <https://vcpkg.readthedocs.io/en/latest/users/config-environment/>`_ 环境变量指定库下载位置。
 
