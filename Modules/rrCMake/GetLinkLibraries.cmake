@@ -7,6 +7,10 @@ cmake_policy(VERSION 3.10)
 
 include_guard()  # 3.10
 
+if(NOT COMMAND check_name_with_cmake_rules)
+  include("${CMAKE_CURRENT_LIST_DIR}/CheckNameWithCMakeRules.cmake")
+endif()
+
 #===============================================================================
 #.rst:
 # .. command:: get_link_libraries
@@ -28,17 +32,20 @@ function(get_link_libraries _VARIABLE _TARGET)
   #-----------------------------------------------------------------------------
   # 规整化参数
 
-  set(xVariable      "${_VARIABLE}")
-  set(tTarget        "${_TARGET}")
+  set(xVariable "${_VARIABLE}")
+  check_name_with_cmake_rules("${xVariable}" AUTHOR_WARNING)
+
+  set(tTarget "${_TARGET}")
+  if(NOT TARGET "${tTarget}")
+    message(FATAL_ERROR "The name isn't a target: ${tTarget}.")
+  endif()
+
   set(bIncludeItself "${_INCLUDE_ITSELF}")
-  set(bRecurse       "${_RECURSE}")
+
+  set(bRecurse "${_RECURSE}")
 
   if(DEFINED _UNPARSED_ARGUMENTS)
     message(FATAL_ERROR "Unexpected arguments: ${_UNPARSED_ARGUMENTS}.")
-  endif()
-
-  if(NOT TARGET "${tTarget}")
-    message(FATAL_ERROR "The name isn't a target: ${tTarget}.")
   endif()
 
   #-----------------------------------------------------------------------------
