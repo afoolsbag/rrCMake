@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-08-07
+# 2016-10-08 – 2019-11-18
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -7,6 +7,7 @@ cmake_policy(VERSION 3.10)
 
 include_guard()  # 3.10
 
+#===============================================================================
 #.rst:
 # .. command:: add_compile_options_ex
 #
@@ -15,7 +16,7 @@ include_guard()  # 3.10
 #   .. code-block:: cmake
 #
 #     add_compile_options_ex(
-#       <argument>...
+#       <argument-of-add-compile-options>...
 #       [ANALYZE]
 #       [DISABLE_LANGUAGE_EXTENSIONS]
 #       [HIGHEST_WARNING_LEVEL|RECOMMENDED_WARNING_LEVEL]
@@ -43,19 +44,37 @@ function(add_compile_options_ex)
                  UTF-8
                  VISIBLE_DEFAULT_HIDDEN
                  WARNING_AS_ERROR)
-  cmake_parse_arguments(PARSE_ARGV 0 "" "${zOptKws}" "${}" "${}")
+  set(zOneValKws)
+  set(zMutValKws)
+  cmake_parse_arguments(PARSE_ARGV 0 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
+
+  #-----------------------------------------------------------------------------
+  # 规整化参数
+
+  set(bAnalyze                      "${_ANALYZE}")
+  set(bDisableLanguageExtensions    "${_DISABLE_LANGUAGE_EXTENSIONS}")
+  set(bHighestWarningLevel          "${_HIGHEST_WARNING_LEVEL}")
+  set(bMultipleProcesses            "${_MULTIPLE_PROCESSES}")
+  set(bRecommendedWarningLevel      "${_RECOMMENDED_WARNING_LEVEL}")
+  set(bUtf8                         "${_UTF-8}")
+  set(bVisibleDefaultHidden         "${_VISIBLE_DEFAULT_HIDDEN}")
+  set(bWarningAsError               "${_WARNING_AS_ERROR}")
+  set(zArgumentsOfAddCompileOptions ${_UNPARSED_ARGUMENTS})
+
+  #-----------------------------------------------------------------------------
+  # 扩展功能
 
   get_cmake_property(zLangs ENABLED_LANGUAGES)
 
-  if(_ANALYZE)
+  if(bAnalyze)
     if(1910 LESS_EQUAL MSVC_VERSION AND CMAKE_CXX_COMPILER)
       add_compile_options("/analyze" "/analyze:WX-" "/analyze:ruleset AllRules.ruleset")
     endif()
   endif()
 
-  if(_DISABLE_LANGUAGE_EXTENSIONS)
-    foreach(sL IN LISTS zLangs)
-      if(CMAKE_${sL}_COMPILER_ID STREQUAL "GNU")
+  if(bDisableLanguageExtensions)
+    foreach(sLang IN LISTS zLangs)
+      if(CMAKE_${sLang}_COMPILER_ID STREQUAL "GNU")
         add_compile_options("-Wpedantic")
         break()
       endif()
@@ -65,9 +84,9 @@ function(add_compile_options_ex)
     endif()
   endif()
 
-  if(_HIGHEST_WARNING_LEVEL)
-    foreach(sL IN LISTS zLangs)
-      if(CMAKE_${sL}_COMPILER_ID STREQUAL "GNU")
+  if(bHighestWarningLevel)
+    foreach(sLang IN LISTS zLangs)
+      if(CMAKE_${sLang}_COMPILER_ID STREQUAL "GNU")
         add_compile_options("-Wall" "-Wextra")
         break()
       endif()
@@ -75,9 +94,9 @@ function(add_compile_options_ex)
     if(MSVC)
       add_compile_options("/Wall")
     endif()
-  elseif(_RECOMMENDED_WARNING_LEVEL)
-    foreach(sL IN LISTS zLangs)
-      if(CMAKE_${sL}_COMPILER_ID STREQUAL "GNU")
+  elseif(bRecommendedWarningLevel)
+    foreach(sLang IN LISTS zLangs)
+      if(CMAKE_${sLang}_COMPILER_ID STREQUAL "GNU")
         add_compile_options("-Wall")
         break()
       endif()
@@ -87,30 +106,30 @@ function(add_compile_options_ex)
     endif()
   endif()
 
-  if(_MULTIPLE_PROCESSES)
+  if(bMultipleProcesses)
     if(MSVC)
       add_compile_options("/MP")
     endif()
   endif()
 
-  if(_UTF-8)
+  if(bUtf8)
     if(MSVC)
       add_compile_options("/utf-8")
     endif()
   endif()
 
-  if(_VISIBLE_DEFAULT_HIDDEN)
-    foreach(sL IN LISTS zLangs)
-      if(CMAKE_${sL}_COMPILER_ID STREQUAL "GNU")
+  if(bVisibleDefaultHidden)
+    foreach(sLang IN LISTS zLangs)
+      if(CMAKE_${sLang}_COMPILER_ID STREQUAL "GNU")
         add_compile_options("-fvisibility=hidden")
         break()
       endif()
     endforeach()
   endif()
 
-  if(_WARNING_AS_ERROR)
-    foreach(sL IN LISTS zLangs)
-      if(CMAKE_${sL}_COMPILER_ID STREQUAL "GNU")
+  if(bWarningAsError)
+    foreach(sLang IN LISTS zLangs)
+      if(CMAKE_${sLang}_COMPILER_ID STREQUAL "GNU")
         add_compile_options("-Werror")
         break()
       endif()
@@ -120,5 +139,9 @@ function(add_compile_options_ex)
     endif()
   endif()
 
-  add_compile_options(${_UNPARSED_ARGUMENTS})
+  #-----------------------------------------------------------------------------
+  # 基础功能
+
+  add_compile_options(${zArgumentsOfAddCompileOptions})
+
 endfunction()

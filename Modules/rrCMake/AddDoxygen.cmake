@@ -1,22 +1,13 @@
 # zhengrr
-# 2016-10-08 – 2019-10-15
+# 2016-10-08 – 2019-11-18
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
 cmake_policy(VERSION 3.10)
 
-include_guard()
+include_guard()  # 3.10
 
-#.rst:
-# .. command:: arguments_to_doxygen
-macro(arguments_to_doxygen)
-  foreach(sCfgName IN ITEMS ${ARGV})
-    if(DEFINED _${sCfgName})
-      set(DOXYGEN_${sCfgName} ${_${sCfgName}})
-    endif()
-  endforeach()
-endmacro()
-
+#===============================================================================
 #.rst:
 # .. command:: add_doxygen
 #
@@ -25,7 +16,7 @@ endmacro()
 #   .. code-block:: cmake
 #
 #     add_doxygen(                                                       default
-#       <argument>...
+#       <argument-of-doxygen-add-docs>...
 #       [FULL_PATH_NAMES       <YES|NO>]                                     YES
 #       [STRIP_FROM_PATH       path]
 #       [JAVADOC_AUTOBRIEF     <YES|NO>]                                      NO
@@ -43,124 +34,42 @@ endmacro()
 #   - `FindDoxygen <https://cmake.org/cmake/help/latest/module/FindDoxygen.html>`_
 #   - `Configuration <http://doxygen.org/manual/config.html>`_
 function(add_doxygen)
-  set(zOneValKws)
-  set(zMutValKws)
-  list(APPEND zOneValKws FULL_PATH_NAMES
-                         STRIP_FROM_PATH
-                         JAVADOC_AUTOBRIEF
-                         OPTIMIZE_OUTPUT_FOR_C
-                         EXTRACT_ALL
-                         HTML_OUTPUT
-                         USE_MATHJAX
-                         DOT_PATH
-                         UML_LOOK
-                         PLANTUML_JAR_PATH)
-  cmake_parse_arguments(PARSE_ARGV 0 "" "" "${zOneValKws}" "${zMutValKws}")
+  set(zDoxOneValKws)
+  set(zDoxMutValKws)
+  list(APPEND zDoxOneValKws FULL_PATH_NAMES
+                            STRIP_FROM_PATH
+                            JAVADOC_AUTOBRIEF
+                            OPTIMIZE_OUTPUT_FOR_C
+                            EXTRACT_ALL
+                            HTML_OUTPUT
+                            USE_MATHJAX
+                            DOT_PATH
+                            UML_LOOK
+                            PLANTUML_JAR_PATH)
+  set(zOptKws)
+  set(zOneValKws ${zDoxOneValKws})
+  set(zMutValKws ${zDoxMutValKws})
+  cmake_parse_arguments(PARSE_ARGV 0 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
+
+  #-----------------------------------------------------------------------------
+  # 规整化参数
+
+  set(zArgumentsOfDoxygenAddDocs ${_UNPARSED_ARGUMENTS})
+
+  #-----------------------------------------------------------------------------
+  # 查找依赖、配置参数并添加目标
 
   find_package(Doxygen)
   if(NOT DOXYGEN_FOUND)
-    message(WARNING "Doxygen is needed to generate doxygen documentation.")
+    message(FATAL_ERROR "Doxygen is needed to generate doxygen documentation.")
   endif()
 
-  arguments_to_doxygen(
-    ${zOneValKws}
-    ${zMutValKws}
-  )
+  foreach(sDoxConfName IN LISTS zDoxOneValKws zDoxMutValKws)
+    if(DEFINED _${sDoxConfName})
+      set(DOXYGEN_${sDoxConfName} ${_${sDoxConfName}})
+    endif()
+  endforeach()
 
-  doxygen_add_docs(${_UNPARSED_ARGUMENTS})
-endfunction()
+  doxygen_add_docs(${zArgumentsOfDoxygenAddDocs})
 
-#.rst:
-# .. command:: add_doxygen_con
-#
-#   添加 Doxygen 目标到项目，遵循惯例（convention）。
-#
-#   .. code-block:: cmake
-#
-#     add_doxygen_con(
-#       <argument>...
-#     )
-#
-#   参见：
-#
-#   - `option <https://cmake.org/cmake/help/latest/command/option.html>`_
-#   - :command:`add_doxygen`
-#   - `install <https://cmake.org/cmake/help/latest/command/install.html>`_
-function(add_doxygen_con _NAME)
-  set(zOptKws    ALL EXCLUDE_FROM_ALL)
-  set(zOneValKws WORKING_DIRECTORY
-                 COMMENT)
-  set(zMutValKws)
-  list(APPEND zOneValKws STRIP_FROM_PATH
-                         EXTRACT_ALL
-                         HTML_OUTPUT
-                         USE_MATHJAX
-                         DOT_PATH
-                         PLANTUML_JAR_PATH)
-  cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
-
-  string(TOUPPER ${PROJECT_NAME} _PROJECT_NAME_UPPER)
-  string(TOUPPER ${_NAME}        _NAME_UPPER)
-
-  # option
-  string(REGEX REPLACE "^${_PROJECT_NAME_UPPER}_?" "" sTrimmedNameUpper "${_NAME_UPPER}")
-  string(LENGTH "${sTrimmedNameUpper}" sLen)
-  if(0 LESS sLen)
-    set(vOptVar ${_PROJECT_NAME_UPPER}_${sTrimmedNameUpper}_DOCUMENTATION)
-  else()
-    set(vOptVar ${_PROJECT_NAME_UPPER}_DOCUMENTATION)
-  endif()
-  option(${vOptVar} "Build ${_NAME} documentation." ${DOXYGEN_FOUND})
-  if(NOT ${vOptVar})
-    return()
-  endif()
-
-  # arguments
-  if(_EXCLUDE_FROM_ALL)
-    set(_ALL)
-  else()
-    set(_ALL ALL)
-  endif()
-  if(NOT DEFINED _WORKING_DIRECTORY)
-    set(_WORKING_DIRECTORY WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")
-  endif()
-  if(NOT DEFINED _COMMENT)
-    set(_COMMENT COMMENT "Generating documentation with Doxygen.")
-  endif()
-
-  # configurations
-  if(NOT DEFINED _STRIP_FROM_PATH)
-    set(_STRIP_FROM_PATH   STRIP_FROM_PATH   "${PROJECT_SOURCE_DIR}")
-  endif()
-  if(NOT DEFINED _EXTRACT_ALL)
-    set(_EXTRACT_ALL       EXTRACT_ALL       YES)
-  endif()
-  if(NOT DEFINED _HTML_OUTPUT)
-    set(_HTML_OUTPUT       HTML_OUTPUT       "doxygen")
-  endif()
-  if(NOT DEFINED _USE_MATHJAX)
-    set(_USE_MATHJAX       USE_MATHJAX       YES)
-  endif()
-  if(NOT DEFINED _DOT_PATH)
-    set(_DOT_PATH          DOT_PATH          "$ENV{GRAPHVIZ_DOT}")
-  endif()
-  if(NOT DEFINED _PLANTUML_JAR_PATH)
-    set(_PLANTUML_JAR_PATH PLANTUML_JAR_PATH "$ENV{PLANTUML}")
-  endif()
-
-  # add_doxygen
-  add_doxygen(
-    ${_NAME} ${_UNPARSED_ARGUMENTS} ${_ALL} ${WORKING_DIRECTORY} ${_COMMENT}
-    ${_STRIP_FROM_PATH}
-    ${_EXTRACT_ALL}
-    ${_HTML_OUTPUT}
-    ${_USE_MATHJAX}
-    ${_DOT_PATH}
-    ${_PLANTUML_JAR_PATH}
-  )
-
-  # install
-  install(
-    DIRECTORY   "${PROJECT_BINARY_DIR}/doxygen/"
-    DESTINATION "doc/${_NAME}")
 endfunction()
