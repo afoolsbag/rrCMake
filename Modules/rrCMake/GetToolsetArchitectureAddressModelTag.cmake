@@ -28,9 +28,9 @@ endif()
 #     get_toolset_architecture_address_model_tag(
 #       <variable>
 #     )
-function(get_toolset_architecture_address_model_tag vVariable)
+function(get_toolset_architecture_address_model_tag xVariable)
   get_toolset_tag(sTool)
   get_architecture_tag(sArch)
   get_address_model_tag(sAddr)
-  set(${vVariable} "${sTool}${sArch}${sAddr}" PARENT_SCOPE)
+  set("${xVariable}" "${sTool}${sArch}${sAddr}" PARENT_SCOPE)
 endfunction()

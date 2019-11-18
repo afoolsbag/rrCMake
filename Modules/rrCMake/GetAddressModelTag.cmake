@@ -23,16 +23,16 @@ include_guard()  # 3.10
 #
 #   - `<https://boost.org/doc/libs/master/more/getting_started/windows.html#library-naming>`_
 #   - `<https://gitlab.kitware.com/cmake/cmake/blob/master/Modules/FindBoost.cmake>`_
-function(get_address_model_tag vVariable)
+function(get_address_model_tag xVariable)
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(${vVariable} "64" PARENT_SCOPE)
+    set("${xVariable}" "64" PARENT_SCOPE)
     return()
   endif()
 
   if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set(${vVariable} "32" PARENT_SCOPE)
+    set("${xVariable}" "32" PARENT_SCOPE)
     return()
   endif()
 
-  set(${vVariable} "" PARENT_SCOPE)
+  set("${xVariable}" "" PARENT_SCOPE)
 endfunction()

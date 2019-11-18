@@ -25,8 +25,8 @@ endif()
 #     get_architecture_address_model_tag(
 #       <variable>
 #     )
-function(get_architecture_address_model_tag vVariable)
+function(get_architecture_address_model_tag xVariable)
   get_architecture_tag(sArch)
   get_address_model_tag(sAddr)
-  set(${vVariable} "${sArch}${sAddr}" PARENT_SCOPE)
+  set("${xVariable}" "${sArch}${sAddr}" PARENT_SCOPE)
 endfunction()

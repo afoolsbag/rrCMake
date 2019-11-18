@@ -28,7 +28,7 @@ function(get_link_libraries _VARIABLE _TARGET)
   #-----------------------------------------------------------------------------
   # 规整化参数
 
-  set(vVariable      "${_VARIABLE}")
+  set(xVariable      "${_VARIABLE}")
   set(tTarget        "${_TARGET}")
   set(bIncludeItself "${_INCLUDE_ITSELF}")
   set(bRecurse       "${_RECURSE}")
@@ -91,6 +91,6 @@ function(get_link_libraries _VARIABLE _TARGET)
   endif()
 
   # 返回结果
-  set("${vVariable}" ${zItems} PARENT_SCOPE)
+  set("${xVariable}" ${zItems} PARENT_SCOPE)
 
 endfunction()

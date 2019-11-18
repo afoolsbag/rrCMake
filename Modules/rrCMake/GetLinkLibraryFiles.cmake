@@ -32,7 +32,7 @@ function(get_link_library_files _VARIABLE _TARGET)
   #-----------------------------------------------------------------------------
   # 规整化参数
 
-  set(vVariable      "${_VARIABLE}")
+  set(xVariable      "${_VARIABLE}")
   set(tTarget        "${_TARGET}")
   set(bIncludeItself "${_INCLUDE_ITSELF}")
   set(bRecurse       "${_RECURSE}")
@@ -80,6 +80,6 @@ function(get_link_library_files _VARIABLE _TARGET)
   list(REMOVE_DUPLICATES zFiles)
 
   # 返回结果
-  set("${vVariable}" ${zFiles} PARENT_SCOPE)
+  set("${xVariable}" ${zFiles} PARENT_SCOPE)
 
 endfunction()
