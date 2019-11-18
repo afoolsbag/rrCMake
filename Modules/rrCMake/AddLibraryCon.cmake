@@ -1,14 +1,14 @@
 # zhengrr
-# 2017-12-18 – 2019-11-18
+# 2016-10-08 – 2019-11-18
 # Unlicense
 
-cmake_minimum_required(VERSION 3.10)
-cmake_policy(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
+cmake_policy(VERSION 3.12)
 
 include_guard()  # 3.10
 
-if(NOT COMMAND add_executable_ex)
-  include("${CMAKE_CURRENT_LIST_DIR}/AddExecutableEx.cmake")
+if(NOT COMMAND add_library_ex)
+  include("${CMAKE_CURRENT_LIST_DIR}/AddLibraryEx.cmake")
 endif()
 if(NOT COMMAND check_name_with_cmake_rules)
   include("${CMAKE_CURRENT_LIST_DIR}/CheckNameWithCMakeRules.cmake")
@@ -22,14 +22,14 @@ endif()
 
 #===============================================================================
 #.res:
-# .. command:: add_executable_con
+# .. command:: add_library_con
 #
 #   添加库目标到项目，遵循惯例（convention）。
 #
 #   .. code-block:: cmake
 #
-#     add_executable_con(
-#       <name> <argument-of-add-executable>...
+#     add_library_con(
+#       <name> <argument-of-add-library>...
 #       [PROPERTIES          < <property-key> <property-value> >...]
 #       [COMPILE_DEFINITIONS < <INTERFACE|PUBLIC|PRIVATE> <definition>... >...]
 #       [COMPILE_FEATURES    < <INTERFACE|PUBLIC|PRIVATE> <feature>... >...]
@@ -43,10 +43,10 @@ endif()
 #
 #   参见：
 #
-#   - :command:`add_executable_ex`
+#   - :command:`add_library_ex`
 #   - `option <https://cmake.org/cmake/help/latest/command/option.html>`_
 #   - `install <https://cmake.org/cmake/help/latest/command/install.html>`_
-function(add_executable_con _NAME)
+function(add_library_con _NAME)
   set(zOptKws)
   set(zOneValKws)
   set(zMutValKws PROPERTIES
@@ -111,22 +111,36 @@ function(add_executable_con _NAME)
     set(zSources SOURCES ${_SOURCES})
   endif()
 
-  set(zArgumentsOfAddExecutable ${_UNPARSED_ARGUMENTS})
+  set(zArgumentsOfAddLibrary ${_UNPARSED_ARGUMENTS})
 
   #-----------------------------------------------------------------------------
-  # 启停选项
+  # 启停配置
+
+  if(MODULE IN_LIST zArgumentsOfAddLibrary)
+    set(sType MODULE)
+  elseif(SHARED IN_LIST zArgumentsOfAddLibrary)
+    set(sType SHARED)
+  elseif(STATIC IN_LIST zArgumentsOfAddLibrary)
+    set(sType STATIC)
+  elseif(BUILD_SHARED_LIBS)
+    set(sType SHARED)
+  else()
+    set(sType STATIC)
+  endif()
+  string(TOUPPER "${sType}" sTypeUpper)
+  string(TOLOWER "${sType}" sTypeLower)
 
   string(TOUPPER "${sName}" sNameUpper)
   string(TOUPPER "${PROJECT_NAME}" sProjectNameUpper)
   string(REGEX REPLACE "^${sProjectNameUpper}_?" "" sTrimmedNameUpper "${sNameUpper}")
   string(LENGTH "${sTrimmedNameUpper}" nLen)
   if(0 LESS nLen)
-    set(xOptVar ${sProjectNameUpper}_${sTrimmedNameUpper}_EXECUTABLE)
+    set(xOptVar ${sProjectNameUpper}_${sTrimmedNameUpper}_${sTypeUpper}_LIBRARY)
   else()
-    set(xOptVar ${sProjectNameUpper}_EXECUTABLE)
+    set(xOptVar ${sProjectNameUpper}_${sTypeUpper}_LIBRARY)
   endif()
 
-  option(${xOptVar} "Build ${sName} executable." ON)
+  option(${xOptVar} "Build ${sName} ${sTypeLower} library." ON)
   if(NOT ${xOptVar})
     return()
   endif()
@@ -138,16 +152,20 @@ function(add_executable_con _NAME)
     set(zProperties PROPERTIES)
   endif()
   # 在 Debug 构建下，循惯例以 d 后缀
-  if(NOT DEBUG_POSTFIX IN_LIST ozProperties)
-    list(APPEND ozProperties DEBUG_POSTFIX "d")
+  if(NOT DEBUG_POSTFIX IN_LIST zProperties)
+    list(APPEND zProperties DEBUG_POSTFIX "d")
   endif()
   # 以原始名而非修饰名作为输出文件名
-  if(NOT OUTPUT_NAME IN_LIST ozProperties)
-    list(APPEND ozProperties OUTPUT_NAME "${sName}")
+  if(NOT OUTPUT_NAME IN_LIST zProperties)
+    list(APPEND zProperties OUTPUT_NAME "${sName}")
+  endif()
+  # 在 Unix-like 系统上，库循惯例以 lib 前缀；在 Windows 系统上，静态库循 Boost 风格以 lib 前缀
+  if(NOT PREFIX IN_LIST zProperties AND (UNIX OR sType STREQUAL STATIC))
+    list(APPEND zProperties PREFIX "lib")
   endif()
 
-  add_executable_ex(
-    "${sName}" ${zArgumentsOfAddExecutable}
+  add_library_ex(
+    "${sName}" ${zArgumentsOfAddLibrary}
     ${zProperties}
     ${zCompileDefinitions}
     ${zCompileFeatures}
@@ -163,6 +181,8 @@ function(add_executable_con _NAME)
   get_toolset_architecture_address_model_tag(sTag)
   install(
     TARGETS             "${sName}"
+    ARCHIVE DESTINATION "lib/${sTag}$<$<CONFIG:Debug>:d>/"
+    LIBRARY DESTINATION "lib/${sTag}$<$<CONFIG:Debug>:d>/"
     RUNTIME DESTINATION "bin/${sTag}$<$<CONFIG:Debug>:d>/")
 
 endfunction()

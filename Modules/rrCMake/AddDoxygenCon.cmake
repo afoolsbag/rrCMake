@@ -64,8 +64,6 @@ function(add_doxygen_con _NAME)
     set(sComment             "Generating documentation with Doxygen.")
   endif()
 
-  # 以下参数原样传递给 Doxygen，因而全部视为简单字符串
-
   if(DEFINED _STRIP_FROM_PATH)
     set(sStripFromPath       "${_STRIP_FROM_PATH}")
   else()
