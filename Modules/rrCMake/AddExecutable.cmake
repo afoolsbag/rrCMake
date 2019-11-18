@@ -1,5 +1,5 @@
 # zhengrr
-# 2017-12-18 – 2019-10-15
+# 2017-12-18 – 2019-11-18
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -8,7 +8,7 @@ cmake_policy(VERSION 3.10)
 include_guard()  # 3.10
 
 if(NOT COMMAND get_toolset_architecture_address_model_tag)
-  include("${CMAKE_CURRENT_LIST_DIR}/LibraryTag.cmake")
+  include("${CMAKE_CURRENT_LIST_DIR}/GetToolsetArchitectureAddressModelTag.cmake")
 endif()
 
 if(NOT COMMAND post_build_copy_link_files)
