@@ -132,7 +132,8 @@ function(add_doxygen_con _NAME)
   endif()
 
   add_doxygen(
-    "${sName}"        ${zArgumentsOfAddDoxygen}
+    "${sName}"        "${PROJECT_SOURCE_DIR}"
+                      ${zArgumentsOfAddDoxygen}
                       ${oAll}
     WORKING_DIRECTORY "${pWorkingDirectory}"
     COMMENT           "${sComment}"
@@ -144,7 +145,7 @@ function(add_doxygen_con _NAME)
     PLANTUML_JAR_PATH "${sPlantumlJarPath}")
 
   install(
-    DIRECTORY   "${PROJECT_BINARY_DIR}/doxygen/"
-    DESTINATION "doc/${_NAME}")
+    DIRECTORY   "${PROJECT_BINARY_DIR}/${sHtmlOutput}/"
+    DESTINATION "doc/${sName}")
 
 endfunction()
