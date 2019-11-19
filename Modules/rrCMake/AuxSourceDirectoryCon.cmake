@@ -94,8 +94,10 @@ function(aux_source_directory_con _DIRECTORY _VARIABLE)
     list(APPEND zExtensions ".h"   ".c"   ".inl")
   endif()
   if(bCxx)
-    list(APPEND zExtensions ".hpp" ".cpp" ".hh"  ".cc"  ".hxx" ".cxx" ".hp"  ".cp"
-                            ".HPP" ".CPP" ".H"   ".C"   ".h++" ".c++" ".h"   ".inl")
+    list(APPEND zExtensions ".hpp" ".hxx" ".hp"  ".hh"  ".h++" ".H"   ".h"
+                            ".cpp" ".cxx" ".cp"  ".cc"  ".c++" ".C"
+                            ".tpp" ".txx" ".tp"         ".t++"        ".inc"
+                                                                      ".inl")
   endif()
   if(bMfc)
     list(APPEND zExtensions ".h"   ".cpp"

@@ -148,7 +148,7 @@ function(aux_source_directory_ex _DIRECTORY _VARIABLE)
     if(CXX IN_LIST zLangs)
       list(APPEND zExtensions ".hpp" ".hxx" ".hp" ".hh" ".h++" ".H" ".h"    # 头文件
                               ".cpp" ".cxx" ".cp" ".cc" ".c++" ".C"         # 源文件
-                              ".tpp"                                ".inc"  # 模板实现文件
+                              ".tpp" ".txx" ".tp"       ".t++"      ".inc"  # 模板实现文件
                                                                     ".inl") # 内联实现文件
     endif()
   endif()
