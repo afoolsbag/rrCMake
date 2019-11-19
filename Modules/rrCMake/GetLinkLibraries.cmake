@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-04-15 – 2019-11-18
+# 2019-04-15 – 2019-11-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -22,6 +22,10 @@ endif()
 #     get_link_libraries(
 #       <variable> <target> [INCLUDE_ITSELF] [RECURSE]
 #     )
+#
+#   参见：
+#
+#   - :command:`check_name_with_cmake_rules`
 function(get_link_libraries _VARIABLE _TARGET)
   set(zOptKws    INCLUDE_ITSELF
                  RECURSE)
@@ -32,21 +36,25 @@ function(get_link_libraries _VARIABLE _TARGET)
   #-----------------------------------------------------------------------------
   # 规整化参数
 
+  if(DEFINED _UNPARSED_ARGUMENTS)
+    message(FATAL_ERROR "Unexpected arguments: ${_UNPARSED_ARGUMENTS}.")
+  endif()
+
+  # VARIABLE
   set(xVariable "${_VARIABLE}")
   check_name_with_cmake_rules("${xVariable}" AUTHOR_WARNING)
 
+  # TARGET
   set(tTarget "${_TARGET}")
   if(NOT TARGET "${tTarget}")
     message(FATAL_ERROR "The name isn't a target: ${tTarget}.")
   endif()
 
+  # INCLUDE_ITSELF
   set(bIncludeItself "${_INCLUDE_ITSELF}")
 
+  # RECURSE
   set(bRecurse "${_RECURSE}")
-
-  if(DEFINED _UNPARSED_ARGUMENTS)
-    message(FATAL_ERROR "Unexpected arguments: ${_UNPARSED_ARGUMENTS}.")
-  endif()
 
   #-----------------------------------------------------------------------------
   # 查找链接库
@@ -74,6 +82,7 @@ function(get_link_libraries _VARIABLE _TARGET)
 
     list(LENGTH zTodos nLen)
     while(NOT nLen EQUAL 0)
+
       foreach(sTodo IN LISTS zTodos)
         if(TARGET "${sTodo}")
           get_target_property(sType "${sTodo}" TYPE)
@@ -91,6 +100,7 @@ function(get_link_libraries _VARIABLE _TARGET)
 
       list(REMOVE_DUPLICATES zTodos)
       list(REMOVE_ITEM zTodos ${zDones})
+
       list(LENGTH zTodos nLen)
     endwhile()
 

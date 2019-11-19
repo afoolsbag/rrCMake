@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-11-18
+# 2016-10-08 – 2019-11-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -30,7 +30,6 @@ macro(project_ex)
                  LICENSE)
   set(zMutValKws AUTHORS)
   cmake_parse_arguments("PROJECT_EX_ARG" "${zOptKws}" "${zOneValKws}" "${zMutValKws}" ${ARGV})
-
   # 宏的参数解析使用全局前缀，并跳过参数规整化，减少变量污染
 
   # TIME_AS_VERSION
@@ -41,7 +40,6 @@ macro(project_ex)
       message(WARNING "Keyword VERSION is used, ignore keyword TIME_AS_VERSION.")
     endif()
   endif()
-
   if(DEFINED PROJECT_EX_ARG_VERSION)
     list(INSERT PROJECT_EX_ARG_VERSION 0 VERSION)
   endif()

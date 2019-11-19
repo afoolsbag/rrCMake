@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-04-15 – 2019-11-18
+# 2019-04-15 – 2019-11-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -7,7 +7,7 @@ cmake_policy(VERSION 3.10)
 
 include_guard()  # 3.10
 
-if(NOT COMMAND get_link_libraries)
+if(NOT COMMAND get_link_library_files)
   include("${CMAKE_CURRENT_LIST_DIR}/GetLinkLibraryFiles.cmake")
 endif()
 
@@ -25,6 +25,10 @@ endif()
 #       [RECURSE]
 #       [DESTINATION <directory>...]
 #     )
+#
+#   参见：
+#
+#   - :command:`get_link_library_files`
 function(post_build_copy_link_library_files _TARGET)
   set(zOptKws    INCLUDE_ITSELF
                  RECURSE)
@@ -35,39 +39,39 @@ function(post_build_copy_link_library_files _TARGET)
   #-----------------------------------------------------------------------------
   # 规整化参数
 
-  set(tTarget        "${_TARGET}")
-  set(bIncludeItself "${_INCLUDE_ITSELF}")
-  set(bRecurse       "${_RECURSE}")
+  if(DEFINED _UNPARSED_ARGUMENTS)
+    message(FATAL_ERROR "Unexpected arguments: ${_UNPARSED_ARGUMENTS}.")
+  endif()
 
+  # TARGET
+  set(tTarget "${_TARGET}")
+  if(NOT TARGET "${tTarget}")
+    message(FATAL_ERROR "The name isn't a target: ${tTarget}.")
+  endif()
+
+  # INCLUDE_ITSELF
+  unset(oIncludeItself)
+  if(_INCLUDE_ITSELF)
+    set(oIncludeItself INCLUDE_ITSELF)
+  endif()
+
+  # RECURSE
+  unset(oRecurse)
+  if(_RECURSE)
+    set(oRecurse RECURSE)
+  endif()
+
+  # DESTINATION
   if(DEFINED _DESTINATION)
     set(zDestination ${_DESTINATION})
   else()
     set(zDestination "$<TARGET_FILE_DIR:${tTarget}>")
   endif()
 
-  if(DEFINED _UNPARSED_ARGUMENTS)
-    message(FATAL_ERROR "Unexpected arguments: ${_UNPARSED_ARGUMENTS}.")
-  endif()
-
-  if(NOT TARGET "${tTarget}")
-    message(FATAL_ERROR "The name isn't a target: ${tTarget}.")
-  endif()
-
   #-----------------------------------------------------------------------------
   # 构建后复制链接库文件
 
-  if(bIncludeItself)
-    set(oIncludeItself INCLUDE_ITSELF)
-  else()
-    set(oIncludeItself)
-  endif()
-
-  if(bRecurse)
-    set(oRecurse RECURSE)
-  else()
-    set(oRecurse)
-  endif()
-
+  # 查找链接库文件
   get_link_library_files(zFiles "${tTarget}" ${oIncludeItself} ${oRecurse})
 
   if(zFiles)

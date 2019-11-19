@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-04-15 – 2019-11-18
+# 2019-04-15 – 2019-11-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -25,6 +25,11 @@ endif()
 #     get_link_library_files(
 #       <variable> <target> [INCLUDE_ITSELF] [RECURSE]
 #     )
+#
+#   参见：
+#
+#   - :command:`check_name_with_cmake_rules`
+#   - :command:`get_link_libraries`
 function(get_link_library_files _VARIABLE _TARGET)
   set(zOptKws    INCLUDE_ITSELF
                  RECURSE)
@@ -35,26 +40,30 @@ function(get_link_library_files _VARIABLE _TARGET)
   #-----------------------------------------------------------------------------
   # 规整化参数
 
+  if(DEFINED _UNPARSED_ARGUMENTS)
+    message(FATAL_ERROR "Unexpected arguments: ${_UNPARSED_ARGUMENTS}.")
+  endif()
+
+  # VARIABLE
   set(xVariable "${_VARIABLE}")
   check_name_with_cmake_rules("${xVariable}" AUTHOR_WARNING)
 
+  # TARGET
   set(tTarget "${_TARGET}")
   if(NOT TARGET "${tTarget}")
     message(FATAL_ERROR "The name isn't a target: ${tTarget}.")
   endif()
 
+  # INCLUDE_ITSELF
   unset(oIncludeItself)
   if(_INCLUDE_ITSELF)
     set(oIncludeItself INCLUDE_ITSELF)
   endif()
 
+  # RECURSE
   unset(oRecurse)
   if(_RECURSE)
     set(oRecurse RECURSE)
-  endif()
-
-  if(DEFINED _UNPARSED_ARGUMENTS)
-    message(FATAL_ERROR "Unexpected arguments: ${_UNPARSED_ARGUMENTS}.")
   endif()
 
   #-----------------------------------------------------------------------------

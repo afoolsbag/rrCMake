@@ -1,11 +1,15 @@
 # zhengrr
-# 2018-06-06 – 2019-11-18
+# 2018-06-06 – 2019-11-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
 cmake_policy(VERSION 3.10)
 
 include_guard()  # 3.10
+
+if(NOT COMMAND check_name_with_cmake_rules)
+  include("${CMAKE_CURRENT_LIST_DIR}/CheckNameWithCMakeRules.cmake")
+endif()
 
 #===============================================================================
 #.rst:
@@ -21,9 +25,12 @@ include_guard()  # 3.10
 #
 #   参见：
 #
+#   - :command:`check_name_with_cmake_rules`
 #   - `<https://boost.org/doc/libs/master/more/getting_started/windows.html#library-naming>`_
 #   - `<https://gitlab.kitware.com/cmake/cmake/blob/master/Modules/FindBoost.cmake>`_
 function(get_architecture_tag xVariable)
+  check_name_with_cmake_rules("${xVariable}" AUTHOR_WARNING)
+
   get_cmake_property(zLangs ENABLED_LANGUAGES)
   foreach(sLang IN LISTS zLangs)
 
