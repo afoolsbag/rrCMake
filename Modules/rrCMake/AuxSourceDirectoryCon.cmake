@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-11-18
+# 2016-10-08 – 2019-11-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.14)
@@ -9,6 +9,9 @@ include_guard()  # 3.10
 
 if(NOT COMMAND aux_source_directory_ex)
   include("${CMAKE_CURRENT_LIST_DIR}/AuxSourceDirectoryEx.cmake")
+endif()
+if(NOT COMMAND check_name_with_cmake_rules)
+  include("${CMAKE_CURRENT_LIST_DIR}/CheckNameWithCMakeRules.cmake")
 endif()
 
 #===============================================================================
@@ -20,7 +23,7 @@ endif()
 #   .. code-block:: cmake
 #
 #     aux_source_directory_con(
-#       <arguments...>
+#       <argument-of-aux-source-directory-ex...>
 #       [C] [CXX] [MFC] [QT] [CFG]
 #       [PCH_NAME   <pch-name>}]
 #       [PCH_HEADER <pch-header>]
@@ -30,70 +33,112 @@ endif()
 #   参见：
 #
 #   - :command:`aux_source_directory_con`
+#   - :command:`check_name_with_cmake_rules`
 function(aux_source_directory_con _DIRECTORY _VARIABLE)
   set(zOptKws    C CXX MFC QT CFG)
+  set(zOneValKws)
   set(zMutValKws EXTENSIONS)
-  cmake_parse_arguments(PARSE_ARGV 2 "" "${zOptKws}" "" "${zMutValKws}")
+  cmake_parse_arguments(PARSE_ARGV 2 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  list(INSERT _EXTENSIONS 0 EXTENSIONS)
-  if(_C)
-    list(APPEND _EXTENSIONS ".h"   ".c"   ".inl")
+  #-----------------------------------------------------------------------------
+  # 规整化参数
+
+  # DIRECTORY
+  set(pDirectory "${_DIRECTORY}")
+
+  # VARIABLE
+  set(xVariable "${_VARIABLE}")
+  check_name_with_cmake_rules("${xVariable}" AUTHOR_WARNING)
+
+  # EXTENSIONS
+  set(zExtensions ${_EXTENSIONS})
+
+  # C / CXX / MFC / QT / CFG
+  set(bC   "${_C}")
+  set(bCxx "${_CXX}")
+  set(bMfc "${_MFC}")
+  set(bQt  "${_QT}")
+  set(bCfg "${_CFG}")
+
+  # PCH_NAME / PCH_HEADER / PCH_SOURCE
+  if(bMfc)
+
+    if(DEFINED _PCH_NAME)
+      set(sPchName ${_PCH_NAME})
+    else()
+      set(sPchName ${PROJECT_NAME})
+    endif()
+
+    if(DEFINED _PCH_HEADER)
+      set(sPchHeader ${_PCH_HEADER})
+    else()
+      set(sPchHeader "stdafx.h")
+    endif()
+
+    if(DEFINED _PCH_SOURCE)
+      set(sPchSource ${_PCH_HEADER})
+    else()
+      set(sPchSource "stdafx.cpp")
+    endif()
+
   endif()
-  if(_CXX)
-    list(APPEND _EXTENSIONS ".hpp" ".cpp" ".hh"  ".cc"  ".hxx" ".cxx" ".hp"  ".cp"
+
+  # UNPARSED_ARGUMENTS
+  set(zArgumentsOfAuxSourceDirectoryEx ${_UNPARSED_ARGUMENTS})
+
+  #-----------------------------------------------------------------------------
+  # 惯例
+
+  # 扩展名
+  if(bC)
+    list(APPEND zExtensions ".h"   ".c"   ".inl")
+  endif()
+  if(bCxx)
+    list(APPEND zExtensions ".hpp" ".cpp" ".hh"  ".cc"  ".hxx" ".cxx" ".hp"  ".cp"
                             ".HPP" ".CPP" ".H"   ".C"   ".h++" ".c++" ".h"   ".inl")
   endif()
-  if(_MFC)
-    list(APPEND _EXTENSIONS ".h"   ".cpp"
+  if(bMfc)
+    list(APPEND zExtensions ".h"   ".cpp"
                             ".rc"  ".rc2" ".bmp" ".cur" ".ico")
   endif()
-  if(_QT)
-    list(APPEND _EXTENSIONS ".h"   ".cpp" ".ui"
+  if(bQt)
+    list(APPEND zExtensions ".h"   ".cpp" ".ui"
                             ".qrc" ".qml" ".ts")
   endif()
-  if(_CFG)
-    list(APPEND _EXTENSIONS ".in"  ".dox" ".md")
+  if(bCfg)
+    list(APPEND zExtensions ".in"  ".dox" ".md")
   endif()
-  list(REMOVE_DUPLICATES _EXTENSIONS)
+  list(REMOVE_DUPLICATES zExtensions)
 
-  # aux_source_directory_ex
+  # 搜集源文件
   aux_source_directory_ex(
-    ${_DIRECTORY} ${_VARIABLE} ${_UNPARSED_ARGUMENTS}
-    ${_EXPLICIT}
-    ${_EXTENSIONS}
-  )
-  set(${_VARIABLE} ${${_VARIABLE}} PARENT_SCOPE)
+    "${pDirectory}" zSrcFiles
+    ${zArgumentsOfAuxSourceDirectoryEx}
+    EXTENSIONS      ${zExtensions})
 
-  if(_MFC)
-    if(NOT DEFINED _PCH_NAME)
-      set(_PCH_NAME ${PROJECT_NAME})
-    endif()
-    if(NOT DEFINED _PCH_HEADER)
-      set(_PCH_HEADER "stdafx.h")
-    endif()
-    if(NOT DEFINED _PCH_SOURCE)
-      set(_PCH_SOURCE "stdafx.cpp")
-    endif()
-  endif()
-
-  if(_PCH_NAME AND _PCH_HEADER AND _PCH_SOURCE)
-    set(sPchFile "${CMAKE_CURRENT_BINARY_DIR}/${_PCH_NAME}$<$<CONFIG:Debug>:d>.pch")
-    foreach(sFile ${${_VARIABLE}})
-      if(NOT sFile MATCHES ".*\\.(c|cpp|cc|cxx|cp|CPP|C|c\\+\\+)$")
+  # 预编译头
+  if(sPchName AND sPchHeader AND sPchSource)
+    set(pPchFile "${CMAKE_CURRENT_BINARY_DIR}/${sPchName}$<$<CONFIG:Debug>:d>.pch")
+    foreach(pFile ${zSrcFiles})
+      if(NOT pFile MATCHES [[.*\.(c|cpp|cc|cxx|cp|CPP|C|c\+\+)$]])
         continue()
       endif()
-      get_filename_component(sName "${sFile}" NAME)
-      if(sName STREQUAL _PCH_SOURCE)
+      get_filename_component(sName "${pFile}" NAME)
+      if(sName STREQUAL sPchSource)
         set_source_files_properties(
-          ${sFile}
-          PROPERTIES COMPILE_FLAGS  "/Yc\"${_PCH_HEADER}\" /Fp\"${sPchFile}\""
-                     OBJECT_OUTPUTS "${sPchFile}")
+          "${pFile}"
+          PROPERTIES COMPILE_FLAGS  "/Yc\"${sPchHeader}\" /Fp\"${pPchFile}\""
+                     OBJECT_OUTPUTS "${pPchFile}")
       else()
         set_source_files_properties(
-          ${sFile}
-          PROPERTIES COMPILE_FLAGS  "/Yu\"${_PCH_HEADER}\" /FI\"${_PCH_HEADER}\" /Fp\"${sPchFile}\""
-                     OBJECT_DEPENDS "${sPchFile}")
+          "${pFile}"
+          PROPERTIES COMPILE_FLAGS  "/Yu\"${sPchHeader}\" /FI\"${sPchHeader}\" /Fp\"${pPchFile}\""
+                     OBJECT_DEPENDS "${pPchFile}")
       endif()
     endforeach()
   endif()
+
+  # 返回结果
+  set("${xVariable}" ${zSrcFiles} PARENT_SCOPE)
+
 endfunction()

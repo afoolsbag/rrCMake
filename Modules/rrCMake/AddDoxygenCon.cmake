@@ -10,6 +10,9 @@ include_guard()  # 3.10
 if(NOT COMMAND add_doxygen)
   include("${CMAKE_CURRENT_LIST_DIR}/AddDoxygen.cmake")
 endif()
+if(NOT COMMAND check_name_with_cmake_rules)
+  include("${CMAKE_CURRENT_LIST_DIR}/CheckNameWithCMakeRules.cmake")
+endif()
 
 #===============================================================================
 #.rst:
@@ -25,8 +28,8 @@ endif()
 #
 #   参见：
 #
-#   - `option <https://cmake.org/cmake/help/latest/command/option.html>`_
 #   - :command:`add_doxygen`
+#   - `option <https://cmake.org/cmake/help/latest/command/option.html>`_
 #   - `install <https://cmake.org/cmake/help/latest/command/install.html>`_
 function(add_doxygen_con _NAME)
   set(zDoxOneValKws)
@@ -48,64 +51,80 @@ function(add_doxygen_con _NAME)
   #-----------------------------------------------------------------------------
   # 规整化参数
 
-  set(sName                  "${_NAME}")
-  set(bAll                   "${_ALL}")
-  set(bExcludeFromAll        "${_EXCLUDE_FROM_ALL}")
+  # NAME
+  set(sName "${_NAME}")
+  check_name_with_cmake_rules("${sName}" AUTHOR_WARNING)
+  string(TOUPPER "${sName}" sNameUpper)
 
+  # ALL (ignored) / EXCLUDE_FROM_ALL
+  if(_EXCLUDE_FROM_ALL)
+    set(oAll)
+  else()
+    set(oAll ALL)
+  endif()
+
+  # WORKING_DIRECTORY
   if(DEFINED _WORKING_DIRECTORY)
-    set(pWorkingDirectory    "${_WORKING_DIRECTORY}")
+    set(pWorkingDirectory "${_WORKING_DIRECTORY}")
   else()
-    set(pWorkingDirectory    "${PROJECT_BINARY_DIR}")
+    set(pWorkingDirectory "${PROJECT_BINARY_DIR}")
   endif()
 
+  # COMMENT
   if(DEFINED _COMMENT)
-    set(sComment             "${_COMMENT}")
+    set(sComment          "${_COMMENT}")
   else()
-    set(sComment             "Generating documentation with Doxygen.")
+    set(sComment          "Generating documentation with Doxygen.")
   endif()
 
+  # STRIP_FROM_PATH
   if(DEFINED _STRIP_FROM_PATH)
-    set(sStripFromPath       "${_STRIP_FROM_PATH}")
+    set(sStripFromPath    "${_STRIP_FROM_PATH}")
   else()
-    set(sStripFromPath       "${PROJECT_SOURCE_DIR}")
+    set(sStripFromPath    "${PROJECT_SOURCE_DIR}")
   endif()
 
+  # EXTRACT_ALL
   if(DEFINED _EXTRACT_ALL)
-    set(sExtractAll          "${_EXTRACT_ALL}")
+    set(sExtractAll       "${_EXTRACT_ALL}")
   else()
-    set(sExtractAll          "YES")
+    set(sExtractAll       "YES")
   endif()
 
+  # HTML_OUTPUT
   if(DEFINED _HTML_OUTPUT)
-    set(sHtmlOutput          "${_HTML_OUTPUT}")
+    set(sHtmlOutput       "${_HTML_OUTPUT}")
   else()
-    set(sHtmlOutput          "doxygen")
+    set(sHtmlOutput       "doxygen")
   endif()
 
+  # USE_MATHJAX
   if(DEFINED _USE_MATHJAX)
-    set(sUseMathjax          "${_USE_MATHJAX}")
+    set(sUseMathjax       "${_USE_MATHJAX}")
   else()
-    set(sUseMathjax          "YES")
+    set(sUseMathjax       "YES")
   endif()
 
+  # DOT_PATH
   if(DEFINED _DOT_PATH)
-    set(sDotPath             "${_DOT_PATH}")
+    set(sDotPath          "${_DOT_PATH}")
   else()
-    set(sDotPath             "$ENV{GRAPHVIZ_DOT}")
+    set(sDotPath          "$ENV{GRAPHVIZ_DOT}")
   endif()
 
+  # PLANTUML_JAR_PATH
   if(DEFINED _PLANTUML_JAR_PATH)
-    set(sPlantumlJarPath     "${_PLANTUML_JAR_PATH}")
+    set(sPlantumlJarPath  "${_PLANTUML_JAR_PATH}")
   else()
-    set(sPlantumlJarPath     "$ENV{PLANTUML}")
+    set(sPlantumlJarPath  "$ENV{PLANTUML}")
   endif()
 
+  # UNPARSED_ARGUMENTS
   set(zArgumentsOfAddDoxygen ${_UNPARSED_ARGUMENTS})
 
   #-----------------------------------------------------------------------------
   # 启停选项
 
-  string(TOUPPER "${sName}" sNameUpper)
   string(TOUPPER "${PROJECT_NAME}" sProjectNameUpper)
   string(REGEX REPLACE "^${sProjectNameUpper}_?" "" sTrimmedNameUpper "${sNameUpper}")
   string(LENGTH "${sTrimmedNameUpper}" nLen)
@@ -122,12 +141,6 @@ function(add_doxygen_con _NAME)
 
   #-----------------------------------------------------------------------------
   # 引入并配置目标
-
-  if(bExcludeFromAll)  # 只取决于 EXCLUDE_FROM_ALL 参数，忽略 ALL 参数
-    set(oAll)
-  else()
-    set(oAll ALL)
-  endif()
 
   add_doxygen(
     "${sName}"        "${PROJECT_SOURCE_DIR}"

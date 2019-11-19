@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-11-18
+# 2016-10-08 – 2019-11-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.14)
@@ -41,6 +41,8 @@ endif()
 #
 #   参见：
 #
+#   - :command:`check_name_with_cmake_rules`
+#   - :command:`check_name_with_fext_rules`
 #   - `aux_source_directory <https://cmake.org/cmake/help/latest/command/aux_source_directory.html>`_
 #   - `file <https://cmake.org/cmake/help/latest/command/file.html>`_
 #   - `source_group <https://cmake.org/cmake/help/latest/command/source_group.html>`_
