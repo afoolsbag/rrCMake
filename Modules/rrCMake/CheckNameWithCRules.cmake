@@ -1,5 +1,5 @@
 # zhengrr
-# 2017-12-18 – 2019-11-19
+# 2017-12-18 – 2019-11-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -23,6 +23,7 @@ include_guard()  # 3.10
 #   参见：
 #
 #   - `<https://zh.cppreference.com/w/c/language/identifier>`_
+#
 function(check_name_with_c_rules sName oMode)
   if(NOT ${ARGC} EQUAL 2)
     message(FATAL_ERROR "Incorrect number of arguments: ${ARGN}.")

@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-11-18
+# 2016-10-08 – 2019-11-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -19,13 +19,13 @@ endif()
 #   .. code-block:: cmake
 #
 #     product_ex(
-#       <argument>...
+#       <argument-of-preject_ex>...
 #     )
 #
 #   参见：
 #
 #   - :command:`project_ex`
-#   - `preject <https://cmake.org/cmake/help/latest/command/project.html>`_
+#
 macro(product_ex)
   project_ex(${ARGV})
   set(PRODUCT_AUTHORS       ${PROJECT_AUTHORS})

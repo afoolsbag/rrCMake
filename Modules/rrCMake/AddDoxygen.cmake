@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-11-18
+# 2016-10-08 – 2019-11-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -7,7 +7,6 @@ cmake_policy(VERSION 3.10)
 
 include_guard()  # 3.10
 
-#===============================================================================
 #.rst:
 # .. command:: add_doxygen
 #
@@ -16,7 +15,7 @@ include_guard()  # 3.10
 #   .. code-block:: cmake
 #
 #     add_doxygen(                                                       default
-#       <argument-of-doxygen-add-docs>...
+#       <argument-of-doxygen_add_docs>...
 #       [FULL_PATH_NAMES       <YES|NO>]                                     YES
 #       [STRIP_FROM_PATH       path]
 #       [JAVADOC_AUTOBRIEF     <YES|NO>]                                      NO
@@ -33,32 +32,34 @@ include_guard()  # 3.10
 #
 #   - `FindDoxygen <https://cmake.org/cmake/help/latest/module/FindDoxygen.html>`_
 #   - `Configuration <http://doxygen.org/manual/config.html>`_
+#
 function(add_doxygen)
-  set(zDoxOneValKws)
+  set(zDoxOneValKws DOT_PATH
+                    EXTRACT_ALL
+                    FULL_PATH_NAMES
+                    HTML_OUTPUT
+                    JAVADOC_AUTOBRIEF
+                    OPTIMIZE_OUTPUT_FOR_C
+                    PLANTUML_JAR_PATH
+                    STRIP_FROM_PATH
+                    UML_LOOK
+                    USE_MATHJAX)
   set(zDoxMutValKws)
-  list(APPEND zDoxOneValKws FULL_PATH_NAMES
-                            STRIP_FROM_PATH
-                            JAVADOC_AUTOBRIEF
-                            OPTIMIZE_OUTPUT_FOR_C
-                            EXTRACT_ALL
-                            HTML_OUTPUT
-                            USE_MATHJAX
-                            DOT_PATH
-                            UML_LOOK
-                            PLANTUML_JAR_PATH)
   set(zOptKws)
   set(zOneValKws ${zDoxOneValKws})
   set(zMutValKws ${zDoxMutValKws})
   cmake_parse_arguments(PARSE_ARGV 0 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  #-----------------------------------------------------------------------------
-  # 规整化参数
+  #
+  # 参数规整
+  #
 
-  # UNPARSED_ARGUMENTS
+  # <argument-of-doxygen_add_docs>...
   set(zArgumentsOfDoxygenAddDocs ${_UNPARSED_ARGUMENTS})
 
-  #-----------------------------------------------------------------------------
-  # 查找依赖、配置参数并添加目标
+  #
+  # 业务逻辑
+  #
 
   find_package(Doxygen)
   if(NOT DOXYGEN_FOUND)

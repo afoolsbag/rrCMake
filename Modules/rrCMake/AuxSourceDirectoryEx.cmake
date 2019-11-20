@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-11-19
+# 2016-10-08 – 2019-11-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.14)
@@ -14,7 +14,6 @@ if(NOT COMMAND check_name_with_fext_rules)
   include("${CMAKE_CURRENT_LIST_DIR}/CheckNameWithFExtRules.cmake")
 endif()
 
-#===============================================================================
 #.rst
 # .. command:: aux_source_directory_ex
 #
@@ -24,19 +23,14 @@ endif()
 #
 #     aux_source_directory_ex(
 #       <directory> <variable>
-#
 #       [RECURES]
-#
 #       [MATCHES    <regex>...]
 #       [CLASHES    <regex>...]
-#
 #       [EXPLICIT]
-#       [EXTENSIONS <extensions...>]
-#
+#       [EXTENSIONS <extension...>]
 #       [FLAT]
 #       [PREFIX     <group-prefix>]
-#
-#       [PROPERTIES <property-key> <property-value> ...]
+#       [PROPERTIES < <property-key> <property-value> >...]
 #     )
 #
 #   参见：
@@ -47,25 +41,27 @@ endif()
 #   - `file <https://cmake.org/cmake/help/latest/command/file.html>`_
 #   - `source_group <https://cmake.org/cmake/help/latest/command/source_group.html>`_
 #   - `set_source_files_properties <https://cmake.org/cmake/help/latest/command/set_source_files_properties.html>`_
+#
 function(aux_source_directory_ex _DIRECTORY _VARIABLE)
-  set(zOptKws    RECURSE
-                 EXPLICIT
-                 FLAT)
+  set(zOptKws    EXPLICIT
+                 FLAT
+                 RECURSE)
   set(zOneValKws PREFIX)
-  set(zMutValKws MATCHES
-                 CLASHES
+  set(zMutValKws CLASHES
                  EXTENSIONS
+                 MATCHES
                  PROPERTIES)
   cmake_parse_arguments(PARSE_ARGV 2 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  #-----------------------------------------------------------------------------
-  # 规整化参数
+  #
+  # 参数规整
+  #
 
   if(DEFINED _UNPARSED_ARGUMENTS)
     message(FATAL_ERROR "Unexpected arguments: ${_UNPARSED_ARGUMENTS}.")
   endif()
 
-  # DIRECTORY
+  # <directory>
   set(pDirectory "${_DIRECTORY}")
   if(NOT IS_ABSOLUTE "${pDirectory}")
     set(pDirectory "${CMAKE_CURRENT_SOURCE_DIR}/${pDirectory}")
@@ -74,49 +70,49 @@ function(aux_source_directory_ex _DIRECTORY _VARIABLE)
     message(WARNING "The argument isn't a directory: ${_DIRECTORY}.")
   endif()
 
-  # VARIABLE
+  # <variable>
   set(xVariable "${_VARIABLE}")
   check_name_with_cmake_rules("${xVariable}" AUTHOR_WARNING)
 
-  # RECURES
+  # [RECURES]
   if(_RECURSE)
     set(oRecurse GLOB_RECURSE)
   else()
     set(oRecurse GLOB)
   endif()
 
-  # MATCHES
+  # [MATCHES <regex>...]
   unset(zMatches)
   if(DEFINED _MATCHES)
     set(zMatches "${_MATCHES}")
   endif()
 
-  # CLASHES
+  # [CLASHES <regex>...]
   unset(zClashes)
   if(DEFINED _CLASHES)
     set(zClashes "${_CLASHES}")
   endif()
 
-  # EXPLICIT
+  # [EXPLICIT]
   set(bExplicit "${_EXPLICIT}")
 
-  # EXTENSIONS
+  # [EXTENSIONS <extension...>]
   set(zExtensions ${_EXTENSIONS})
   foreach(sExt IN LISTS zExtensions)
     check_name_with_fext_rules("${sExt}" FATAL_ERROR)
   endforeach()
 
-  # FLAT
+  # [FLAT]
   set(bFlat "${_FLAT}")
 
-  # PREFIX
+  # [PREFIX <group-prefix>]
   if(DEFINED _PREFIX)
     set(sPrefix "${_PREFIX}")
   else()
     set(sPrefix "/")
   endif()
 
-  # PROPERTIES
+  # [PROPERTIES < <property-key> <property-value> >...]
   unset(zProperties)
   if(DEFINED _PROPERTIES)
     list(LENGTH _PROPERTIES nLen)
@@ -127,8 +123,9 @@ function(aux_source_directory_ex _DIRECTORY _VARIABLE)
     endif()
   endif()
 
-  #-----------------------------------------------------------------------------
+  #
   # 常见扩展名
+  #
 
   if(NOT bExplicit)
     get_cmake_property(zLangs ENABLED_LANGUAGES)
@@ -157,8 +154,9 @@ function(aux_source_directory_ex _DIRECTORY _VARIABLE)
     list(REMOVE_DUPLICATES zExtensions)
   endif()
 
-  #-----------------------------------------------------------------------------
+  #
   # 文件搜集
+  #
 
   set(zResults)
   foreach(sExt IN LISTS zExtensions)
@@ -204,8 +202,9 @@ function(aux_source_directory_ex _DIRECTORY _VARIABLE)
     list(REMOVE_DUPLICATES zResults)
   endif()
 
-  #-----------------------------------------------------------------------------
+  #
   # 收尾
+  #
 
   if(bFlat)
     source_group("${sPrefix}" FILES ${zResults})

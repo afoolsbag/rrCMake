@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-11-19
+# 2016-10-08 – 2019-11-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -15,7 +15,7 @@ include_guard()  # 3.10
 #   .. code-block:: cmake
 #
 #     project_ex(
-#       <argument>...
+#       <argument-of-preject>...
 #       [TIME_AS_VERSION]
 #       [AUTHORS <author>...]
 #       [LICENSE <license>]
@@ -24,32 +24,43 @@ include_guard()  # 3.10
 #   参见：
 #
 #   - `preject <https://cmake.org/cmake/help/latest/command/project.html>`_
+#
 macro(project_ex)
   set(zOptKws    TIME_AS_VERSION)
-  set(zOneValKws VERSION
-                 LICENSE)
+  set(zOneValKws LICENSE
+                 VERSION)
   set(zMutValKws AUTHORS)
-  cmake_parse_arguments("PROJECT_EX_ARG" "${zOptKws}" "${zOneValKws}" "${zMutValKws}" ${ARGV})
-  # 宏的参数解析使用全局前缀，并跳过参数规整化，减少变量污染
+  cmake_parse_arguments("_project_ex" "${zOptKws}" "${zOneValKws}" "${zMutValKws}" ${ARGV})
+
+  #
+  # 参数规整
+  #
 
   # TIME_AS_VERSION
-  if(PROJECT_EX_ARG_TIME_AS_VERSION)
-    if(NOT DEFINED PROJECT_EX_ARG_VERSION)
-      string(TIMESTAMP PROJECT_EX_ARG_VERSION "%Y.%m.%d.%H%M")
+  if(_project_ex_TIME_AS_VERSION)
+    if(NOT DEFINED _project_ex_VERSION)
+      string(TIMESTAMP _project_ex_VERSION "%Y.%m.%d.%H%M")
     else()
-      message(WARNING "Keyword VERSION is used, ignore keyword TIME_AS_VERSION.")
+      message(AUTHOR_WARNING "Keyword VERSION is used, ignore keyword TIME_AS_VERSION.")
     endif()
   endif()
-  if(DEFINED PROJECT_EX_ARG_VERSION)
-    list(INSERT PROJECT_EX_ARG_VERSION 0 VERSION)
+  if(DEFINED _project_ex_VERSION)
+    list(INSERT _project_ex_VERSION 0 VERSION)
   endif()
 
+  #
   # 基础功能
-  project(${PROJECT_EX_ARG_UNPARSED_ARGUMENTS} ${PROJECT_EX_ARG_VERSION})
+  #
+
+  project(${_project_ex_UNPARSED_ARGUMENTS} ${_project_ex_VERSION})
+
+  #
+  # 扩展功能
+  #
 
   # PROJECT_AUTHORS
-  if(DEFINED PROJECT_EX_ARG_AUTHORS)
-    set(PROJECT_AUTHORS ${PROJECT_EX_ARG_AUTHORS})
+  if(DEFINED _project_ex_AUTHORS)
+    set(PROJECT_AUTHORS ${_project_ex_AUTHORS})
   elseif(DEFINED PRODUCT_AUTHORS)
     set(PROJECT_AUTHORS ${PRODUCT_AUTHORS})
   else()
@@ -57,8 +68,8 @@ macro(project_ex)
   endif()
 
   # PROJECT_LICENSE
-  if(DEFINED PROJECT_EX_ARG_LICENSE)
-    set(PROJECT_LICENSE "${PROJECT_EX_ARG_LICENSE}")
+  if(DEFINED _project_ex_LICENSE)
+    set(PROJECT_LICENSE "${_project_ex_LICENSE}")
   elseif(DEFINED PRODUCT_LICENSE)
     set(PROJECT_LICENSE "${PRODUCT_LICENSE}")
   else()

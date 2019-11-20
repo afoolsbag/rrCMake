@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-11-18
+# 2016-10-08 – 2019-11-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -14,7 +14,6 @@ if(NOT COMMAND check_name_with_cmake_rules)
   include("${CMAKE_CURRENT_LIST_DIR}/CheckNameWithCMakeRules.cmake")
 endif()
 
-#===============================================================================
 #.rst:
 # .. command:: add_doxygen_con
 #
@@ -23,107 +22,105 @@ endif()
 #   .. code-block:: cmake
 #
 #     add_doxygen_con(
-#       <name> <argument-of-add-doxygen>...
+#       <name> <argument-of-add_doxygen>...
 #     )
 #
 #   参见：
 #
 #   - :command:`add_doxygen`
+#   - :command:`check_name_with_cmake_rules`
 #   - `option <https://cmake.org/cmake/help/latest/command/option.html>`_
 #   - `install <https://cmake.org/cmake/help/latest/command/install.html>`_
+#
 function(add_doxygen_con _NAME)
-  set(zDoxOneValKws)
+  set(zDoxOneValKws DOT_PATH
+                    EXTRACT_ALL
+                    HTML_OUTPUT
+                    PLANTUML_JAR_PATH
+                    STRIP_FROM_PATH
+                    USE_MATHJAX)
   set(zDoxMutValKws)
-  list(APPEND zDoxOneValKws STRIP_FROM_PATH
-                            EXTRACT_ALL
-                            HTML_OUTPUT
-                            USE_MATHJAX
-                            DOT_PATH
-                            PLANTUML_JAR_PATH)
-  set(zOptKws    ALL
-                 EXCLUDE_FROM_ALL)
-  set(zOneValKws WORKING_DIRECTORY
-                 COMMENT
-                 ${zDoxOneValKws})
-  set(zMutValKws ${zDoxMutValKws})
+  set(zOptKws       ALL
+                    EXCLUDE_FROM_ALL)
+  set(zOneValKws    WORKING_DIRECTORY
+                    COMMENT
+                    ${zDoxOneValKws})
+  set(zMutValKws    ${zDoxMutValKws})
   cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  #-----------------------------------------------------------------------------
-  # 规整化参数
+  #
+  # 参数规整
+  #
 
-  # NAME
+  # <name>
   set(sName "${_NAME}")
   check_name_with_cmake_rules("${sName}" AUTHOR_WARNING)
   string(TOUPPER "${sName}" sNameUpper)
 
-  # ALL (ignored) / EXCLUDE_FROM_ALL
+  # <argument-of-add_doxygen>...
+  set(zArgumentsOfAddDoxygen ${_UNPARSED_ARGUMENTS})
+
+  # doxygen_add_docs 参数惯例值
+
   if(_EXCLUDE_FROM_ALL)
     set(oAll)
   else()
     set(oAll ALL)
   endif()
 
-  # WORKING_DIRECTORY
   if(DEFINED _WORKING_DIRECTORY)
     set(pWorkingDirectory "${_WORKING_DIRECTORY}")
   else()
     set(pWorkingDirectory "${PROJECT_BINARY_DIR}")
   endif()
 
-  # COMMENT
   if(DEFINED _COMMENT)
     set(sComment          "${_COMMENT}")
   else()
     set(sComment          "Generating documentation with Doxygen.")
   endif()
 
-  # STRIP_FROM_PATH
+  # doxygen_add_docs 配置惯例值
+
   if(DEFINED _STRIP_FROM_PATH)
     set(sStripFromPath    "${_STRIP_FROM_PATH}")
   else()
     set(sStripFromPath    "${PROJECT_SOURCE_DIR}")
   endif()
 
-  # EXTRACT_ALL
   if(DEFINED _EXTRACT_ALL)
     set(sExtractAll       "${_EXTRACT_ALL}")
   else()
     set(sExtractAll       "YES")
   endif()
 
-  # HTML_OUTPUT
   if(DEFINED _HTML_OUTPUT)
     set(sHtmlOutput       "${_HTML_OUTPUT}")
   else()
     set(sHtmlOutput       "doxygen")
   endif()
 
-  # USE_MATHJAX
   if(DEFINED _USE_MATHJAX)
     set(sUseMathjax       "${_USE_MATHJAX}")
   else()
     set(sUseMathjax       "YES")
   endif()
 
-  # DOT_PATH
   if(DEFINED _DOT_PATH)
     set(sDotPath          "${_DOT_PATH}")
   else()
     set(sDotPath          "$ENV{GRAPHVIZ_DOT}")
   endif()
 
-  # PLANTUML_JAR_PATH
   if(DEFINED _PLANTUML_JAR_PATH)
     set(sPlantumlJarPath  "${_PLANTUML_JAR_PATH}")
   else()
     set(sPlantumlJarPath  "$ENV{PLANTUML}")
   endif()
 
-  # UNPARSED_ARGUMENTS
-  set(zArgumentsOfAddDoxygen ${_UNPARSED_ARGUMENTS})
-
-  #-----------------------------------------------------------------------------
+  #
   # 启停选项
+  #
 
   string(TOUPPER "${PROJECT_NAME}" sProjectNameUpper)
   string(REGEX REPLACE "^${sProjectNameUpper}_?" "" sTrimmedNameUpper "${sNameUpper}")
@@ -139,8 +136,9 @@ function(add_doxygen_con _NAME)
     return()
   endif()
 
-  #-----------------------------------------------------------------------------
-  # 引入并配置目标
+  #
+  # 业务逻辑
+  #
 
   add_doxygen(
     "${sName}"        "${PROJECT_SOURCE_DIR}"

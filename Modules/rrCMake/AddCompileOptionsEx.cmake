@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-11-18
+# 2016-10-08 – 2019-11-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -7,7 +7,6 @@ cmake_policy(VERSION 3.10)
 
 include_guard()  # 3.10
 
-#===============================================================================
 #.rst:
 # .. command:: add_compile_options_ex
 #
@@ -16,7 +15,7 @@ include_guard()  # 3.10
 #   .. code-block:: cmake
 #
 #     add_compile_options_ex(
-#       <argument-of-add-compile-options>...
+#       <argument-of-add_compile_options>...
 #       [ANALYZE]
 #       [DISABLE_LANGUAGE_EXTENSIONS]
 #       [HIGHEST_WARNING_LEVEL|RECOMMENDED_WARNING_LEVEL]
@@ -35,6 +34,7 @@ include_guard()  # 3.10
 #   - `MSVC: Warning Level <https://docs.microsoft.com/cpp/build/reference/compiler-option-warning-level>`_
 #   - `MSVC: Build with Multiple Processes <https://docs.microsoft.com/cpp/build/reference/mp-build-with-multiple-processes>`_
 #   - `MSVC: Set Source and Executable character sets to UTF-8 <https://docs.microsoft.com/cpp/build/reference/utf-8-set-source-and-executable-character-sets-to-utf-8>`_
+#
 function(add_compile_options_ex)
   set(zOptKws    ANALYZE
                  DISABLE_LANGUAGE_EXTENSIONS
@@ -48,9 +48,11 @@ function(add_compile_options_ex)
   set(zMutValKws)
   cmake_parse_arguments(PARSE_ARGV 0 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  #-----------------------------------------------------------------------------
-  # 规整化参数
+  #
+  # 参数规整
+  #
 
+  set(zArgumentsOfAddCompileOptions ${_UNPARSED_ARGUMENTS})
   set(bAnalyze                      "${_ANALYZE}")
   set(bDisableLanguageExtensions    "${_DISABLE_LANGUAGE_EXTENSIONS}")
   set(bHighestWarningLevel          "${_HIGHEST_WARNING_LEVEL}")
@@ -59,10 +61,16 @@ function(add_compile_options_ex)
   set(bUtf8                         "${_UTF-8}")
   set(bVisibleDefaultHidden         "${_VISIBLE_DEFAULT_HIDDEN}")
   set(bWarningAsError               "${_WARNING_AS_ERROR}")
-  set(zArgumentsOfAddCompileOptions ${_UNPARSED_ARGUMENTS})
 
-  #-----------------------------------------------------------------------------
+  #
+  # 基础功能
+  #
+
+  add_compile_options(${zArgumentsOfAddCompileOptions})
+
+  #
   # 扩展功能
+  #
 
   get_cmake_property(zLangs ENABLED_LANGUAGES)
 
@@ -138,10 +146,5 @@ function(add_compile_options_ex)
       add_compile_options("/WX")
     endif()
   endif()
-
-  #-----------------------------------------------------------------------------
-  # 基础功能
-
-  add_compile_options(${zArgumentsOfAddCompileOptions})
 
 endfunction()

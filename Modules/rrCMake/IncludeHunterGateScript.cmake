@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-06-05 – 2019-11-18
+# 2019-06-05 – 2019-11-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -10,19 +10,29 @@ include_guard()  # 3.10
 #.rst:
 # .. command:: include_hunter_gate_script
 #
-#   检查、下载并包含 `HunterGate` 脚本。
+#   检查、下载并包含 `HunterGate.cmake` 脚本。
+#
+#   .. code-block:: cmake
+#
+#     include_conan_script()
+#
+#   参见：
+#
+#   - `Hunter <https://github.com/cpp-pm/hunter>`_
+#
 macro(include_hunter_gate_script)
   if(NOT EXISTS "${CMAKE_BINARY_DIR}/HunterGate.cmake")
     message(STATUS "Downloading HunterGate.cmake script")
-    file(DOWNLOAD "https://raw.githubusercontent.com/hunter-packages/gate/master/cmake/HunterGate.cmake"
-                  "${CMAKE_BINARY_DIR}/HunterGate.cmake"
-                  SHOW_PROGRESS
-         STATUS   INCLUDE_HUNTER_GATE_SCRIPT_VAR_STATUS)
-    list(GET INCLUDE_HUNTER_GATE_SCRIPT_VAR_STATUS 0 INCLUDE_HUNTER_GATE_SCRIPT_VAR_STATUS_CODE)
-    if(NOT INCLUDE_HUNTER_GATE_SCRIPT_VAR_STATUS_CODE EQUAL 0)
+    file(
+      DOWNLOAD "https://raw.githubusercontent.com/hunter-packages/gate/master/cmake/HunterGate.cmake"
+               "${CMAKE_BINARY_DIR}/HunterGate.cmake"
+               SHOW_PROGRESS
+      STATUS   _include_hunter_gate_script_Status)
+    list(GET _include_hunter_gate_script_Status 0 _include_hunter_gate_script_StatusCode)
+    if(NOT _include_hunter_gate_script_StatusCode EQUAL 0)
       file(REMOVE "${CMAKE_BINARY_DIR}/HunterGate.cmake")
-      list(GET INCLUDE_HUNTER_GATE_SCRIPT_VAR_STATUS 1 INCLUDE_HUNTER_GATE_SCRIPT_VAR_STATUS_TEXT)
-      message(FATAL_ERROR "Download HunterGate.cmake script failed: ${INCLUDE_HUNTER_GATE_SCRIPT_VAR_STATUS_TEXT}")
+      list(GET _include_hunter_gate_script_Status 1 _include_hunter_gate_script_StatusText)
+      message(FATAL_ERROR "Download HunterGate.cmake script failed: ${_include_hunter_gate_script_StatusText}")
     endif()
     message(STATUS "Downloading HunterGate.cmake script - done")
   endif()
@@ -43,15 +53,16 @@ macro(include_hunter_gate_script)
 
   # https://github.com/cpp-pm/hunter/releases
   HunterGate(
-    URL "https://github.com/cpp-pm/hunter/archive/v0.23.228.tar.gz"
-    SHA1 "0546cabd20ed784a2245083eb59e9185bf1d63a9")
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.229.tar.gz"
+    SHA1 "be830371b9ac8d74591cf0a7f9403de4189f0977")
 
   # 默认将 Hunter 参数隐藏到 Advanced
-  mark_as_advanced(HUNTER_CONFIGURATION_TYPES
-                   HUNTER_ENABLED
-                   HUNTER_MSVC_VCVARSALL
-                   HUNTER_NO_TOOLCHAIN_ID_RECALCULATION
-                   HUNTER_STATUS_DEBUG
-                   HUNTER_STATUS_PRINT
-                   HUNTER_TLS_VERIFY)
+  mark_as_advanced(
+    HUNTER_CONFIGURATION_TYPES
+    HUNTER_ENABLED
+    HUNTER_MSVC_VCVARSALL
+    HUNTER_NO_TOOLCHAIN_ID_RECALCULATION
+    HUNTER_STATUS_DEBUG
+    HUNTER_STATUS_PRINT
+    HUNTER_TLS_VERIFY)
 endmacro()

@@ -1,5 +1,5 @@
 # zhengrr
-# 2017-12-18 – 2019-11-18
+# 2017-12-18 – 2019-11-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -11,7 +11,6 @@ if(NOT COMMAND check_name_with_cmake_rules)
   include("${CMAKE_CURRENT_LIST_DIR}/CheckNameWithCMakeRules.cmake")
 endif()
 
-#===============================================================================
 #.rst:
 # .. command:: add_executable_ex
 #
@@ -20,7 +19,7 @@ endif()
 #   .. code-block:: cmake
 #
 #     add_executable_ex(
-#       <name> <argument-of-add-executable>...
+#       <name> <argument-of-add_executable>...
 #       [PROPERTIES          < <property-key> <property-value> >...]
 #       [COMPILE_DEFINITIONS < <INTERFACE|PUBLIC|PRIVATE> <definition>... >...]
 #       [COMPILE_FEATURES    < <INTERFACE|PUBLIC|PRIVATE> <feature>... >...]
@@ -34,6 +33,7 @@ endif()
 #
 #   参见：
 #
+#   - :command:`check_name_with_cmake_rules`
 #   - `add_executable <https://cmake.org/cmake/help/latest/command/add_executable.html>`_
 #   - `set_target_properties <https://cmake.org/cmake/help/latest/command/set_target_properties.html>`_
 #   - `target_compile_definitions <https://cmake.org/cmake/help/latest/command/target_compile_definitions.html>`_
@@ -44,26 +44,33 @@ endif()
 #   - `target_link_libraries <https://cmake.org/cmake/help/latest/command/target_link_libraries.html>`_
 #   - `target_link_options <https://cmake.org/cmake/help/latest/command/target_link_options.html>`_
 #   - `target_sources <https://cmake.org/cmake/help/latest/command/target_sources.html>`_
+#
 function(add_executable_ex _NAME)
   set(zOptKws)
   set(zOneValKws)
-  set(zMutValKws PROPERTIES
-                 COMPILE_DEFINITIONS
+  set(zMutValKws COMPILE_DEFINITIONS
                  COMPILE_FEATURES
                  COMPILE_OPTIONS
                  INCLUDE_DIRECTORIES
                  LINK_DIRECTORIES
                  LINK_LIBRARIES
                  LINK_OPTIONS
+                 PROPERTIES
                  SOURCES)
   cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  #-----------------------------------------------------------------------------
-  # 规整化参数
+  #
+  # 参数规整
+  #
 
+  # <name>
   set(sName "${_NAME}")
   check_name_with_cmake_rules("${sName}" AUTHOR_WARNING)
 
+  # <argument-of-add_executable>...
+  set(zArgumentsOfAddExecutable ${_UNPARSED_ARGUMENTS})
+
+  # [PROPERTIES < <property-key> <property-value> >...]
   unset(zProperties)
   if(DEFINED _PROPERTIES)
     list(LENGTH _PROPERTIES nLen)
@@ -74,6 +81,7 @@ function(add_executable_ex _NAME)
     endif()
   endif()
 
+  # [COMPILE_DEFINITIONS < <INTERFACE|PUBLIC|PRIVATE> <definition>... >...]
   unset(zCompileDefinitions)
   if(DEFINED _COMPILE_DEFINITIONS)
     list(LENGTH _COMPILE_DEFINITIONS nLen)
@@ -84,6 +92,7 @@ function(add_executable_ex _NAME)
     endif()
   endif()
 
+  # [COMPILE_FEATURES < <INTERFACE|PUBLIC|PRIVATE> <feature>... >...]
   unset(zCompileFeatures)
   if(DEFINED _COMPILE_FEATURES)
     list(LENGTH _COMPILE_FEATURES nLen)
@@ -94,6 +103,7 @@ function(add_executable_ex _NAME)
     endif()
   endif()
 
+  # [COMPILE_OPTIONS < <INTERFACE|PUBLIC|PRIVATE> <option>... >...]
   unset(zCompileOptions)
   if(DEFINED _COMPILE_OPTIONS)
     list(LENGTH _COMPILE_OPTIONS nLen)
@@ -104,6 +114,7 @@ function(add_executable_ex _NAME)
     endif()
   endif()
 
+  # [INCLUDE_DIRECTORIES < <INTERFACE|PUBLIC|PRIVATE> <directory>... >...]
   unset(zIncludeDirectories)
   if(DEFINED _INCLUDE_DIRECTORIES)
     list(LENGTH _INCLUDE_DIRECTORIES nLen)
@@ -114,6 +125,7 @@ function(add_executable_ex _NAME)
     endif()
   endif()
 
+  # [LINK_DIRECTORIES < <INTERFACE|PUBLIC|PRIVATE> <directory>... >...]
   unset(zLinkDirectories)
   if(DEFINED _LINK_DIRECTORIES)
     list(LENGTH _LINK_DIRECTORIES nLen)
@@ -124,6 +136,7 @@ function(add_executable_ex _NAME)
     endif()
   endif()
 
+  # [LINK_LIBRARIES < <INTERFACE|PUBLIC|PRIVATE> <library>... >...]
   unset(zLinkLibraries)
   if(DEFINED _LINK_LIBRARIES)
     list(LENGTH _LINK_LIBRARIES nLen)
@@ -134,6 +147,7 @@ function(add_executable_ex _NAME)
     endif()
   endif()
 
+  # [LINK_OPTIONS < <INTERFACE|PUBLIC|PRIVATE> <option>... >...]
   unset(zLinkOptions)
   if(DEFINED _LINK_OPTIONS)
     list(LENGTH _LINK_OPTIONS nLen)
@@ -144,6 +158,7 @@ function(add_executable_ex _NAME)
     endif()
   endif()
 
+  # [SOURCES < <INTERFACE|PUBLIC|PRIVATE> <source>... >...]
   unset(zSources)
   if(DEFINED _SOURCES)
     list(LENGTH _SOURCES nLen)
@@ -154,15 +169,15 @@ function(add_executable_ex _NAME)
     endif()
   endif()
 
-  set(zArgumentsOfAddExecutable ${_UNPARSED_ARGUMENTS})
-
-  #-----------------------------------------------------------------------------
+  #
   # 基础功能
+  #
 
   add_executable("${sName}" ${zArgumentsOfAddExecutable})
 
-  #-----------------------------------------------------------------------------
+  #
   # 扩展功能
+  #
 
   if(DEFINED zProperties)
     set_target_properties("${sName}" PROPERTIES ${zProperties})

@@ -1,5 +1,5 @@
 # zhengrr
-# 2017-12-18 – 2019-11-18
+# 2017-12-18 – 2019-11-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -20,7 +20,6 @@ if(NOT COMMAND post_build_copy_link_library_files)
   include("${CMAKE_CURRENT_LIST_DIR}/PostBuildCopyLinkLibraryFiles.cmake")
 endif()
 
-#===============================================================================
 #.res:
 # .. command:: add_executable_con
 #
@@ -29,7 +28,7 @@ endif()
 #   .. code-block:: cmake
 #
 #     add_executable_con(
-#       <name> <argument-of-add-executable>...
+#       <name> <argument-of-add_executable>...
 #       [PROPERTIES          < <property-key> <property-value> >...]
 #       [COMPILE_DEFINITIONS < <INTERFACE|PUBLIC|PRIVATE> <definition>... >...]
 #       [COMPILE_FEATURES    < <INTERFACE|PUBLIC|PRIVATE> <feature>... >...]
@@ -44,79 +43,96 @@ endif()
 #   参见：
 #
 #   - :command:`add_executable_ex`
+#   - :command:`check_name_with_cmake_rules`
+#   - :command:`get_toolset_architecture_address_model_tag`
+#   - :command:`post_build_copy_link_library_files`
 #   - `option <https://cmake.org/cmake/help/latest/command/option.html>`_
 #   - `install <https://cmake.org/cmake/help/latest/command/install.html>`_
+#
 function(add_executable_con _NAME)
   set(zOptKws)
   set(zOneValKws)
-  set(zMutValKws PROPERTIES
-                 COMPILE_DEFINITIONS
+  set(zMutValKws COMPILE_DEFINITIONS
                  COMPILE_FEATURES
                  COMPILE_OPTIONS
                  INCLUDE_DIRECTORIES
                  LINK_DIRECTORIES
                  LINK_LIBRARIES
                  LINK_OPTIONS
+                 PROPERTIES
                  SOURCES)
   cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  #-----------------------------------------------------------------------------
-  # 规整化参数
+  #
+  # 参数规整
+  #
 
+  # <name>
   set(sName "${_NAME}")
   check_name_with_cmake_rules("${sName}" AUTHOR_WARNING)
+  string(TOUPPER "${sName}" sNameUpper)
 
+  # <argument-of-add_executable>...
+  set(zArgumentsOfAddExecutable ${_UNPARSED_ARGUMENTS})
+
+  # [PROPERTIES < <property-key> <property-value> >...]
   unset(zProperties)
   if(DEFINED _PROPERTIES)
     set(zProperties PROPERTIES ${_PROPERTIES})
   endif()
 
+  # [COMPILE_DEFINITIONS < <INTERFACE|PUBLIC|PRIVATE> <definition>... >...]
   unset(zCompileDefinitions)
   if(DEFINED _COMPILE_DEFINITIONS)
     set(zCompileDefinitions COMPILE_DEFINITIONS ${_COMPILE_DEFINITIONS})
   endif()
 
+  # [COMPILE_FEATURES < <INTERFACE|PUBLIC|PRIVATE> <feature>... >...]
   unset(zCompileFeatures)
   if(DEFINED _COMPILE_FEATURES)
     set(zCompileFeatures COMPILE_FEATURES ${_COMPILE_FEATURES})
   endif()
 
+  # [COMPILE_OPTIONS < <INTERFACE|PUBLIC|PRIVATE> <option>... >...]
   unset(zCompileOptions)
   if(DEFINED _COMPILE_OPTIONS)
     set(zCompileOptions COMPILE_OPTIONS ${_COMPILE_OPTIONS})
   endif()
 
+  # [INCLUDE_DIRECTORIES < <INTERFACE|PUBLIC|PRIVATE> <directory>... >...]
   unset(zIncludeDirectories)
   if(DEFINED _INCLUDE_DIRECTORIES)
     set(zIncludeDirectories INCLUDE_DIRECTORIES ${_INCLUDE_DIRECTORIES})
   endif()
 
+  # [LINK_DIRECTORIES < <INTERFACE|PUBLIC|PRIVATE> <directory>... >...]
   unset(zLinkDirectories)
   if(DEFINED _LINK_DIRECTORIES)
     set(zLinkDirectories LINK_DIRECTORIES ${_LINK_DIRECTORIES})
   endif()
 
+  # [LINK_LIBRARIES < <INTERFACE|PUBLIC|PRIVATE> <library>... >...]
   unset(zLinkLibraries)
   if(DEFINED _LINK_LIBRARIES)
     set(zLinkLibraries LINK_LIBRARIES ${_LINK_LIBRARIES})
   endif()
 
+  # [LINK_OPTIONS < <INTERFACE|PUBLIC|PRIVATE> <option>... >...]
   unset(zLinkOptions)
   if(DEFINED _LINK_OPTIONS)
     set(zLinkOptions LINK_OPTIONS ${_LINK_OPTIONS})
   endif()
 
+  # [SOURCES < <INTERFACE|PUBLIC|PRIVATE> <source>... >...]
   unset(zSources)
   if(DEFINED _SOURCES)
     set(zSources SOURCES ${_SOURCES})
   endif()
 
-  set(zArgumentsOfAddExecutable ${_UNPARSED_ARGUMENTS})
-
-  #-----------------------------------------------------------------------------
+  #
   # 启停选项
+  #
 
-  string(TOUPPER "${sName}" sNameUpper)
   string(TOUPPER "${PROJECT_NAME}" sProjectNameUpper)
   string(REGEX REPLACE "^${sProjectNameUpper}_?" "" sTrimmedNameUpper "${sNameUpper}")
   string(LENGTH "${sTrimmedNameUpper}" nLen)
@@ -131,8 +147,9 @@ function(add_executable_con _NAME)
     return()
   endif()
 
-  #-----------------------------------------------------------------------------
-  # 引入并配置目标
+  #
+  # 业务逻辑
+  #
 
   if(NOT DEFINED zProperties)
     set(zProperties PROPERTIES)

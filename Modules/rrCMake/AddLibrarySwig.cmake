@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-11-18
+# 2016-10-08 – 2019-11-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.12)
@@ -20,7 +20,6 @@ if(NOT COMMAND post_build_copy_link_library_files)
   include("${CMAKE_CURRENT_LIST_DIR}/PostBuildCopyLinkLibraryFiles.cmake")
 endif()
 
-#===============================================================================
 #.res:
 # .. command:: add_library_swig
 #
@@ -29,7 +28,7 @@ endif()
 #   .. code-block:: cmake
 #
 #     add_library_swig(
-#       <name> <argument-of-add-library>...
+#       <name> <argument-of-add_library>...
 #       <SWIG_LANGUAGE        <CSHARP|D|GO|GUILE|JAVA|JAVASCRIPT|LUA|OCTAVE|PERL5|PHP7|PYTHON|R|RUBY|SCILAB|TCL8|XML> >
 #       <SWIG_INTERFACE       <path-to-interface.swg>>
 #       [SWIG_OUTPUT_DIR      <path-to-output-diractory>]
@@ -48,35 +47,46 @@ endif()
 #   参见：
 #
 #   - :command:`add_library_con`
+#   - :command:`check_name_with_cmake_rules`
+#   - :command:`get_toolset_architecture_address_model_tag`
+#   - :command:`post_build_copy_link_library_files`
+#
 function(add_library_swig _NAME)
   set(zOptKws)
-  set(zOneValKws SWIG_LANGUAGE
-                 SWIG_INTERFACE
+  set(zOneValKws SWIG_INTERFACE
+                 SWIG_LANGUAGE
                  SWIG_OUTPUT_DIR)
-  set(zMutValKws SWIG_ARGUMENTS
-                 PROPERTIES
-                 COMPILE_DEFINITIONS
+  set(zMutValKws COMPILE_DEFINITIONS
                  COMPILE_FEATURES
                  COMPILE_OPTIONS
                  INCLUDE_DIRECTORIES
                  LINK_DIRECTORIES
                  LINK_LIBRARIES
                  LINK_OPTIONS
-                 SOURCES)
+                 PROPERTIES
+                 SOURCES
+                 SWIG_ARGUMENTS)
   cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  #-----------------------------------------------------------------------------
-  # 规整化参数
+  #
+  # 参数规整
+  #
 
+  # <name>
   set(sName "${_NAME}")
   check_name_with_cmake_rules("${sName}" AUTHOR_WARNING)
 
+  # <argument-of-add_library>...
+  set(zArgumentsOfAddLibrary ${_UNPARSED_ARGUMENTS})
+
+  # <SWIG_LANGUAGE <CSHARP|D|GO|GUILE|JAVA|JAVASCRIPT|LUA|OCTAVE|PERL5|PHP7|PYTHON|R|RUBY|SCILAB|TCL8|XML> >
   if(NOT DEFINED _SWIG_LANGUAGE)
     message(FATAL_ERROR "Missing SWIG_LANGUAGE argument.")
   else()
   set(sSwigLanguage "${_SWIG_LANGUAGE}")
   string(TOLOWER ${sSwigLanguage} sSwigLanguageLower)
 
+  # <SWIG_INTERFACE <path-to-interface.swg>>
   if(NOT DEFINED _SWIG_INTERFACE)
     message(FATAL_ERROR "Missing SWIG_INTERFACE argument.")
   endif()
@@ -89,6 +99,7 @@ function(add_library_swig _NAME)
   endif()
   get_filename_component(sSwigInterfaceWle "${pSwigInterface}" NAME_WLE)
 
+  # [SWIG_OUTPUT_DIR <path-to-output-diractory>]
   if(DEFINED _SWIG_OUTPUT_DIR)
     set(pSwigOutputDir "${_SWIG_OUTPUT_DIR}")
   else()
@@ -103,59 +114,67 @@ function(add_library_swig _NAME)
     message(FATAL_ERROR "The SWIG output directory isn't a directory: ${_SWIG_OUTPUT_DIR}.")
   endif()
 
+  # [SWIG_ARGUMENTS <arguments>...]
   set(zSwigArguments ${_SWIG_ARGUMENTS})
 
+  # [PROPERTIES < <property-key> <property-value> >...]
   unset(zProperties)
   if(DEFINED _PROPERTIES)
     set(zProperties PROPERTIES ${_PROPERTIES})
   endif()
 
+  # [COMPILE_DEFINITIONS < <INTERFACE|PUBLIC|PRIVATE> <definition>... >...]
   unset(zCompileDefinitions)
   if(DEFINED _COMPILE_DEFINITIONS)
     set(zCompileDefinitions COMPILE_DEFINITIONS ${_COMPILE_DEFINITIONS})
   endif()
 
+  # [COMPILE_FEATURES < <INTERFACE|PUBLIC|PRIVATE> <feature>... >...]
   unset(zCompileFeatures)
   if(DEFINED _COMPILE_FEATURES)
     set(zCompileFeatures COMPILE_FEATURES ${_COMPILE_FEATURES})
   endif()
 
+  # [COMPILE_OPTIONS < <INTERFACE|PUBLIC|PRIVATE> <option>... >...]
   unset(zCompileOptions)
   if(DEFINED _COMPILE_OPTIONS)
     set(zCompileOptions COMPILE_OPTIONS ${_COMPILE_OPTIONS})
   endif()
 
+  # [INCLUDE_DIRECTORIES < <INTERFACE|PUBLIC|PRIVATE> <directory>... >...]
   unset(zIncludeDirectories)
   if(DEFINED _INCLUDE_DIRECTORIES)
     set(zIncludeDirectories INCLUDE_DIRECTORIES ${_INCLUDE_DIRECTORIES})
   endif()
 
+  # [LINK_DIRECTORIES < <INTERFACE|PUBLIC|PRIVATE> <directory>... >...]
   unset(zLinkDirectories)
   if(DEFINED _LINK_DIRECTORIES)
     set(zLinkDirectories LINK_DIRECTORIES ${_LINK_DIRECTORIES})
   endif()
 
+  # [LINK_LIBRARIES < <INTERFACE|PUBLIC|PRIVATE> <library>... >...]
   unset(zLinkLibraries)
   if(DEFINED _LINK_LIBRARIES)
     set(zLinkLibraries LINK_LIBRARIES ${_LINK_LIBRARIES})
   endif()
 
+  # [LINK_OPTIONS < <INTERFACE|PUBLIC|PRIVATE> <option>... >...]
   unset(zLinkOptions)
   if(DEFINED _LINK_OPTIONS)
     set(zLinkOptions LINK_OPTIONS ${_LINK_OPTIONS})
   endif()
 
+  # [SOURCES < <INTERFACE|PUBLIC|PRIVATE> <source>... >...]
   unset(zSources)
   if(DEFINED _SOURCES)
     set(zSources SOURCES ${_SOURCES})
   endif()
 
-  set(zArgumentsOfAddLibrary ${_UNPARSED_ARGUMENTS})
-
-  #-----------------------------------------------------------------------------
-  # 调用 SWIG 生成
   #
+  # 调用 SWIG 生成：
   # 在 CMake 配置时初步生成，并为目标加入前置构建，在每次编译前自动重新生成
+  #
 
   find_package(SWIG REQUIRED)  # CMP0074 3.12
 
@@ -204,8 +223,9 @@ function(add_library_swig _NAME)
     message(FATAL_ERROR "Gennerate SWIG ${sSwigLanguage} files failed: ${nResultCode}")
   endif()
 
-  #-----------------------------------------------------------------------------
-  # 引入并配置目标
+  #
+  # 添加目标
+  #
 
   if(NOT DEFINED zIncludeDirectories)
     set(zIncludeDirectories INCLUDE_DIRECTORIES)
@@ -238,6 +258,6 @@ function(add_library_swig _NAME)
             ${zSwigArguments}
             "${pSwigInterface}")
 
-  post_build_copy_link_library_files("${sName}" INCLUDE_ITSELF RECURSE DESTINATION "${sSwigOutputDir}")
+  post_build_copy_link_library_files("${sName}" INCLUDE_ITSELF RECURSE DESTINATION "${pSwigOutputDir}")
 
 endfunction()
