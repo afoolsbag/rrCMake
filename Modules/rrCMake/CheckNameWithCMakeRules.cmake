@@ -11,7 +11,8 @@ include_guard()  # 3.10
 # .. command:: check_name_with_cmake_rules
 #
 #   检查输入是否符合 CMake 推荐变量命名规则：
-#   仅包含拉丁字母、阿拉伯数字、下划线、连字符和冒号（用于域分隔）。
+#   仅包含拉丁字母、阿拉伯数字、下划线和连字符；
+#   另引入双冒号（``::``）用于域分隔，尾部双加号（``++``）用于某些库的 C++ 版本。
 #
 #   .. code-block:: cmake
 #
@@ -28,7 +29,7 @@ function(check_name_with_cmake_rules sName oMode)
   if(NOT ${ARGC} EQUAL 2)
     message(FATAL_ERROR "Incorrect number of arguments: ${ARGN}.")
   endif()
-  if(NOT "${sName}" MATCHES "^[-0-9:A-Z_a-z]+$")
+  if(NOT "${sName}" MATCHES [[^[-0-9A-Z_a-z]+(::[-0-9A-Z_a-z]+)*(\+\+)?$]])
     message(${oMode} "The name isn't meet CMake recommend variable rules: ${sName}.")
   endif()
 endfunction()
