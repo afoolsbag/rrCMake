@@ -42,7 +42,7 @@ function(add_subdirectory_con _SOURCE_DIRECTORY)
 
   # <source-directory>
   set(pSourceDirectory "${_SOURCE_DIRECTORY}")
-  get_filename_component(sSourceDirectoryName NAME)
+  get_filename_component(sSourceDirectoryName "${pSourceDirectory}" NAME)
   string(TOUPPER "${sSourceDirectoryName}" sSourceDirectoryNameUpper)
 
   # <argument-of-add_subdirectory>...
