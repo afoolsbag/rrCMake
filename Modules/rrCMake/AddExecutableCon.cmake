@@ -1,5 +1,5 @@
 # zhengrr
-# 2017-12-18 – 2019-11-20
+# 2017-12-18 – 2019-11-25
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -155,12 +155,12 @@ function(add_executable_con _NAME)
     set(zProperties PROPERTIES)
   endif()
   # 在 Debug 构建下，循惯例以 d 后缀
-  if(NOT DEBUG_POSTFIX IN_LIST ozProperties)
-    list(APPEND ozProperties DEBUG_POSTFIX "d")
+  if(NOT DEBUG_POSTFIX IN_LIST zProperties)
+    list(APPEND zProperties DEBUG_POSTFIX "d")
   endif()
   # 以原始名而非修饰名作为输出文件名
-  if(NOT OUTPUT_NAME IN_LIST ozProperties)
-    list(APPEND ozProperties OUTPUT_NAME "${sName}")
+  if(NOT OUTPUT_NAME IN_LIST zProperties)
+    list(APPEND zProperties OUTPUT_NAME "${sName}")
   endif()
 
   add_executable_ex(
