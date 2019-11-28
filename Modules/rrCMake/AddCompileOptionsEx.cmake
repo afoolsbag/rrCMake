@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-11-20
+# 2016-10-08 – 2019-11-27
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -20,6 +20,7 @@ include_guard()  # 3.10
 #       [DISABLE_LANGUAGE_EXTENSIONS]
 #       [HIGHEST_WARNING_LEVEL|RECOMMENDED_WARNING_LEVEL]
 #       [MULTIPLE_PROCESSES]
+#       [SECURITY_DEVELOPMENT_LIFECYCLE]
 #       [UTF-8]
 #       [VISIBLE_DEFAULT_HIDDEN]
 #       [WARNING_AS_ERROR]
@@ -28,12 +29,13 @@ include_guard()  # 3.10
 #   参见：
 #
 #   - `add_compile_options <https://cmake.org/cmake/help/latest/command/add_compile_options.html>`_
-#   - `MSVC: Code Analysis <https://docs.microsoft.com/cpp/build/reference/analyze-code-analysis>`_
-#   - `MSVC: Disable Language Extensions <https://docs.microsoft.com/cpp/build/reference/za-ze-disable-language-extensions>`_
+#   - `MSVC: 代码分析 <https://docs.microsoft.com/cpp/build/reference/analyze-code-analysis>`_
+#   - `MSVC: 禁用语言扩展 <https://docs.microsoft.com/cpp/build/reference/za-ze-disable-language-extensions>`_
 #   - `GCC: Warning Options <https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html>`_
-#   - `MSVC: Warning Level <https://docs.microsoft.com/cpp/build/reference/compiler-option-warning-level>`_
-#   - `MSVC: Build with Multiple Processes <https://docs.microsoft.com/cpp/build/reference/mp-build-with-multiple-processes>`_
-#   - `MSVC: Set Source and Executable character sets to UTF-8 <https://docs.microsoft.com/cpp/build/reference/utf-8-set-source-and-executable-character-sets-to-utf-8>`_
+#   - `MSVC: 警告级别 <https://docs.microsoft.com/cpp/build/reference/compiler-option-warning-level>`_
+#   - `MSVC: 使用多个进程生成 <https://docs.microsoft.com/cpp/build/reference/mp-build-with-multiple-processes>`_
+#   - `MSVC: 启用附加安全检查 <https://docs.microsoft.com/cpp/build/reference/sdl-enable-additional-security-checks>`_
+#   - `MSVC: 将源和可执行字符集设置为 UTF-8 <https://docs.microsoft.com/cpp/build/reference/utf-8-set-source-and-executable-character-sets-to-utf-8>`_
 #
 function(add_compile_options_ex)
   set(zOptKws    ANALYZE
@@ -41,6 +43,7 @@ function(add_compile_options_ex)
                  HIGHEST_WARNING_LEVEL
                  MULTIPLE_PROCESSES
                  RECOMMENDED_WARNING_LEVEL
+                 SECURITY_DEVELOPMENT_LIFECYCLE
                  UTF-8
                  VISIBLE_DEFAULT_HIDDEN
                  WARNING_AS_ERROR)
@@ -57,6 +60,7 @@ function(add_compile_options_ex)
   set(bDisableLanguageExtensions    "${_DISABLE_LANGUAGE_EXTENSIONS}")
   set(bHighestWarningLevel          "${_HIGHEST_WARNING_LEVEL}")
   set(bMultipleProcesses            "${_MULTIPLE_PROCESSES}")
+  set(bSecurityDevelopmentLifecycle "${SECURITY_DEVELOPMENT_LIFECYCLE}")
   set(bRecommendedWarningLevel      "${_RECOMMENDED_WARNING_LEVEL}")
   set(bUtf8                         "${_UTF-8}")
   set(bVisibleDefaultHidden         "${_VISIBLE_DEFAULT_HIDDEN}")
@@ -117,6 +121,12 @@ function(add_compile_options_ex)
   if(bMultipleProcesses)
     if(MSVC)
       add_compile_options("/MP")
+    endif()
+  endif()
+
+  if(bSecurityDevelopmentLifecycle)
+    if(MSVC)
+      add_compile_options("/sdl")
     endif()
   endif()
 
