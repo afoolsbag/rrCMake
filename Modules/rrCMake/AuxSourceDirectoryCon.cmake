@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2019-11-20
+# 2016-10-08 – 2019-12-11
 # Unlicense
 
 cmake_minimum_required(VERSION 3.14)
@@ -55,7 +55,7 @@ function(aux_source_directory_con _DIRECTORY _VARIABLE)
   set(xVariable "${_VARIABLE}")
   check_name_with_cmake_rules("${xVariable}" AUTHOR_WARNING)
 
-  # aux_source_directory_ex: [EXTENSIONS <extension...>]
+  # aux_source_directory_ex: [EXTENSIONS <extension...>] [other-arguments...]
   set(zExtensions ${_EXTENSIONS})
 
   # <argument-of-aux_source_directory_ex>...
@@ -97,31 +97,29 @@ function(aux_source_directory_con _DIRECTORY _VARIABLE)
   #
 
   if(bC)
-    list(APPEND zExtensions ".h"   ".c"   ".inl")
+    list(INSERT 0 zExtensions ".h"   ".c"   ".inl")
   endif()
 
   if(bCxx)
-    list(APPEND zExtensions ".hpp" ".hxx" ".hp"  ".hh"  ".h++" ".H"   ".h"
+    list(INSERT 0 zExtensions ".hpp" ".hxx" ".hp"  ".hh"  ".h++" ".H"   ".h"
                             ".cpp" ".cxx" ".cp"  ".cc"  ".c++" ".C"
                             ".tpp" ".txx" ".tp"         ".t++"        ".inc"
                                                                       ".inl")
   endif()
 
   if(bMfc)
-    list(APPEND zExtensions ".h"   ".cpp"
+    list(INSERT 0 zExtensions ".h"   ".cpp"
                             ".rc"  ".rc2" ".bmp" ".cur" ".ico")
   endif()
 
   if(bQt)
-    list(APPEND zExtensions ".h"   ".cpp" ".ui"
+    list(INSERT 0 zExtensions ".h"   ".cpp" ".ui"
                             ".qrc" ".qml" ".ts")
   endif()
 
   if(bCfg)
-    list(APPEND zExtensions ".in"  ".dox" ".md")
+    list(INSERT 0 zExtensions ".in"  ".dox" ".md")
   endif()
-
-  list(REMOVE_DUPLICATES zExtensions)
 
   #
   # 搜集源文件
