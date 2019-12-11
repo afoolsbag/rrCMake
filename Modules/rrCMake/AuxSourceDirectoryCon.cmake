@@ -97,28 +97,28 @@ function(aux_source_directory_con _DIRECTORY _VARIABLE)
   #
 
   if(bC)
-    list(INSERT 0 zExtensions ".h"   ".c"   ".inl")
+    list(INSERT zExtensions 0 ".h"   ".c"   ".inl")
   endif()
 
   if(bCxx)
-    list(INSERT 0 zExtensions ".hpp" ".hxx" ".hp"  ".hh"  ".h++" ".H"   ".h"
-                            ".cpp" ".cxx" ".cp"  ".cc"  ".c++" ".C"
-                            ".tpp" ".txx" ".tp"         ".t++"        ".inc"
-                                                                      ".inl")
+    list(INSERT zExtensions 0 ".hpp" ".hxx" ".hp"  ".hh"  ".h++" ".H"   ".h"
+                              ".cpp" ".cxx" ".cp"  ".cc"  ".c++" ".C"
+                              ".tpp" ".txx" ".tp"         ".t++"        ".inc"
+                                                                        ".inl")
   endif()
 
   if(bMfc)
-    list(INSERT 0 zExtensions ".h"   ".cpp"
-                            ".rc"  ".rc2" ".bmp" ".cur" ".ico")
+    list(INSERT zExtensions 0 ".h"   ".cpp"
+                              ".rc"  ".rc2" ".bmp" ".cur" ".ico")
   endif()
 
   if(bQt)
-    list(INSERT 0 zExtensions ".h"   ".cpp" ".ui"
-                            ".qrc" ".qml" ".ts")
+    list(INSERT zExtensions 0 ".h"   ".cpp" ".ui"
+                              ".qrc" ".qml" ".ts")
   endif()
 
   if(bCfg)
-    list(INSERT 0 zExtensions ".in"  ".dox" ".md")
+    list(INSERT zExtensions 0 ".in"  ".dox" ".md")
   endif()
 
   #
