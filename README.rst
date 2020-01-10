@@ -87,7 +87,7 @@ Hunter
 
 Hunter 通过设定 `HUNTER_ROOT <https://github.com/hunter-packages/gate#effects>`_ 环境变量指定库存储位置；
 
-Hunter 支持的库列表可以在 `All packages <https://hunter.sh/en/latest/packages/all.html>`_ 找到。
+Hunter 支持的库列表可以在 `All packages <https://hunter.readthedocs.io/en/latest/packages/all.html>`_ 找到。
 
 vcpkg
 `````

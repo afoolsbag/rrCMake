@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-06-05 – 2019-11-20
+# 2019-06-05 – 2020-01-08
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -53,8 +53,8 @@ macro(include_hunter_gate_script)
 
   # https://github.com/cpp-pm/hunter/releases
   HunterGate(
-    URL "https://github.com/cpp-pm/hunter/archive/v0.23.229.tar.gz"
-    SHA1 "be830371b9ac8d74591cf0a7f9403de4189f0977")
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.241.tar.gz"
+    SHA1 "0897935585580d4eece64804f4f48fe9199a7a2c")
 
   # 默认将 Hunter 参数隐藏到 Advanced
   mark_as_advanced(
