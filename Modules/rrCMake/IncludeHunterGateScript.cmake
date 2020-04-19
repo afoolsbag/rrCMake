@@ -53,8 +53,8 @@ macro(include_hunter_gate_script)
 
   # https://github.com/cpp-pm/hunter/releases
   HunterGate(
-    URL "https://github.com/cpp-pm/hunter/archive/v0.23.241.tar.gz"
-    SHA1 "0897935585580d4eece64804f4f48fe9199a7a2c")
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.253.tar.gz"
+    SHA1 "88ea6d37c897a81a080eb9ae0f69d7807bbb3c73")
 
   # 默认将 Hunter 参数隐藏到 Advanced
   mark_as_advanced(
