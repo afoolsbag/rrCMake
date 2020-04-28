@@ -82,7 +82,7 @@ function(add_library_swig _NAME)
   # <SWIG_LANGUAGE <CSHARP|D|GO|GUILE|JAVA|JAVASCRIPT|LUA|OCTAVE|PERL5|PHP7|PYTHON|R|RUBY|SCILAB|TCL8|XML> >
   if(NOT DEFINED _SWIG_LANGUAGE)
     message(FATAL_ERROR "Missing SWIG_LANGUAGE argument.")
-  else()
+  endif()
   set(sSwigLanguage "${_SWIG_LANGUAGE}")
   string(TOLOWER ${sSwigLanguage} sSwigLanguageLower)
 
