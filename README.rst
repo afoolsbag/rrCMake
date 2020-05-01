@@ -86,7 +86,7 @@ Conan 通过设定 `CONAN_USER_HOME <https://docs.conan.io/en/latest/reference/e
 
 Conan 提供 `CMake-Conan <https://github.com/conan-io/cmake-conan>`_ 脚本，侵入式地包装 Conan 命令为 CMake 命令；
 
-Conan 提供 `conan-center <https://conan.io/center/>`_ 资源库。
+Conan 提供 `ConanCenter <https://conan.io/center/>`_ 资源库。
 
 Hunter
 ``````
