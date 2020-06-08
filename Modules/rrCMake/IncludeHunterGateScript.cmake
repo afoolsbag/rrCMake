@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-06-05 – 2020-01-08
+# 2019-06-05 – 2020-06-08
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -14,7 +14,7 @@ include_guard()  # 3.10
 #
 #   .. code-block:: cmake
 #
-#     include_conan_script()
+#     include_hunter_gate_script()
 #
 #   参见：
 #

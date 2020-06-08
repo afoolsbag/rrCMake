@@ -2,7 +2,7 @@
 #           /  __ \|  \/  |     | |
 #  _ __ _ __| /  \/| .  . | __ _| | _____
 # | '__| '__| |    | |\/| |/ _` | |/ / _ \ zhengrr
-# | |  | |  | \__/\| |  | | (_| |   <  __/ 2016-10-08 – 2020-05-01
+# | |  | |  | \__/\| |  | | (_| |   <  __/ 2016-10-08 – 2020-06-08
 # |_|  |_|   \____/\_|  |_/\__,_|_|\_\___| Unlicense
 
 #.rst:
@@ -20,7 +20,7 @@ include_guard()  # 3.10
 #.rst:
 # .. command:: _rrcmake_include_module_files
 #
-#   遍历查找 rrCMake 目录下所有 *.cmake 模块，并将其包含。
+#   遍历查找 rrCMake 目录下所有 *.cmake 模块，并逐个包含。
 #
 function(_rrcmake_include_module_files)
   file(GLOB zModuleFiles "${CMAKE_CURRENT_LIST_DIR}/rrCMake/*.cmake")

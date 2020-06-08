@@ -10,7 +10,7 @@ include_guard()  # 3.10
 #.rst:
 # .. command:: project_ex
 #
-#   设定项目属性（project），扩展功能（extend）。
+#   基于 ``project`` 命令，提供扩展（``ex`` tended）选项。
 #
 #   .. code-block:: cmake
 #
