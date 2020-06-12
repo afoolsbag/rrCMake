@@ -79,6 +79,17 @@ Conan
 
 `Conan <https://conan.io/>`_ 采用非侵入式设计，需要安装；
 
+.. code-block::
+
+  :: 查看代理
+  %USERPROFILE%> conan config get [proxies.http]
+
+  :: 设置代理
+  %USERPROFILE%> conan config set proxies.http=http://[username:password@]proxy.example.org:49152/
+
+  :: 移除代理
+  %USERPROFILE%> conan config rm proxies.http
+
 Conan 通过指定 ``conanfile.txt`` 的 ``[generators]`` 为 ``cmake_paths``，
 并设定 CMake 的 ``CMAKE_TOOLCHAIN_FILE`` 变量为 ``/path/to/conan_paths.cmake`` 实现非侵入式设计；
 
