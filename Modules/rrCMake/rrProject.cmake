@@ -14,7 +14,7 @@ include_guard()  # 3.10
 
   .. code-block:: cmake
 
-    _rrproject_set_project_variable(<name-without-prefix> [<value>...])
+    _rrproject_set_project_variable(<name-without-prefix> [<value>...] [PARENT_SCOPE])
 
   该命令将至少设置以下两个变量：
 
