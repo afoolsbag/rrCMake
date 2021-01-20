@@ -1,24 +1,32 @@
 CMake
 =====
 
-`CMake <https://cmake.org>`_
+`CMake <https://cmake.org>`_ 是一款跨平台、开源的构建系统，用于生成平台相关的构建系统。
 
 参考
 ----
 
 `CMake Reference Documentation <https://cmake.org/cmake/help/latest/>`_
 
+- `cmake-buildsystem(7) <https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html>`_
 - `cmake-commands(7) <https://cmake.org/cmake/help/latest/manual/cmake-commands.7.html>`_
-
+- `cmake-compile-features(7) <https://cmake.org/cmake/help/latest/manual/cmake-compile-features.7.html>`_
 - `cmake-developer(7) <https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html>`_
-
+- `cmake-env-variables(7) <https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html>`_
+- `cmake-file-api(7) <https://cmake.org/cmake/help/latest/manual/cmake-file-api.7.html>`_
+- `cmake-generator-expressions(7) <https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html>`_
+- `cmake-generators(7) <https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html>`_
 - `cmake-language(7) <https://cmake.org/cmake/help/latest/manual/cmake-language.7.html>`_
-
 - `cmake-modules(7) <https://cmake.org/cmake/help/latest/manual/cmake-modules.7.html>`_
-
 - `cmake-packages(7) <https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html>`_
-
+- `cmake-policies(7) <https://cmake.org/cmake/help/latest/manual/cmake-policies.7.html>`_
+- `cmake-presets(7) <https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html>`_
+- `cmake-properties(7) <https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html>`_
+- `cmake-qt(7) <https://cmake.org/cmake/help/latest/manual/cmake-qt.7.html>`_
+- `cmake-server(7) <https://cmake.org/cmake/help/latest/manual/cmake-server.7.html>`_
+- `cmake-toolchains(7) <https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html>`_
 - `cmake-variables(7) <https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html>`_
+- `cpack-generators(7) <https://cmake.org/cmake/help/latest/manual/cpack-generators.7.html>`_
 
 `CMake Community Wiki <https://gitlab.kitware.com/cmake/community/wikis/>`_
 
@@ -67,15 +75,15 @@ reStructuredText
 C/C++ 包管理工具
 ----------------
 
-`The State of Package Management in C++ - Mathieu Ropert [ACCU 2019] <https://youtube.com/watch?v=k99_qbB2FvM>`_
+参见 `The State of Package Management in C++ - Mathieu Ropert [ACCU 2019] <https://youtube.com/watch?v=k99_qbB2FvM>`_。
 
 cget
-````
+^^^^
 
 `cget <https://cget.readthedocs.io/>`_
 
 Conan
-`````
+^^^^^
 
 `Conan <https://conan.io/>`_ 采用非侵入式设计，需要安装；
 
@@ -100,7 +108,7 @@ Conan 提供 `CMake-Conan <https://github.com/conan-io/cmake-conan>`_ 脚本，�
 Conan 提供 `ConanCenter <https://conan.io/center/>`_ 资源库。
 
 Hunter
-``````
+^^^^^^
 
 `Hunter <https://hunter.sh/>`_ 使用纯 CMake 实现，采用侵入式设计，无需安装；
 
@@ -109,7 +117,7 @@ Hunter 通过设定 `HUNTER_ROOT <https://github.com/hunter-packages/gate#effect
 Hunter 支持的库列表可以在 `All packages <https://hunter.readthedocs.io/en/latest/packages/all.html>`_ 找到。
 
 vcpkg
-`````
+^^^^^
 
 `vcpkg <https://vcpkg.readthedocs.io/>`_ 采用非侵入式设计，需要安装；
 
