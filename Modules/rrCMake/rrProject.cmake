@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2020-06-17
+# 2016-10-08 – 2021-01-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -7,145 +7,178 @@ cmake_policy(VERSION 3.10)
 
 include_guard()  # 3.10
 
-#.rst:
-# .. command:: rr_project
-#
-#   基于 ``project`` 命令，提供更多选项和功能。
-#
-#   .. code-block:: cmake
-#
-#     rr_project(
-#       <argument_of_"preject"_command>...
-#       [TIME_AS_VERSION]
-#       [AUTHORS <author>...]
-#       [LICENSE <license>])
-#
-#   参见：
-#
-#   - `preject <https://cmake.org/cmake/help/latest/command/project.html>`_
-#
+#[=======================================================================[.rst:
+.. command:: _rrproject_set_project_variable
+
+  内部命令：设置项目变量。
+
+  .. code-block:: cmake
+
+    _rrproject_set_project_variable(<name-without-prefix> [<value>...])
+
+  该命令将至少设置以下两个变量：
+
+  - ``PROJECT_<name-without-prefix>``
+  - ``${PROJECT_NAME}_<name-without-prefix>``
+
+  且，若当前项目为顶层项目，该命令还会设置 ``CMAKE_PROJECT`` 前缀变量：
+
+  - ``CMAKE_PROJECT_<name-without-prefix>``
+
+  参见：
+
+  - `project <https://cmake.org/cmake/help/latest/command/project.html>`_
+  - `set <https://cmake.org/cmake/help/latest/command/set.html>`_
+
+#]=======================================================================]
+macro(_rrproject_set_project_variable sNameWithoutPrefix)
+  set(__rrproject_set_project_variable_zArgRest ${ARGV})
+  list(POP_FRONT __rrproject_set_project_variable_zArgRest)
+
+  set("PROJECT_${sNameWithoutPrefix}" ${__rrproject_set_project_variable_zArgRest})
+  set("${PROJECT_NAME}_${sNameWithoutPrefix}" ${__rrproject_set_project_variable_zArgRest})
+  if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    set("CMAKE_PROJECT_${sNameWithoutPrefix}" ${__rrproject_set_project_variable_zArgRest})
+  endif()
+
+  unset(__rrproject_set_project_variable_zArgRest)
+endmacro()
+
+#[=======================================================================[.rst:
+.. command:: rr_project
+
+  基于 ``project`` 命令，提供更多选项和功能。
+
+  .. code-block:: cmake
+
+    rr_project(
+      <argument-of-preject-command>...
+      [TIME_AS_VERSION]
+      [AUTHORS <author>...]
+      [LICENSE <license>])
+
+  参见：
+
+  - `project <https://cmake.org/cmake/help/latest/command/project.html>`_
+
+#]=======================================================================]
 macro(rr_project)
   set(_rr_project_zOptKws    TIME_AS_VERSION)
   set(_rr_project_zOneValKws LICENSE
                              VERSION)
   set(_rr_project_zMutValKws AUTHORS)
   cmake_parse_arguments("_rr_project" "${_rr_project_zOptKws}" "${_rr_project_zOneValKws}" "${_rr_project_zMutValKws}" ${ARGV})
+  unset(_rr_project_zMutValKws)
+  unset(_rr_project_zOneValKws)
+  unset(_rr_project_zOptKws)
 
-  # 选项：TIME_AS_VERSION
-  if(_rr_project_TIME_AS_VERSION)
-    if(NOT DEFINED _rr_project_VERSION)
-      string(TIMESTAMP _rr_project_VERSION "%Y.%m.%d.%H%M")
-    else()
+  # 选项：VERSION 和 TIME_AS_VERSION
+  if(DEFINED _rr_project_VERSION)
+    if(_rr_project_TIME_AS_VERSION)
       message(AUTHOR_WARNING "Keyword VERSION is used, ignore keyword TIME_AS_VERSION.")
     endif()
-  endif()
-  if(DEFINED _rr_project_VERSION)
-    list(INSERT _rr_project_VERSION 0 VERSION)
+    set(_rr_project_oVersion VERSION ${_rr_project_VERSION})
+  else()
+    if(_rr_project_TIME_AS_VERSION)
+      string(TIMESTAMP _rr_project_oVersion "%Y.%m.%d.%H%M")
+      list(INSERT _rr_project_oVersion 0 VERSION)
+    else()
+      set(_rr_project_oVersion)
+    endif()
   endif()
 
   # 基础：project
-  project(${_rr_project_UNPARSED_ARGUMENTS} ${_rr_project_VERSION})
+  project(${_rr_project_UNPARSED_ARGUMENTS} ${_rr_project_oVersion})
+
+  unset(_rr_project_oVersion)
 
   # 选项：AUTHORS
   if(DEFINED _rr_project_AUTHORS)
-    set(PROJECT_AUTHORS ${_rr_project_AUTHORS})
-    set("${PROJECT_NAME}_AUTHORS" ${_rr_project_AUTHORS})
-    if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-      set(CMAKE_PROJECT_AUTHORS ${_rr_project_AUTHORS})
-    endif()
+    _rrproject_set_project_variable(AUTHORS ${_rr_project_AUTHORS})
   elseif(DEFINED PRODUCT_AUTHORS)
-    set(PROJECT_AUTHORS ${PRODUCT_AUTHORS})
-    set("${PROJECT_NAME}_AUTHORS" ${PRODUCT_AUTHORS})
+    _rrproject_set_project_variable(AUTHORS ${PRODUCT_AUTHORS})
   else()
-    set(PROJECT_AUTHORS)
-    set("${PROJECT_NAME}_AUTHORS")
+    _rrproject_set_project_variable(AUTHORS)
   endif()
 
   # 选项：LICENSE
   if(DEFINED _rr_project_LICENSE)
-    set(PROJECT_LICENSE "${_rr_project_LICENSE}")
-    set("${PROJECT_NAME}_LICENSE" "${_rr_project_LICENSE}")
-    if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-      set(CMAKE_PROJECT_LICENSE "${_rr_project_LICENSE}")
-    endif()
+    _rrproject_set_project_variable(LICENSE "${_rr_project_LICENSE}")
   elseif(DEFINED PRODUCT_LICENSE)
-    set(PROJECT_LICENSE "${PRODUCT_LICENSE}")
-    set("${PROJECT_NAME}_LICENSE" "${PRODUCT_LICENSE}")
+    _rrproject_set_project_variable(LICENSE "${PRODUCT_LICENSE}")
   else()
-    set(PROJECT_LICENSE)
-    set("${PROJECT_NAME}_LICENSE")
+    _rrproject_set_project_variable(LICENSE)
   endif()
 
   # 功能：PROJECT_NAME_LOWER
-  string(TOLOWER "${PROJECT_NAME}" PROJECT_NAME_LOWER)
-  set("${PROJECT_NAME}_LOWER" "${PROJECT_NAME_LOWER}")
-  if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set(CMAKE_PROJECT_NAME_LOWER "${PROJECT_NAME_LOWER}")
-  endif()
+  string(TOLOWER "${PROJECT_NAME}" _rr_project_sNameLower)
+  _rrproject_set_project_variable(NAME_LOWER "${_rr_project_sNameLower}")
+  unset(_rr_project_sNameLower)
 
   # 功能：PROJECT_NAME_UPPER
-  string(TOUPPER "${PROJECT_NAME}" PROJECT_NAME_UPPER)
-  set("${PROJECT_NAME}_UPPER" "${PROJECT_NAME_UPPER}")
-  if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set(CMAKE_PROJECT_NAME_UPPER "${PROJECT_NAME_UPPER}")
-  endif()
+  string(TOUPPER "${PROJECT_NAME}" _rr_project_sNameUpper)
+  _rrproject_set_project_variable(NAME_UPPER "${_rr_project_sNameUpper}")
+  unset(_rr_project_sNameUpper)
 
   # 功能：PROJECT_VERSION_MAJOR 默认值
-  if(NOT "${PROJECT_VERSION_MAJOR}")
-    set(PROJECT_VERSION_MAJOR 0)
-    set("${PROJECT_NAME}_VERSION_MAJOR" 0)
-    if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-      set(CMAKE_PROJECT_VERSION_MAJOR 0)
-    endif()
+  if("${PROJECT_VERSION_MAJOR}" STREQUAL "")
+    _rrproject_set_project_variable(VERSION_MAJOR 0)
   endif()
 
   # 功能：PROJECT_VERSION_MINOR 默认值
-  if(NOT "${PROJECT_VERSION_MINOR}")
-    set(PROJECT_VERSION_MINOR 0)
-    set("${PROJECT_NAME}_VERSION_MINOR" 0)
-    if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-      set(CMAKE_PROJECT_VERSION_MINOR 0)
-    endif()
+  if("${PROJECT_VERSION_MINOR}" STREQUAL "")
+    _rrproject_set_project_variable(VERSION_MINOR 0)
   endif()
 
   # 功能：PROJECT_VERSION_PATCH 默认值
-  if(NOT "${PROJECT_VERSION_PATCH}")
-    set(PROJECT_VERSION_PATCH 0)
-    set("${PROJECT_NAME}_VERSION_PATCH" 0)
-    if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-      set(CMAKE_PROJECT_VERSION_PATCH 0)
-    endif()
+  if("${PROJECT_VERSION_PATCH}" STREQUAL "")
+    _rrproject_set_project_variable(VERSION_PATCH 0)
   endif()
 
   # 功能：PROJECT_VERSION_TWEAK 默认值
-  if(NOT "${PROJECT_VERSION_TWEAK}")
-    set(PROJECT_VERSION_TWEAK 0)
-    set("${PROJECT_NAME}_VERSION_TWEAK" 0)
-    if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-      set(CMAKE_PROJECT_VERSION_TWEAK 0)
-    endif()
+  if("${PROJECT_VERSION_TWEAK}" STREQUAL "")
+    _rrproject_set_project_variable(VERSION_TWEAK 0)
   endif()
 
 endmacro()
 
-#.rst:
-# .. command:: rr_project_extra
-#
-#   为避免“No project() command is present. ......”开发者警告，提供 ``rr_project`` 命令的附加版命令。
-#
-#   .. code-block:: cmake
-#
-#     project(
-#       <argument_of_"preject"_command>...)
-#     rr_project_extra(
-#       [TIME_AS_VERSION]
-#       [AUTHORS <author>...]
-#       [LICENSE <license>])
-#
-#   参见：
-#
-#   - :command:`rr_project`
-#
+#[=======================================================================[.rst:
+.. command:: rr_project_extra
+
+  为避免
+  
+  ::
+
+    CMake Warning (dev) in CMakeLists.txt:
+    No project() command is present.  The top-level CMakeLists.txt file must
+    contain a literal, direct call to the project() command.  Add a line of
+    code such as
+
+      project(ProjectName)
+
+    near the top of the file, but after cmake_minimum_required().
+
+    CMake is pretending there is a "project(Project)" command on the first
+    line.
+    This warning is for project developers.  Use -Wno-dev to suppress it.
+
+  开发者警告，提供 ``rr_project`` 命令的缀加版。
+
+  .. code-block:: cmake
+
+    project(
+      <argument-of-preject-command>...)
+    rr_project_extra(
+      [TIME_AS_VERSION]
+      [AUTHORS <author>...]
+      [LICENSE <license>])
+
+  参见：
+
+  - `project <https://cmake.org/cmake/help/latest/command/project.html>`_
+  - :command:`rr_project`
+
+#]=======================================================================]
 function(rr_project_extra)
   set(zOptKws    TIME_AS_VERSION)
   set(zOneValKws LICENSE)
@@ -154,119 +187,78 @@ function(rr_project_extra)
 
   # 选项：TIME_AS_VERSION
   if(_TIME_AS_VERSION)
-    string(LENGTH "${PROJECT_VERSION}" nLen)
-    if(nLen EQUAL 0)
+    if(NOT "${PROJECT_VERSION}" STREQUAL "")
+      message(AUTHOR_WARNING "PROJECT_VERSION isn't empty, ignore keyword TIME_AS_VERSION.")
+    else()
       string(TIMESTAMP vMajor "%Y")
       math(EXPR vMajor "${vMajor}")
+      _rrproject_set_project_variable(VERSION_MAJOR "${vMajor}" PARENT_SCOPE)
+      set(PROJECT_VERSION_MAJOR "${vMajor}")  # 同时改变本作用域内的变量值，用于后续的默认值判定
+
       string(TIMESTAMP vMinor "%m")
       math(EXPR vMinor "${vMinor}")
+      _rrproject_set_project_variable(VERSION_MINOR "${vMinor}" PARENT_SCOPE)
+      set(PROJECT_VERSION_MINOR "${vMinor}")  # 同上
+
       string(TIMESTAMP vPatch "%d")
       math(EXPR vPatch "${vPatch}")
+      _rrproject_set_project_variable(VERSION_PATCH "${vPatch}" PARENT_SCOPE)
+      set(PROJECT_VERSION_PATCH "${vPatch}")  # 同上
+
       string(TIMESTAMP vTweak "%H%M")
       math(EXPR vTweak "${vTweak}")
+      _rrproject_set_project_variable(VERSION_TWEAK "${vTweak}" PARENT_SCOPE)
+      set(PROJECT_VERSION_TWEAK "${vTweak}")  # 同上
+
       set(vVersion "${vMajor}.${vMinor}.${vPatch}.${vTweak}")
-      set(PROJECT_VERSION_MAJOR "${vMajor}" PARENT_SCOPE)
-      set(PROJECT_VERSION_MINOR "${vMinor}" PARENT_SCOPE)
-      set(PROJECT_VERSION_PATCH "${vPatch}" PARENT_SCOPE)
-      set(PROJECT_VERSION_TWEAK "${vTweak}" PARENT_SCOPE)
-      set(PROJECT_VERSION "${vVersion}" PARENT_SCOPE)
-      set("${PROJECT_NAME}_VERSION_MAJOR" "${vMajor}" PARENT_SCOPE)
-      set("${PROJECT_NAME}_VERSION_MINOR" "${vMinor}" PARENT_SCOPE)
-      set("${PROJECT_NAME}_VERSION_PATCH" "${vPatch}" PARENT_SCOPE)
-      set("${PROJECT_NAME}_VERSION_TWEAK" "${vTweak}" PARENT_SCOPE)
-      set("${PROJECT_NAME}_VERSION" "${vVersion}" PARENT_SCOPE)
-      if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-        set(CMAKE_PROJECT_VERSION_MAJOR "${vMajor}" PARENT_SCOPE)
-        set(CMAKE_PROJECT_VERSION_MINOR "${vMinor}" PARENT_SCOPE)
-        set(CMAKE_PROJECT_VERSION_PATCH "${vPatch}" PARENT_SCOPE)
-        set(CMAKE_PROJECT_VERSION_TWEAK "${vTweak}" PARENT_SCOPE)
-        set(CMAKE_PROJECT_VERSION "${vVersion}" PARENT_SCOPE)
-      endif()
-    else()
-      message(AUTHOR_WARNING "PROJECT_VERSION isn't empty, ignore keyword TIME_AS_VERSION.")
+      _rrproject_set_project_variable(VERSION "${vVersion}" PARENT_SCOPE)
     endif()
   endif()
 
   # 选项：AUTHORS
   if(DEFINED _AUTHORS)
-    set(PROJECT_AUTHORS ${_AUTHORS} PARENT_SCOPE)
-    set("${PROJECT_NAME}_AUTHORS" ${_AUTHORS} PARENT_SCOPE)
-    if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-      set(CMAKE_PROJECT_AUTHORS ${_AUTHORS} PARENT_SCOPE)
-    endif()
+    _rrproject_set_project_variable(AUTHORS ${_AUTHORS} PARENT_SCOPE)
   elseif(DEFINED PRODUCT_AUTHORS)
-    set(PROJECT_AUTHORS ${PRODUCT_AUTHORS} PARENT_SCOPE)
-    set("${PROJECT_NAME}_AUTHORS" ${PRODUCT_AUTHORS} PARENT_SCOPE)
+    _rrproject_set_project_variable(AUTHORS ${PRODUCT_AUTHORS} PARENT_SCOPE)
   else()
-    set(PROJECT_AUTHORS PARENT_SCOPE)
-    set("${PROJECT_NAME}_AUTHORS" PARENT_SCOPE)
+    _rrproject_set_project_variable(AUTHORS PARENT_SCOPE)
   endif()
 
   # 选项：LICENSE
   if(DEFINED _LICENSE)
-    set(PROJECT_LICENSE "${_LICENSE}" PARENT_SCOPE)
-    set("${PROJECT_NAME}_LICENSE" "${_LICENSE}" PARENT_SCOPE)
-    if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-      set(CMAKE_PROJECT_LICENSE "${_LICENSE}" PARENT_SCOPE)
-    endif()
+    _rrproject_set_project_variable(LICENSE ${_LICENSE} PARENT_SCOPE)
   elseif(DEFINED PRODUCT_LICENSE)
-    set(PROJECT_LICENSE "${PRODUCT_LICENSE}" PARENT_SCOPE)
-    set("${PROJECT_NAME}_LICENSE" "${PRODUCT_LICENSE}" PARENT_SCOPE)
+    _rrproject_set_project_variable(LICENSE ${PRODUCT_LICENSE} PARENT_SCOPE)
   else()
-    set(PROJECT_LICENSE PARENT_SCOPE)
-    set("${PROJECT_NAME}_LICENSE" PARENT_SCOPE)
+    _rrproject_set_project_variable(LICENSE PARENT_SCOPE)
   endif()
 
   # 功能：PROJECT_NAME_LOWER
   string(TOLOWER "${PROJECT_NAME}" sLower)
-  set(PROJECT_NAME_LOWER "${sLower}" PARENT_SCOPE)
-  set("${PROJECT_NAME}_LOWER" "${sLower}" PARENT_SCOPE)
-  if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set(CMAKE_PROJECT_NAME_LOWER "${sLower}" PARENT_SCOPE)
-  endif()
+  _rrproject_set_project_variable(NAME_LOWER "${sLower}" PARENT_SCOPE)
 
   # 功能：PROJECT_NAME_UPPER
   string(TOUPPER "${PROJECT_NAME}" sUpper)
-  set(PROJECT_NAME_UPPER "${sUpper}" PARENT_SCOPE)
-  set("${PROJECT_NAME}_UPPER" "${sUpper}" PARENT_SCOPE)
-  if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set(CMAKE_PROJECT_NAME_UPPER "${sUpper}" PARENT_SCOPE)
-  endif()
+  _rrproject_set_project_variable(NAME_UPPER "${sUpper}" PARENT_SCOPE)
 
   # 功能：PROJECT_VERSION_MAJOR 默认值
-  if(NOT "${PROJECT_VERSION_MAJOR}" AND NOT _TIME_AS_VERSION)
-    set(PROJECT_VERSION_MAJOR 0 PARENT_SCOPE)
-    set("${PROJECT_NAME}_VERSION_MAJOR" 0 PARENT_SCOPE)
-    if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-      set(CMAKE_PROJECT_VERSION_MAJOR 0 PARENT_SCOPE)
-    endif()
+  if("${PROJECT_VERSION_MAJOR}" STREQUAL "")
+    _rrproject_set_project_variable(VERSION_MAJOR 0 PARENT_SCOPE)
   endif()
 
   # 功能：PROJECT_VERSION_MINOR 默认值
-  if(NOT "${PROJECT_VERSION_MINOR}" AND NOT _TIME_AS_VERSION)
-    set(PROJECT_VERSION_MINOR 0 PARENT_SCOPE)
-    set("${PROJECT_NAME}_VERSION_MINOR" 0 PARENT_SCOPE)
-    if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-      set(CMAKE_PROJECT_VERSION_MINOR 0 PARENT_SCOPE)
-    endif()
+  if("${PROJECT_VERSION_MINOR}" STREQUAL "")
+    _rrproject_set_project_variable(VERSION_MINOR 0 PARENT_SCOPE)
   endif()
 
   # 功能：PROJECT_VERSION_PATCH 默认值
-  if(NOT "${PROJECT_VERSION_PATCH}" AND NOT _TIME_AS_VERSION)
-    set(PROJECT_VERSION_PATCH 0 PARENT_SCOPE)
-    set("${PROJECT_NAME}_VERSION_PATCH" 0 PARENT_SCOPE)
-    if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-      set(CMAKE_PROJECT_VERSION_PATCH 0 PARENT_SCOPE)
-    endif()
+  if("${PROJECT_VERSION_PATCH}" STREQUAL "")
+    _rrproject_set_project_variable(VERSION_PATCH 0 PARENT_SCOPE)
   endif()
 
   # 功能：PROJECT_VERSION_TWEAK 默认值
-  if(NOT "${PROJECT_VERSION_TWEAK}" AND NOT _TIME_AS_VERSION)
-    set(PROJECT_VERSION_TWEAK 0 PARENT_SCOPE)
-    set("${PROJECT_NAME}_VERSION_TWEAK" 0 PARENT_SCOPE)
-    if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-      set(CMAKE_PROJECT_VERSION_TWEAK 0 PARENT_SCOPE)
-    endif()
+  if("${PROJECT_VERSION_TWEAK}" STREQUAL "")
+    _rrproject_set_project_variable(VERSION_TWEAK 0 PARENT_SCOPE)
   endif()
 
 endfunction()
@@ -282,12 +274,11 @@ endfunction()
 #
 #   参见：
 #
-#   - `preject <https://cmake.org/cmake/help/latest/command/project.html>`_
+#   - `project <https://cmake.org/cmake/help/latest/command/project.html>`_
 #   - :command:`rr_project`
 #   - :command:`rr_project_extra`
 #
 function(rr_project_debug_information)
-  set(CMAKE_MESSAGE_LOG_LEVEL DEBUG)
   message(DEBUG "================================================================================")
   message(DEBUG "RR_PROJECT_DEBUG_INFORMATION")
   message(DEBUG "")
