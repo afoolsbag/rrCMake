@@ -32,16 +32,11 @@ include_guard()  # 3.10
 
 #]=======================================================================]
 macro(_rrproject_set_project_variable sNameWithoutPrefix)
-  set(__rrproject_set_project_variable_zArgRest ${ARGV})
-  list(POP_FRONT __rrproject_set_project_variable_zArgRest)
-
-  set("PROJECT_${sNameWithoutPrefix}" ${__rrproject_set_project_variable_zArgRest})
-  set("${PROJECT_NAME}_${sNameWithoutPrefix}" ${__rrproject_set_project_variable_zArgRest})
+  set("PROJECT_${sNameWithoutPrefix}" ${ARGN})
+  set("${PROJECT_NAME}_${sNameWithoutPrefix}" ${ARGN})
   if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set("CMAKE_PROJECT_${sNameWithoutPrefix}" ${__rrproject_set_project_variable_zArgRest})
+    set("CMAKE_PROJECT_${sNameWithoutPrefix}" ${ARGN})
   endif()
-
-  unset(__rrproject_set_project_variable_zArgRest)
 endmacro()
 
 #[=======================================================================[.rst:
@@ -260,7 +255,6 @@ function(rr_project_extra)
   if("${PROJECT_VERSION_TWEAK}" STREQUAL "")
     _rrproject_set_project_variable(VERSION_TWEAK 0 PARENT_SCOPE)
   endif()
-
 endfunction()
 
 #.rst:
@@ -277,8 +271,26 @@ endfunction()
 #   - `project <https://cmake.org/cmake/help/latest/command/project.html>`_
 #   - :command:`rr_project`
 #   - :command:`rr_project_extra`
+#   - `CMAKE_MESSAGE_LOG_LEVEL <https://cmake.org/cmake/help/latest/variable/CMAKE_MESSAGE_LOG_LEVEL.html>`_
 #
 function(rr_project_debug_information)
+  if(NOT DEFINED CACHE{CMAKE_MESSAGE_LOG_LEVEL})
+    set(CMAKE_MESSAGE_LOG_LEVEL "DEBUG" CACHE STRING "message() logging level.")
+    set_property(CACHE CMAKE_MESSAGE_LOG_LEVEL
+                 PROPERTY STRINGS "FATAL_ERROR"
+                                  "SEND_ERROR"
+                                  "WARNING"
+                                  "AUTHOR_WARNING"
+                                  "DEPRECATION"
+                                  "NOTICE"
+                                  "STATUS"
+                                  "VERBOSE"
+                                  "DEBUG"
+                                  "TRACE")
+  endif()
+
+  get_property(zLang GLOBAL PROPERTY ENABLED_LANGUAGES)
+
   message(DEBUG "================================================================================")
   message(DEBUG "RR_PROJECT_DEBUG_INFORMATION")
   message(DEBUG "")
@@ -308,7 +320,6 @@ function(rr_project_debug_information)
   message(DEBUG "PROJECT_AUTHORS:                   '${PROJECT_AUTHORS}'")
   message(DEBUG "PROJECT_LICENSE:                   '${PROJECT_LICENSE}'")
   message(DEBUG "")
-  get_property(zLang GLOBAL PROPERTY ENABLED_LANGUAGES)
   message(DEBUG "ENABLED_LANGUAGES:                 '${zLang}'")
   message(DEBUG "--------------------------------------------------------------------------------")
 endfunction()
