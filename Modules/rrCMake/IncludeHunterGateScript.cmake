@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-06-05 – 2020-06-17
+# 2019-06-05 – 2021-01-20
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -24,7 +24,7 @@ macro(include_hunter_gate_script)
   if(NOT EXISTS "${CMAKE_BINARY_DIR}/HunterGate.cmake")
     message(STATUS "Downloading HunterGate.cmake script")
     file(
-      DOWNLOAD "https://raw.githubusercontent.com/hunter-packages/gate/master/cmake/HunterGate.cmake"
+      DOWNLOAD "https://raw.githubusercontent.com/cpp-pm/gate/master/cmake/HunterGate.cmake"
                "${CMAKE_BINARY_DIR}/HunterGate.cmake"
                SHOW_PROGRESS
       STATUS   _include_hunter_gate_script_Status)
@@ -48,13 +48,13 @@ macro(include_hunter_gate_script)
     set(PROJECT_NAME)
   endif()
 
-  # 默认禁用“重复计算工具链标识”
+  # 默认启用“不要重复计算工具链标识”
   option(HUNTER_NO_TOOLCHAIN_ID_RECALCULATION "No Toolchain-ID recalculation" ON)
 
   # https://github.com/cpp-pm/hunter/releases
   HunterGate(
-    URL "https://github.com/cpp-pm/hunter/archive/v0.23.258.tar.gz"
-    SHA1 "062a19ab13ce8dffa9a882b6ce3e43bdabdf75d3")
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.290.tar.gz"
+    SHA1 "04487198159a9754ac9603aa464cd3de23ca3f3d")
 
   # 默认将 Hunter 参数隐藏到 Advanced
   mark_as_advanced(
