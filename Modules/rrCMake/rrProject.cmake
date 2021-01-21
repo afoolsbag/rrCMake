@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2021-01-20
+# 2016-10-08 – 2021-01-21
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -47,7 +47,7 @@ endmacro()
   .. code-block:: cmake
 
     rr_project(
-      <argument-of-preject-command>...
+      <argument-of-"project"-command>...
       [TIME_AS_VERSION]
       [AUTHORS <author>...]
       [LICENSE <license>])
@@ -67,27 +67,29 @@ macro(rr_project)
   unset(_rr_project_zOneValKws)
   unset(_rr_project_zOptKws)
 
-  # 选项：VERSION 和 TIME_AS_VERSION
+  # 按当前时间取版本号：TIME_AS_VERSION
   if(DEFINED _rr_project_VERSION)
+    # 版本号已设置，跳过
     if(_rr_project_TIME_AS_VERSION)
       message(AUTHOR_WARNING "Keyword VERSION is used, ignore keyword TIME_AS_VERSION.")
     endif()
-    set(_rr_project_oVersion VERSION ${_rr_project_VERSION})
+    set(_rr_project_oVersion "VERSION" "${_rr_project_VERSION}")
   else()
+    # 版本号未设置，按选项进行设置或忽略
     if(_rr_project_TIME_AS_VERSION)
       string(TIMESTAMP _rr_project_oVersion "%Y.%m.%d.%H%M")
-      list(INSERT _rr_project_oVersion 0 VERSION)
+      list(INSERT _rr_project_oVersion 0 "VERSION")
     else()
       set(_rr_project_oVersion)
     endif()
   endif()
 
-  # 基础：project
+  # project
   project(${_rr_project_UNPARSED_ARGUMENTS} ${_rr_project_oVersion})
 
   unset(_rr_project_oVersion)
 
-  # 选项：AUTHORS
+  # 新变量：AUTHORS
   if(DEFINED _rr_project_AUTHORS)
     _rrproject_set_project_variable(AUTHORS ${_rr_project_AUTHORS})
   elseif(DEFINED PRODUCT_AUTHORS)
@@ -96,7 +98,7 @@ macro(rr_project)
     _rrproject_set_project_variable(AUTHORS)
   endif()
 
-  # 选项：LICENSE
+  # 新变量：LICENSE
   if(DEFINED _rr_project_LICENSE)
     _rrproject_set_project_variable(LICENSE "${_rr_project_LICENSE}")
   elseif(DEFINED PRODUCT_LICENSE)
@@ -105,36 +107,21 @@ macro(rr_project)
     _rrproject_set_project_variable(LICENSE)
   endif()
 
-  # 功能：PROJECT_NAME_LOWER
+  # 新变量：PROJECT_NAME_LOWER/UPPER
   string(TOLOWER "${PROJECT_NAME}" _rr_project_sNameLower)
   _rrproject_set_project_variable(NAME_LOWER "${_rr_project_sNameLower}")
   unset(_rr_project_sNameLower)
 
-  # 功能：PROJECT_NAME_UPPER
   string(TOUPPER "${PROJECT_NAME}" _rr_project_sNameUpper)
   _rrproject_set_project_variable(NAME_UPPER "${_rr_project_sNameUpper}")
   unset(_rr_project_sNameUpper)
 
-  # 功能：PROJECT_VERSION_MAJOR 默认值
-  if("${PROJECT_VERSION_MAJOR}" STREQUAL "")
-    _rrproject_set_project_variable(VERSION_MAJOR 0)
-  endif()
-
-  # 功能：PROJECT_VERSION_MINOR 默认值
-  if("${PROJECT_VERSION_MINOR}" STREQUAL "")
-    _rrproject_set_project_variable(VERSION_MINOR 0)
-  endif()
-
-  # 功能：PROJECT_VERSION_PATCH 默认值
-  if("${PROJECT_VERSION_PATCH}" STREQUAL "")
-    _rrproject_set_project_variable(VERSION_PATCH 0)
-  endif()
-
-  # 功能：PROJECT_VERSION_TWEAK 默认值
-  if("${PROJECT_VERSION_TWEAK}" STREQUAL "")
-    _rrproject_set_project_variable(VERSION_TWEAK 0)
-  endif()
-
+  # 缺省值：PROJECT_VERSION_MAJOR/MINOR/PATCH/TWEAK
+  foreach(sSuffix "MAJOR" "MINOR" "PATCH" "TWEAK")
+    if("${PROJECT_VERSION_${sSuffix}}" STREQUAL "")
+      _rrproject_set_project_variable("VERSION_${sSuffix}" 0)
+    endif()
+  endforeach()
 endmacro()
 
 #[=======================================================================[.rst:
@@ -145,16 +132,16 @@ endmacro()
   ::
 
     CMake Warning (dev) in CMakeLists.txt:
-    No project() command is present.  The top-level CMakeLists.txt file must
-    contain a literal, direct call to the project() command.  Add a line of
-    code such as
+      No project() command is present.  The top-level CMakeLists.txt file must
+      contain a literal, direct call to the project() command.  Add a line of
+      code such as
 
-      project(ProjectName)
+        project(ProjectName)
 
-    near the top of the file, but after cmake_minimum_required().
+      near the top of the file, but after cmake_minimum_required().
 
-    CMake is pretending there is a "project(Project)" command on the first
-    line.
+      CMake is pretending there is a "project(Project)" command on the first
+      line.
     This warning is for project developers.  Use -Wno-dev to suppress it.
 
   开发者警告，提供 ``rr_project`` 命令的缀加版。
@@ -162,7 +149,7 @@ endmacro()
   .. code-block:: cmake
 
     project(
-      <argument-of-preject-command>...)
+      ...)
     rr_project_extra(
       [TIME_AS_VERSION]
       [AUTHORS <author>...]
@@ -170,7 +157,6 @@ endmacro()
 
   参见：
 
-  - `project <https://cmake.org/cmake/help/latest/command/project.html>`_
   - :command:`rr_project`
 
 #]=======================================================================]
@@ -180,37 +166,30 @@ function(rr_project_extra)
   set(zMutValKws AUTHORS)
   cmake_parse_arguments(PARSE_ARGV 0 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  # 选项：TIME_AS_VERSION
+  # 按当前时间取版本号：TIME_AS_VERSION
   if(_TIME_AS_VERSION)
     if(NOT "${PROJECT_VERSION}" STREQUAL "")
+      # 版本号已设置，跳过
       message(AUTHOR_WARNING "PROJECT_VERSION isn't empty, ignore keyword TIME_AS_VERSION.")
     else()
-      string(TIMESTAMP vMajor "%Y")
-      math(EXPR vMajor "${vMajor}")
-      _rrproject_set_project_variable(VERSION_MAJOR "${vMajor}" PARENT_SCOPE)
-      set(PROJECT_VERSION_MAJOR "${vMajor}")  # 同时改变本作用域内的变量值，用于后续的默认值判定
-
-      string(TIMESTAMP vMinor "%m")
-      math(EXPR vMinor "${vMinor}")
-      _rrproject_set_project_variable(VERSION_MINOR "${vMinor}" PARENT_SCOPE)
-      set(PROJECT_VERSION_MINOR "${vMinor}")  # 同上
-
-      string(TIMESTAMP vPatch "%d")
-      math(EXPR vPatch "${vPatch}")
-      _rrproject_set_project_variable(VERSION_PATCH "${vPatch}" PARENT_SCOPE)
-      set(PROJECT_VERSION_PATCH "${vPatch}")  # 同上
-
-      string(TIMESTAMP vTweak "%H%M")
-      math(EXPR vTweak "${vTweak}")
-      _rrproject_set_project_variable(VERSION_TWEAK "${vTweak}" PARENT_SCOPE)
-      set(PROJECT_VERSION_TWEAK "${vTweak}")  # 同上
-
-      set(vVersion "${vMajor}.${vMinor}.${vPatch}.${vTweak}")
-      _rrproject_set_project_variable(VERSION "${vVersion}" PARENT_SCOPE)
+      # 设置 PROJECT_VERSION_MAJOR/MINOR/PATCH/TWEAK
+      set(zSuffixes "MAJOR" "MINOR" "PATCH" "TWEAK")
+      set(zFormats  "%Y"    "%m"    "%d"    "%H%M")
+      foreach(sSuffix sFormat IN ZIP_LISTS zSuffixes zFormats)
+        string(TIMESTAMP vVersion "${sFormat}")
+        math(EXPR vVersion "${vVersion}")
+        _rrproject_set_project_variable("VERSION_${sSuffix}" "${vVersion}" PARENT_SCOPE)
+        set("PROJECT_VERSION_${sSuffix}" "${vVersion}")  # 同时改变本作用域内的变量值，用于后续的缺省值判定
+      endforeach()
+      # 设置 PROJECT_VERSION
+      _rrproject_set_project_variable(
+        VERSION
+        "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}.${PROJECT_VERSION_TWEAK}"
+        PARENT_SCOPE)
     endif()
   endif()
 
-  # 选项：AUTHORS
+  # 新变量：AUTHORS
   if(DEFINED _AUTHORS)
     _rrproject_set_project_variable(AUTHORS ${_AUTHORS} PARENT_SCOPE)
   elseif(DEFINED PRODUCT_AUTHORS)
@@ -219,42 +198,28 @@ function(rr_project_extra)
     _rrproject_set_project_variable(AUTHORS PARENT_SCOPE)
   endif()
 
-  # 选项：LICENSE
+  # 新变量：LICENSE
   if(DEFINED _LICENSE)
-    _rrproject_set_project_variable(LICENSE ${_LICENSE} PARENT_SCOPE)
+    _rrproject_set_project_variable(LICENSE "${_LICENSE}" PARENT_SCOPE)
   elseif(DEFINED PRODUCT_LICENSE)
-    _rrproject_set_project_variable(LICENSE ${PRODUCT_LICENSE} PARENT_SCOPE)
+    _rrproject_set_project_variable(LICENSE "${PRODUCT_LICENSE}" PARENT_SCOPE)
   else()
     _rrproject_set_project_variable(LICENSE PARENT_SCOPE)
   endif()
 
-  # 功能：PROJECT_NAME_LOWER
+  # 新变量：PROJECT_NAME_LOWER/UPPER
   string(TOLOWER "${PROJECT_NAME}" sLower)
   _rrproject_set_project_variable(NAME_LOWER "${sLower}" PARENT_SCOPE)
 
-  # 功能：PROJECT_NAME_UPPER
   string(TOUPPER "${PROJECT_NAME}" sUpper)
   _rrproject_set_project_variable(NAME_UPPER "${sUpper}" PARENT_SCOPE)
 
-  # 功能：PROJECT_VERSION_MAJOR 默认值
-  if("${PROJECT_VERSION_MAJOR}" STREQUAL "")
-    _rrproject_set_project_variable(VERSION_MAJOR 0 PARENT_SCOPE)
-  endif()
-
-  # 功能：PROJECT_VERSION_MINOR 默认值
-  if("${PROJECT_VERSION_MINOR}" STREQUAL "")
-    _rrproject_set_project_variable(VERSION_MINOR 0 PARENT_SCOPE)
-  endif()
-
-  # 功能：PROJECT_VERSION_PATCH 默认值
-  if("${PROJECT_VERSION_PATCH}" STREQUAL "")
-    _rrproject_set_project_variable(VERSION_PATCH 0 PARENT_SCOPE)
-  endif()
-
-  # 功能：PROJECT_VERSION_TWEAK 默认值
-  if("${PROJECT_VERSION_TWEAK}" STREQUAL "")
-    _rrproject_set_project_variable(VERSION_TWEAK 0 PARENT_SCOPE)
-  endif()
+  # 缺省值：PROJECT_VERSION_MAJOR/MINOR/PATCH/TWEAK
+  foreach(sSuffix "MAJOR" "MINOR" "PATCH" "TWEAK")
+    if("${PROJECT_VERSION_${sSuffix}}" STREQUAL "")
+      _rrproject_set_project_variable("VERSION_${sSuffix}" 0 PARENT_SCOPE)
+    endif()
+  endforeach()
 endfunction()
 
 #.rst:
@@ -268,12 +233,11 @@ endfunction()
 #
 #   参见：
 #
-#   - `project <https://cmake.org/cmake/help/latest/command/project.html>`_
 #   - :command:`rr_project`
-#   - :command:`rr_project_extra`
 #   - `CMAKE_MESSAGE_LOG_LEVEL <https://cmake.org/cmake/help/latest/variable/CMAKE_MESSAGE_LOG_LEVEL.html>`_
 #
 function(rr_project_debug_information)
+  # 引入 CMAKE_MESSAGE_LOG_LEVEL 选项
   if(NOT DEFINED CACHE{CMAKE_MESSAGE_LOG_LEVEL})
     set(CMAKE_MESSAGE_LOG_LEVEL "DEBUG" CACHE STRING "message() logging level.")
     set_property(CACHE CMAKE_MESSAGE_LOG_LEVEL
@@ -289,6 +253,7 @@ function(rr_project_debug_information)
                                   "TRACE")
   endif()
 
+  # 输出调试信息
   get_property(zLang GLOBAL PROPERTY ENABLED_LANGUAGES)
 
   message(DEBUG "================================================================================")
