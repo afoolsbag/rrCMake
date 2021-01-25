@@ -1,5 +1,5 @@
 # zhengrr
-# 2018-06-06 – 2021-01-21
+# 2018-06-06 – 2021-01-25
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -7,8 +7,9 @@ cmake_policy(VERSION 3.10)
 
 include_guard()  # 3.10
 
-if(NOT COMMAND rr_check_cmake_name)
-  include("${CMAKE_CURRENT_LIST_DIR}/rrNaming.cmake")
+if(NOT COMMAND rr_check_cmake_name OR
+   NOT COMMAND rr_check_no_argn)
+  include("${CMAKE_CURRENT_LIST_DIR}/rrCheck.cmake")
 endif()
 
 #[=======================================================================[.rst:
@@ -31,10 +32,7 @@ function(rr_get_toolset_tag xVariable)
   # 前置断言
   #
 
-  if(NOT ${ARGC} EQUAL 1)
-    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
-  endif()
-
+  rr_check_no_argn("${ARGN}" FATAL_ERROR)
   rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
 
   #
@@ -146,10 +144,7 @@ function(rr_get_architecture_tag xVariable)
   # 前置断言
   #
 
-  if(NOT ${ARGC} EQUAL 1)
-    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
-  endif()
-
+  rr_check_no_argn("${ARGN}" FATAL_ERROR)
   rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
 
   #
@@ -204,10 +199,7 @@ function(rr_get_address_model_tag xVariable)
   # 前置断言
   #
 
-  if(NOT ${ARGC} EQUAL 1)
-    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
-  endif()
-
+  rr_check_no_argn("${ARGN}" FATAL_ERROR)
   rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
 
   #
@@ -248,10 +240,7 @@ function(rr_get_aa_tag xVariable)
   # 前置断言
   #
 
-  if(NOT ${ARGC} EQUAL 1)
-    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
-  endif()
-
+  rr_check_no_argn("${ARGN}" FATAL_ERROR)
   rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
 
   #
@@ -284,11 +273,8 @@ function(rr_get_taa_tag xVariable)
   # 前置断言
   #
 
-  if(NOT ${ARGC} EQUAL 1)
-    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
-  endif()
-
-  check_name_with_cmake_rules("${xVariable}" AUTHOR_WARNING)
+  rr_check_no_argn("${ARGN}" FATAL_ERROR)
+  rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
 
   #
   # 业务逻辑

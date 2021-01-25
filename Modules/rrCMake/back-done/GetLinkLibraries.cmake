@@ -18,9 +18,7 @@ endif()
 #
 #   .. code-block:: cmake
 #
-#     get_link_libraries(
-#       <variable> <target> [INCLUDE_ITSELF] [RECURSE]
-#     )
+#     get_link_libraries(<variable> <target> [INCLUDE_ITSELF] [RECURSE])
 #
 #   参见：
 #

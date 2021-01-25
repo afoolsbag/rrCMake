@@ -36,18 +36,6 @@ endif()
 
 #]=======================================================================]
 macro(_rrproduct_set_product_variables)
-  #
-  # 前置断言
-  #
-
-  if(NOT ${ARGC} EQUAL 0)
-    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
-  endif()
-
-  #
-  # 业务逻辑
-  #
-
   set(PRODUCT_AUTHORS       ${PROJECT_AUTHORS})
   set(PRODUCT_BINARY_DIR    "${PROJECT_BINARY_DIR}")
   set(PRODUCT_DESCRIPTION   "${PROJECT_DESCRIPTION}")
