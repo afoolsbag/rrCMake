@@ -1,5 +1,5 @@
 # zhengrr
-# 2018-06-06 – 2021-01-25
+# 2018-06-06 – 2021-01-28
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -95,7 +95,7 @@ function(rr_get_toolset_tag xVariable)
 
     # https://cmake.org/cmake/help/latest/variable/MINGW.html
     if(MINGW)
-      string(REGEX REPLACE "([0-9]+)\\.([0-9]+)(\\.[0-9]+)?" "\\1\\2" sVer "${CMAKE_${sLang}_COMPILER_VERSION}")
+      string(REGEX REPLACE [[([0-9]+)\.([0-9]+)(\.[0-9]+)?]] [[\1\2]] sVer "${CMAKE_${sLang}_COMPILER_VERSION}")
       set("${xVariable}" "mgw${sVer}" PARENT_SCOPE)
       return()
     endif()
@@ -103,7 +103,7 @@ function(rr_get_toolset_tag xVariable)
     # https://cmake.org/cmake/help/latest/variable/UNIX.html
     # https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
     if(UNIX AND CMAKE_${sLang}_COMPILER_ID STREQUAL "GNU")
-      string(REGEX REPLACE "([0-9]+)\\.([0-9]+)(\\.[0-9]+)?" "\\1\\2" sVer "${CMAKE_${sLang}_COMPILER_VERSION}")
+      string(REGEX REPLACE [[([0-9]+)\.([0-9]+)(\.[0-9]+)?]] [[\1\2]] sVer "${CMAKE_${sLang}_COMPILER_VERSION}")
       if(APPLE)
         set("${xVariable}" "xgcc${sVer}" PARENT_SCOPE)
       else()
@@ -115,7 +115,7 @@ function(rr_get_toolset_tag xVariable)
     # https://cmake.org/cmake/help/latest/variable/UNIX.html
     # https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
     if(UNIX AND CMAKE_${sLang}_COMPILER_ID STREQUAL "Clang")
-      string(REGEX REPLACE "([0-9]+)\\.([0-9]+)(\\.[0-9]+)?" "\\1\\2" sVer "${CMAKE_${sLang}_COMPILER_VERSION}")
+      string(REGEX REPLACE [[([0-9]+)\.([0-9]+)(\.[0-9]+)?]] [[\1\2]] sVer "${CMAKE_${sLang}_COMPILER_VERSION}")
       set("${xVariable}" "clang${sVer}" PARENT_SCOPE)
       return()
     endif()

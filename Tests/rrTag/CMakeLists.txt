@@ -6,4 +6,4 @@ include(rrCMake)
 
 project(rrTag)
 rr_get_taa_tag(sTaaTag)
-message("sTaaTag: '${sTaaTag}'")
+message("Current TAA tag: '${sTaaTag}'")
