@@ -1,5 +1,5 @@
 # zhengrr
-# 2018-06-06 – 2021-01-28
+# 2018-06-06 – 2021-03-08
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -28,16 +28,8 @@ endif()
 
 #]=======================================================================]
 function(rr_get_toolset_tag xVariable)
-  #
-  # 前置断言
-  #
-
   rr_check_no_argn("${ARGN}" FATAL_ERROR)
   rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
-
-  #
-  # 业务逻辑
-  #
 
   get_cmake_property(zLangs ENABLED_LANGUAGES)
   foreach(sLang IN LISTS zLangs)
@@ -140,16 +132,8 @@ endfunction()
 
 #]=======================================================================]
 function(rr_get_architecture_tag xVariable)
-  #
-  # 前置断言
-  #
-
   rr_check_no_argn("${ARGN}" FATAL_ERROR)
   rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
-
-  #
-  # 业务逻辑
-  #
 
   get_cmake_property(zLangs ENABLED_LANGUAGES)
   foreach(sLang IN LISTS zLangs)
@@ -195,16 +179,8 @@ endfunction()
 
 #]=======================================================================]
 function(rr_get_address_model_tag xVariable)
-  #
-  # 前置断言
-  #
-
   rr_check_no_argn("${ARGN}" FATAL_ERROR)
   rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
-
-  #
-  # 业务逻辑
-  #
 
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set("${xVariable}" "64" PARENT_SCOPE)
@@ -236,16 +212,8 @@ rst:
 
 #]=======================================================================]
 function(rr_get_aa_tag xVariable)
-  #
-  # 前置断言
-  #
-
   rr_check_no_argn("${ARGN}" FATAL_ERROR)
   rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
-
-  #
-  # 业务逻辑
-  #
 
   rr_get_architecture_tag(sArch)
   rr_get_address_model_tag(sAddr)
@@ -269,16 +237,8 @@ endfunction()
 
 #]=======================================================================]
 function(rr_get_taa_tag xVariable)
-  #
-  # 前置断言
-  #
-
   rr_check_no_argn("${ARGN}" FATAL_ERROR)
   rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
-
-  #
-  # 业务逻辑
-  #
 
   rr_get_toolset_tag(sTool)
   rr_get_architecture_tag(sArch)

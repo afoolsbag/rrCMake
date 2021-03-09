@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-04-15 – 2021-01-21
+# 2019-04-15 – 2021-03-08
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -29,17 +29,9 @@ endif()
 
 #]=======================================================================]
 function(_rrlinklibraries_get_via_properties xVariable tTarget)
-  #
-  # 前置断言
-  #
-
   rr_check_no_argn("${ARGN}" FATAL_ERROR)
   rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
   rr_check_target("${tTarget}" FATAL_ERROR)
-
-  #
-  # 业务逻辑
-  #
 
   get_target_property(sType "${tTarget}" TYPE)
   if(sType STREQUAL "INTERFACE_LIBRARY")
@@ -74,17 +66,9 @@ function(rr_get_link_libraries xVariable tTarget)
   set(zMutValKws)
   cmake_parse_arguments(PARSE_ARGV 2 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  #
-  # 前置断言
-  #
-
   rr_check_no_argn("${_UNPARSED_ARGUMENTS}" FATAL_ERROR)
   rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
   rr_check_target("${tTarget}" FATAL_ERROR)
-
-  #
-  # 业务逻辑
-  #
 
   # 查找直接链接库
   _rrlinklibraries_get_via_properties(zItems "${tTarget}")
@@ -145,17 +129,9 @@ function(rr_get_link_library_files xVariable tTarget)
   set(zMutValKws)
   cmake_parse_arguments(PARSE_ARGV 2 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  #
-  # 前置断言
-  #
-
   rr_check_no_argn("${_UNPARSED_ARGUMENTS}" FATAL_ERROR)
   rr_check_cmake_name("${xVariable}" AUTHOR_WARNING)
   rr_check_target("${tTarget}" FATAL_ERROR)
-
-  #
-  # 业务逻辑
-  #
 
   if(_INCLUDE_ITSELF)
     set(oIncludeItself "INCLUDE_ITSELF")
@@ -207,7 +183,7 @@ endfunction()
 
   参见：
 
-  - :command:`get_link_library_files`
+  - :command:`rr_get_link_library_files`
 
 #]=======================================================================]
 function(rr_post_build_copy_link_library_files tTarget)
@@ -217,16 +193,8 @@ function(rr_post_build_copy_link_library_files tTarget)
   set(zMutValKws DESTINATION)
   cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
-  #
-  # 前置断言
-  #
-
   rr_check_no_argn("${_UNPARSED_ARGUMENTS}" FATAL_ERROR)
   rr_check_target("${tTarget}" FATAL_ERROR)
-
-  #
-  # 业务逻辑
-  #
 
   if(_INCLUDE_ITSELF)
     set(oIncludeItself "INCLUDE_ITSELF")

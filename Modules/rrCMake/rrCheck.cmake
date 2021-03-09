@@ -1,5 +1,5 @@
 # zhengrr
-# 2017-12-18 – 2021-01-25
+# 2017-12-18 – 2021-03-02
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -15,13 +15,6 @@ include_guard()  # 3.10
   .. code-block:: cmake
 
     _rrcheck_check_message_mode(<string> <variable>)
-
-  用例：
-
-  .. code-block:: cmake
-
-    _rrcheck_check_message_mode("foobar" bResult)
-    message("bResult: ${bResult}")
 
   参见：
 
@@ -42,12 +35,12 @@ endfunction()
 #[=======================================================================[.rst:
 .. command:: rr_check_argc
 
-  检查参数数目。
+  检查输入列表的元素数目是否在指定范围，输出消息或返回真假值。
 
   .. code-block:: cmake
 
-    rr_check_argc(<argv> <upper-limit> [<mode> | <variable>])
-    rr_check_argc(<argv> <lower-limit> <upper-limit> [<mode> | <variable>])
+    rr_check_argc(<argv> <upper-limit> [<message-mode> | <variable>])
+    rr_check_argc(<argv> <lower-limit> <upper-limit> [<message-mode> | <variable>])
   
   用例：
 
@@ -62,40 +55,32 @@ endfunction()
   - `message <https://cmake.org/cmake/help/latest/command/message.html>`_
 
 #]=======================================================================]
-function(rr_check_argc zArgv nPlaceholder)
+function(rr_check_argc zArgv sPlaceholder1)
   if("${ARGC}" EQUAL 2)
     # <argv> <upper-limit>
     unset(nLowerLimit)
     set(nUpperLimit "${ARGV1}")
-    set(oModeOrVariable)
-
+    set(oMessageModeOrVariable)
   elseif("${ARGC}" EQUAL 3)
     if("${ARGV2}" MATCHES [[^[0-9]+$]])
       # <argv> <lower-limit> <upper-limit>
       set(nLowerLimit "${ARGV1}")
       set(nUpperLimit "${ARGV2}")
-      set(oModeOrVariable)
-
+      set(oMessageModeOrVariable)
     else()
-      # <argv> <upper-limit> <mode>|<variable>
+      # <argv> <upper-limit> <message-mode>|<variable>
       unset(nLowerLimit)
       set(nUpperLimit "${ARGV1}")
-      set(oModeOrVariable "${ARGV2}")
+      set(oMessageModeOrVariable "${ARGV2}")
     endif()
-
   elseif("${ARGC}" EQUAL 4)
-    # <argv> <lower-limit> <upper-limit> <mode>|<variable>
+    # <argv> <lower-limit> <upper-limit> <message-mode>|<variable>
     set(nLowerLimit "${ARGV1}")
     set(nUpperLimit "${ARGV2}")
-    set(oModeOrVariable "${ARGV3}")
-  
+    set(oMessageModeOrVariable "${ARGV3}")
   else()
     message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
   endif()
-
-  #
-  # 业务逻辑
-  #
 
   list(LENGTH zArgv nArgc)
   if((DEFINED nLowerLimit AND nArgc LESS nLowerLimit) OR nArgc GREATER nUpperLimit)
@@ -104,14 +89,16 @@ function(rr_check_argc zArgv nPlaceholder)
     set(bPassed "TRUE")
   endif()
 
-  _rrcheck_check_message_mode("${oModeOrVariable}" bReturnViaMessage)
-  if(NOT bReturnViaMessage)
-    set("${oModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
   elseif(NOT bPassed)
-    if(DEFINED nLowerLimit)
-      message(${oModeOrVariable} "Check result: Incorrect number of arguments: ${zArgv} (expect [${nLowerLimit}, ${nUpperLimit}], actually ${nArgc}).")
+    if(NOT DEFINED nLowerLimit)
+      message(${oMessageModeOrVariable} "Assertion error: Incorrect number of arguments: ${zArgv} (expect <= ${nUpperLimit}, actually ${nArgc}).")
+    elseif(nLowerLimit EQUAL nUpperLimit)
+      message(${oMessageModeOrVariable} "Assertion error: Incorrect number of arguments: ${zArgv} (expect ${nLowerLimit}, actually ${nArgc}).")
     else()
-      message(${oModeOrVariable} "Check result: Incorrect number of arguments: ${zArgv} (expect <= ${nUpperLimit}, actually ${nArgc}).")
+      message(${oMessageModeOrVariable} "Assertion error: Incorrect number of arguments: ${zArgv} (expect [${nLowerLimit}, ${nUpperLimit}], actually ${nArgc}).")
     endif()
   endif()
 endfunction()
@@ -119,12 +106,16 @@ endfunction()
 #[=======================================================================[.rst:
 .. command:: rr_check_c_name
 
-  检查输入是否符合 C 语言标识符命名规则：
-  仅包含拉丁字母、阿拉伯数字和下划线，且首字符不为数字。
+  检查输入字符串是否符合 C 语言标识符命名规则：
+
+  1. 仅包含拉丁字母、阿拉伯数字和下划线；
+  2. 首字符不为数字。
+
+  输出消息或返回真假值。
 
   .. code-block:: cmake
 
-    rr_check_c_name(<name> [<mode> | <variable>])
+    rr_check_c_name(<name> [<message-mode> | <variable>])
 
   用例：
 
@@ -140,20 +131,12 @@ endfunction()
 #]=======================================================================]
 function(rr_check_c_name sName)
   if("${ARGC}" EQUAL 1)
-    # <name>
-    set(oModeOrVariable)
-
+    set(oMessageModeOrVariable)
   elseif("${ARGC}" EQUAL 2)
-    # <name> <mode>|<variable>
-    set(oModeOrVariable "${ARGV1}")
-
+    set(oMessageModeOrVariable "${ARGV1}")
   else()
     message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
   endif()
-
-  #
-  # 业务逻辑
-  #
 
   if("${sName}" MATCHES [[^[A-Z_a-z]+[0-9A-Z_a-z]*$]])
     set(bPassed "TRUE")
@@ -161,24 +144,28 @@ function(rr_check_c_name sName)
     set(bPassed "FALSE")
   endif()
 
-  _rrcheck_check_message_mode("${oModeOrVariable}" bReturnViaMessage)
-  if(NOT bReturnViaMessage)
-    set("${oModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
   elseif(NOT bPassed)
-    message(${oModeOrVariable} "Check result: The name isn't meet C identifier rules: ${sName}.")
+    message(${oMessageModeOrVariable} "Assertion error: The name isn't meet C identifier rules: ${sName}.")
   endif()
 endfunction()
 
 #[=======================================================================[.rst:
 .. command:: rr_check_cmake_name
 
-  检查输入是否符合 CMake 推荐变量命名规则：
-  仅包含拉丁字母、阿拉伯数字、下划线和连字符；
-  另引入双冒号（``::``）用于域分隔，尾部双加号（``++``）用于某些库的 C++ 版本。
+  检查输入字符串是否符合 CMake 推荐变量命名规则：
+
+  1. 仅包含拉丁字母、阿拉伯数字、下划线和连字符；
+  2. 额外引入双冒号（``::``）用于域分隔；
+  3. 额外引入尾部双加号（``++``）用于某些库的 C++ 版本。
+
+  输出消息或返回真假值。
 
   .. code-block:: cmake
 
-    rr_check_cmake_name(<name> [<mode> | <variable>])
+    rr_check_cmake_name(<name> [<message-mode> | <variable>])
 
   用例：
 
@@ -194,20 +181,12 @@ endfunction()
 #]=======================================================================]
 function(rr_check_cmake_name sName)
   if("${ARGC}" EQUAL 1)
-    # <name>
-    set(oModeOrVariable)
-
+    set(oMessageModeOrVariable)
   elseif("${ARGC}" EQUAL 2)
-    # <name> <mode>|<variable>
-    set(oModeOrVariable "${ARGV1}")
-
+    set(oMessageModeOrVariable "${ARGV1}")
   else()
     message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
   endif()
-
-  #
-  # 业务逻辑
-  #
 
   if("${sName}" MATCHES [[^[-0-9A-Z_a-z]+(::[-0-9A-Z_a-z]+)*(\+\+)?$]])
     set(bPassed "TRUE")
@@ -215,25 +194,30 @@ function(rr_check_cmake_name sName)
     set(bPassed "FALSE")
   endif()
 
-  _rrcheck_check_message_mode("${oModeOrVariable}" bReturnViaMessage)
-  if(NOT bReturnViaMessage)
-    set("${oModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
   elseif(NOT bPassed)
-    message(${oModeOrVariable} "Check result: The name isn't meet CMake recommend variable rules: ${sName}.")
+    message(${oMessageModeOrVariable} "Assertion error: The name isn't meet CMake recommend variable rules: ${sName}.")
   endif()
 endfunction()
 
 #[=======================================================================[.rst:
 .. command:: rr_check_fext_name
 
-  检查输入是否符合（一般的）文件扩展名命名规则：
-  首字符为下脚点，扩展名仅包含拉丁字母和阿拉伯数字，可以串接。
+  检查输入字符串是否符合（一般的）文件扩展名命名规则：
 
-  另，临时文件偏好选用稀奇古怪的字符组成其后缀，如 ``!``、``#``、``$``、``&``、``@``、``_``、``~`` 等，此处没有考虑。
+  1. 首字符为下脚点；
+  2. 扩展名仅包含拉丁字母和阿拉伯数字；
+  3. 可以串接。
+
+  输出消息或返回真假值。
+
+  值得注意的是，临时文件偏好选用稀奇古怪的字符组成其后缀，如 ``!``、``#``、``$``、``&``、``@``、``_``、``~`` 等，此处没有考虑。
 
   .. code-block:: cmake
 
-    rr_check_fext_name(<name> [<mode> | <variable>])
+    rr_check_fext_name(<name> [<message-mode> | <variable>])
 
   用例：
 
@@ -250,20 +234,12 @@ endfunction()
 #]=======================================================================]
 function(rr_check_fext_name sName)
   if("${ARGC}" EQUAL 1)
-    # <name>
-    set(oModeOrVariable)
-
+    set(oMessageModeOrVariable)
   elseif("${ARGC}" EQUAL 2)
-    # <name> <mode>|<variable>
-    set(oModeOrVariable "${ARGV1}")
-
+    set(oMessageModeOrVariable "${ARGV1}")
   else()
     message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
   endif()
-
-  #
-  # 业务逻辑
-  #
 
   if("${sName}" MATCHES [[^(\.[0-9A-Za-z]+)+$]])
     set(bPassed "TRUE")
@@ -271,22 +247,22 @@ function(rr_check_fext_name sName)
     set(bPassed "FALSE")
   endif()
 
-  _rrcheck_check_message_mode("${oModeOrVariable}" bReturnViaMessage)
-  if(NOT bReturnViaMessage)
-    set("${oModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
   elseif(NOT bPassed)
-    message(${oModeOrVariable} "Check result: The name isn't meet file extension rules: ${sName}.")
+    message(${oMessageModeOrVariable} "Assertion error: The name isn't meet file extension rules: ${sName}.")
   endif()
 endfunction()
 
 #[=======================================================================[.rst:
 .. command:: rr_check_no_argn
 
-  检查不预期的剩余参数。
+  检查输入列表是否为空，输出消息或返回真假值。
 
   .. code-block:: cmake
 
-    rr_check_no_argn(<argn> [<mode> | <variable>])
+    rr_check_no_argn(<argn> [<message-mode> | <variable>])
   
   用例：
 
@@ -303,20 +279,12 @@ endfunction()
 #]=======================================================================]
 function(rr_check_no_argn zArgn)
   if("${ARGC}" EQUAL 1)
-    # <argn>
-    set(oModeOrVariable)
-
+    set(oMessageModeOrVariable)
   elseif("${ARGC}" EQUAL 2)
-    # <argn> <mode>|<variable>
-    set(oModeOrVariable "${ARGV1}")
-
+    set(oMessageModeOrVariable "${ARGV1}")
   else()
     message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
   endif()
-
-  #
-  # 业务逻辑
-  #
 
   if("${zArgn}" STREQUAL "")
     set(bPassed "TRUE")
@@ -324,22 +292,22 @@ function(rr_check_no_argn zArgn)
     set(bPassed "FALSE")
   endif()
 
-  _rrcheck_check_message_mode("${oModeOrVariable}" bReturnViaMessage)
-  if(NOT bReturnViaMessage)
-    set("${oModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
   elseif(NOT bPassed)
-    message(${oModeOrVariable} "Check result: Unexpected arguments: ${zArgn}.")
+    message(${oMessageModeOrVariable} "Assertion error: Unexpected arguments: ${zArgn}.")
   endif()
 endfunction()
 
 #[=======================================================================[.rst:
 .. command:: rr_check_target
 
-  检查输入是否是对象。
+  检查输入字符串是否为对象，输出消息或返回真假值。
 
   .. code-block:: cmake
 
-    rr_check_target(<target-name> [<mode> | <variable>])
+    rr_check_target(<target-name> [<message-mode> | <variable>])
 
   用例：
 
@@ -355,20 +323,12 @@ endfunction()
 #]=======================================================================]
 function(rr_check_target sTargetName)
   if("${ARGC}" EQUAL 1)
-    # <target-name>
-    set(oModeOrVariable)
-
+    set(oMessageModeOrVariable)
   elseif("${ARGC}" EQUAL 2)
-    # <target-name> <mode>|<variable>
-    set(oModeOrVariable "${ARGV1}")
-
+    set(oMessageModeOrVariable "${ARGV1}")
   else()
     message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
   endif()
-
-  #
-  # 业务逻辑
-  #
 
   if(TARGET "${sTargetName}")
     set(bPassed "TRUE")
@@ -376,10 +336,10 @@ function(rr_check_target sTargetName)
     set(bPassed "FALSE")
   endif()
 
-  _rrcheck_check_message_mode("${oModeOrVariable}" bReturnViaMessage)
-  if(NOT bReturnViaMessage)
-    set("${oModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
   elseif(NOT bPassed)
-    message(${oModeOrVariable} "Check result: The name isn't a target: ${sTargetName}.")
+    message(${oMessageModeOrVariable} "Assertion error: The name isn't a target: ${sTargetName}.")
   endif()
 endfunction()
