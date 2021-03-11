@@ -1,5 +1,5 @@
 # zhengrr
-# 2017-12-18 – 2021-03-02
+# 2017-12-18 – 2021-03-11
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -19,7 +19,6 @@ include_guard()  # 3.10
   参见：
 
   - `message <https://cmake.org/cmake/help/latest/command/message.html>`_
-
 #]=======================================================================]
 function(_rrcheck_check_message_mode sString xVariable)
   string(TOUPPER "${sString}" sUpper)
@@ -32,6 +31,21 @@ function(_rrcheck_check_message_mode sString xVariable)
   set("${xVariable}" "FALSE" PARENT_SCOPE)
 endfunction()
 
+#   ___                                       _
+#  / _ \                                     | |
+# / /_\ \_ __ __ _ _   _ _ __ ___   ___ _ __ | |_ ___
+# |  _  | '__/ _` | | | | '_ ` _ \ / _ \ '_ \| __/ __|
+# | | | | | | (_| | |_| | | | | | |  __/ | | | |_\__ \
+# \_| |_/_|  \__, |\__,_|_| |_| |_|\___|_| |_|\__|___/
+#            __/ |
+#           |___/
+#
+# 参见：
+#
+# - `function <https://cmake.org/cmake/help/latest/command/function.html>`_
+# - `macro <https://cmake.org/cmake/help/latest/command/macro.html>`_
+#
+
 #[=======================================================================[.rst:
 .. command:: rr_check_argc
 
@@ -41,19 +55,6 @@ endfunction()
 
     rr_check_argc(<argv> <upper-limit> [<message-mode> | <variable>])
     rr_check_argc(<argv> <lower-limit> <upper-limit> [<message-mode> | <variable>])
-  
-  用例：
-
-  .. code-block:: cmake
-
-    rr_check_argc("${ARGV}" 4 FATAL_ERROR)
-
-  参见：
-
-  - `function <https://cmake.org/cmake/help/latest/command/function.html>`_
-  - `macro <https://cmake.org/cmake/help/latest/command/macro.html>`_
-  - `message <https://cmake.org/cmake/help/latest/command/message.html>`_
-
 #]=======================================================================]
 function(rr_check_argc zArgv sPlaceholder1)
   if("${ARGC}" EQUAL 2)
@@ -79,6 +80,7 @@ function(rr_check_argc zArgv sPlaceholder1)
     set(nUpperLimit "${ARGV2}")
     set(oMessageModeOrVariable "${ARGV3}")
   else()
+    # invalid input
     message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
   endif()
 
@@ -104,6 +106,192 @@ function(rr_check_argc zArgv sPlaceholder1)
 endfunction()
 
 #[=======================================================================[.rst:
+.. command:: rr_check_no_argn
+
+  检查输入列表是否为空，输出消息或返回真假值。
+
+  .. code-block:: cmake
+
+    rr_check_no_argn(<argn> [<message-mode> | <variable>])
+#]=======================================================================]
+function(rr_check_no_argn zArgn)
+  if("${ARGC}" EQUAL 1)
+    set(oMessageModeOrVariable)
+  elseif("${ARGC}" EQUAL 2)
+    set(oMessageModeOrVariable "${ARGV1}")
+  else()
+    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
+  endif()
+
+  if("${zArgn}" STREQUAL "")
+    set(bPassed "TRUE")
+  else()
+    set(bPassed "FALSE")
+  endif()
+
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  elseif(NOT bPassed)
+    message(${oMessageModeOrVariable} "Assertion error: Unexpected arguments: ${zArgn}.")
+  endif()
+endfunction()
+
+#  _____     _     _                      _____ _               _
+# |  ___|   (_)   | |                    /  __ \ |             | |
+# | |____  ___ ___| |_ ___ _ __   ___ ___| /  \/ |__   ___  ___| | _____
+# |  __\ \/ / / __| __/ _ \ '_ \ / __/ _ \ |   | '_ \ / _ \/ __| |/ / __|
+# | |___>  <| \__ \ ||  __/ | | | (_|  __/ \__/\ | | |  __/ (__|   <\__ \
+# \____/_/\_\_|___/\__\___|_| |_|\___\___|\____/_| |_|\___|\___|_|\_\___/
+#
+# 参见：
+#
+# - `if § Existence Checks <https://cmake.org/cmake/help/latest/command/if.html#existence-checks>`_
+#
+
+#[=======================================================================[.rst:
+.. command:: rr_check_command
+
+  检查输入名是否为可调用的命令、宏或函数，输出消息或返回真假值。
+
+  .. code-block:: cmake
+
+    rr_check_command(<command-name> [<message-mode> | <variable>])
+#]=======================================================================]
+function(rr_check_command sCommandName)
+  if("${ARGC}" EQUAL 1)
+    set(oMessageModeOrVariable)
+  elseif("${ARGC}" EQUAL 2)
+    set(oMessageModeOrVariable "${ARGV1}")
+  else()
+    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
+  endif()
+
+  if(COMMAND "${sCommandName}")
+    set(bPassed "TRUE")
+  else()
+    set(bPassed "FALSE")
+  endif()
+
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  elseif(NOT bPassed)
+    message(${oMessageModeOrVariable} "Assertion error: The name isn't a command: ${sCommandName}.")
+  endif()
+endfunction()
+
+#[=======================================================================[.rst:
+.. command:: rr_check_policy
+
+  检查输入标识是否为策略，输出消息或返回真假值。
+
+  .. code-block:: cmake
+
+    rr_check_policy(<policy-id> [<message-mode> | <variable>])
+#]=======================================================================]
+function(rr_check_policy sPolicyId)
+  if("${ARGC}" EQUAL 1)
+    set(oMessageModeOrVariable)
+  elseif("${ARGC}" EQUAL 2)
+    set(oMessageModeOrVariable "${ARGV1}")
+  else()
+    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
+  endif()
+
+  if(POLICY "${sPolicyId}")
+    set(bPassed "TRUE")
+  else()
+    set(bPassed "FALSE")
+  endif()
+
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  elseif(NOT bPassed)
+    message(${oMessageModeOrVariable} "Assertion error: The identifier isn't a policy: ${sPolicyId}.")
+  endif()
+endfunction()
+
+#[=======================================================================[.rst:
+.. command:: rr_check_target
+
+  检查输入名是否为对象，输出消息或返回真假值。
+
+  .. code-block:: cmake
+
+    rr_check_target(<target-name> [<message-mode> | <variable>])
+#]=======================================================================]
+function(rr_check_target sTargetName)
+  if("${ARGC}" EQUAL 1)
+    set(oMessageModeOrVariable)
+  elseif("${ARGC}" EQUAL 2)
+    set(oMessageModeOrVariable "${ARGV1}")
+  else()
+    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
+  endif()
+
+  if(TARGET "${sTargetName}")
+    set(bPassed "TRUE")
+  else()
+    set(bPassed "FALSE")
+  endif()
+
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  elseif(NOT bPassed)
+    message(${oMessageModeOrVariable} "Assertion error: The name isn't a target: ${sTargetName}.")
+  endif()
+endfunction()
+
+# ______ _ _       _____                      _   _
+# |  ___(_) |     |  _  |                    | | (_)
+# | |_   _| | ___ | | | |_ __   ___ _ __ __ _| |_ _  ___  _ __  ___ 
+# |  _| | | |/ _ \| | | | '_ \ / _ \ '__/ _` | __| |/ _ \| '_ \/ __|
+# | |   | | |  __/\ \_/ / |_) |  __/ | | (_| | |_| | (_) | | | \__ \
+# \_|   |_|_|\___| \___/| .__/ \___|_|  \__,_|\__|_|\___/|_| |_|___/
+#                       | |
+#                       |_|
+#
+# 参见：
+#
+# - `if § File Operations <https://cmake.org/cmake/help/latest/command/if.html#file-operations>`_
+#
+
+#[=======================================================================[.rst:
+.. command:: rr_check_directory
+
+  检查输入字符串是否为目录，输出消息或返回真假值。
+
+  .. code-block:: cmake
+
+    rr_check_directory(<directory-path> [<message-mode> | <variable>])
+#]=======================================================================]
+function(rr_check_directory sDirectoryPath)
+  if("${ARGC}" EQUAL 1)
+    set(oMessageModeOrVariable)
+  elseif("${ARGC}" EQUAL 2)
+    set(oMessageModeOrVariable "${ARGV1}")
+  else()
+    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
+  endif()
+
+  if(IS_DIRECTORY "${sDirectoryPath}")
+    set(bPassed "TRUE")
+  else()
+    set(bPassed "FALSE")
+  endif()
+
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  elseif(NOT bPassed)
+    message(${oMessageModeOrVariable} "Assertion error: The path isn't a directory: ${sDirectoryPath}.")
+  endif()
+endfunction()
+
+#[=======================================================================[.rst:
 .. command:: rr_check_c_name
 
   检查输入字符串是否符合 C 语言标识符命名规则：
@@ -117,17 +305,9 @@ endfunction()
 
     rr_check_c_name(<name> [<message-mode> | <variable>])
 
-  用例：
-
-  .. code-block:: cmake
-
-    rr_check_c_name("foobar" AUTHOR_WARNING)
-
   参见：
 
-  - `message <https://cmake.org/cmake/help/latest/command/message.html>`_
   - `C 语言标识符 <https://zh.cppreference.com/w/c/language/identifier>`_
-
 #]=======================================================================]
 function(rr_check_c_name sName)
   if("${ARGC}" EQUAL 1)
@@ -252,94 +432,5 @@ function(rr_check_fext_name sName)
     set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
   elseif(NOT bPassed)
     message(${oMessageModeOrVariable} "Assertion error: The name isn't meet file extension rules: ${sName}.")
-  endif()
-endfunction()
-
-#[=======================================================================[.rst:
-.. command:: rr_check_no_argn
-
-  检查输入列表是否为空，输出消息或返回真假值。
-
-  .. code-block:: cmake
-
-    rr_check_no_argn(<argn> [<message-mode> | <variable>])
-  
-  用例：
-
-  .. code-block:: cmake
-
-    rr_check_no_argn("${ARGN}" FATAL_ERROR)
-
-  参见：
-
-  - `function <https://cmake.org/cmake/help/latest/command/function.html>`_
-  - `macro <https://cmake.org/cmake/help/latest/command/macro.html>`_
-  - `message <https://cmake.org/cmake/help/latest/command/message.html>`_
-
-#]=======================================================================]
-function(rr_check_no_argn zArgn)
-  if("${ARGC}" EQUAL 1)
-    set(oMessageModeOrVariable)
-  elseif("${ARGC}" EQUAL 2)
-    set(oMessageModeOrVariable "${ARGV1}")
-  else()
-    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
-  endif()
-
-  if("${zArgn}" STREQUAL "")
-    set(bPassed "TRUE")
-  else()
-    set(bPassed "FALSE")
-  endif()
-
-  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
-  if(NOT bMessageMode)
-    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
-  elseif(NOT bPassed)
-    message(${oMessageModeOrVariable} "Assertion error: Unexpected arguments: ${zArgn}.")
-  endif()
-endfunction()
-
-#[=======================================================================[.rst:
-.. command:: rr_check_target
-
-  检查输入字符串是否为对象，输出消息或返回真假值。
-
-  .. code-block:: cmake
-
-    rr_check_target(<target-name> [<message-mode> | <variable>])
-
-  用例：
-
-  .. code-block:: cmake
-
-    rr_check_target("foobar" FATAL_ERROR)
-
-  参见：
-
-  - `if <https://cmake.org/cmake/help/latest/command/if.html>`_
-  - `message <https://cmake.org/cmake/help/latest/command/message.html>`_
-
-#]=======================================================================]
-function(rr_check_target sTargetName)
-  if("${ARGC}" EQUAL 1)
-    set(oMessageModeOrVariable)
-  elseif("${ARGC}" EQUAL 2)
-    set(oMessageModeOrVariable "${ARGV1}")
-  else()
-    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
-  endif()
-
-  if(TARGET "${sTargetName}")
-    set(bPassed "TRUE")
-  else()
-    set(bPassed "FALSE")
-  endif()
-
-  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
-  if(NOT bMessageMode)
-    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
-  elseif(NOT bPassed)
-    message(${oMessageModeOrVariable} "Assertion error: The name isn't a target: ${sTargetName}.")
   endif()
 endfunction()

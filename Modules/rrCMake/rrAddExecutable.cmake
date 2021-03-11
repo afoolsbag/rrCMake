@@ -1,9 +1,9 @@
 # zhengrr
-# 2017-12-18 – 2021-03-02
+# 2017-12-18 – 2021-03-10
 # Unlicense
 
-cmake_minimum_required(VERSION 3.10)
-cmake_policy(VERSION 3.10)
+cmake_minimum_required(VERSION 3.17)
+cmake_policy(VERSION 3.17)
 
 include_guard()  # 3.10
 
@@ -17,6 +17,10 @@ if(NOT COMMAND rr_post_build_copy_link_library_files)
   include("${CMAKE_CURRENT_LIST_DIR}/rrLinkLibraries.cmake")
 endif()
 
+# 模块变量
+set(_rrAddExecutable_zKwdNames "COMPILE_DEFINITIONS" "COMPILE_FEATURES" "COMPILE_OPTIONS" "INCLUDE_DIRECTORIES" "LINK_DIRECTORIES" "LINK_LIBRARIES" "LINK_OPTIONS" "PROPERTIES"  "SOURCES")
+set(_rrAddExecutable_zVarNames "zCompileDefinitions" "zCompileFeatures" "zCompileOptions" "zIncludeDirectories" "zLinkDirectories" "zLinkLibraries" "zLinkOptions" "zProperties" "zSources")
+
 #[=======================================================================[.rst:
 .. command:: rr_add_executable
 
@@ -27,14 +31,14 @@ endif()
     rr_add_executable(
       <name> <argument-of-"add_executable"-command>...
       [PROPERTIES          {<property-key> <property-value>}...]
-      [COMPILE_DEFINITIONS {<INTERFACE|PUBLIC|PRIVATE> <definition>...}...]
-      [COMPILE_FEATURES    {<INTERFACE|PUBLIC|PRIVATE> <feature>...}...]
-      [COMPILE_OPTIONS     {<INTERFACE|PUBLIC|PRIVATE> <option>...}...]
-      [INCLUDE_DIRECTORIES {<INTERFACE|PUBLIC|PRIVATE> <directory>...}...]
-      [LINK_DIRECTORIES    {<INTERFACE|PUBLIC|PRIVATE> <directory>...}...]
-      [LINK_LIBRARIES      {<INTERFACE|PUBLIC|PRIVATE> <library>...}...]
-      [LINK_OPTIONS        {<INTERFACE|PUBLIC|PRIVATE> <option>...}...]
-      [SOURCES             {<INTERFACE|PUBLIC|PRIVATE> <source>...}...])
+      [COMPILE_DEFINITIONS {{INTERFACE|PUBLIC|PRIVATE} <definition>...}...]
+      [COMPILE_FEATURES    {{INTERFACE|PUBLIC|PRIVATE} <feature>...}...]
+      [COMPILE_OPTIONS     {{INTERFACE|PUBLIC|PRIVATE} <option>...}...]
+      [INCLUDE_DIRECTORIES {{INTERFACE|PUBLIC|PRIVATE} <directory>...}...]
+      [LINK_DIRECTORIES    {{INTERFACE|PUBLIC|PRIVATE} <directory>...}...]
+      [LINK_LIBRARIES      {{INTERFACE|PUBLIC|PRIVATE} <library>...}...]
+      [LINK_OPTIONS        {{INTERFACE|PUBLIC|PRIVATE} <option>...}...]
+      [SOURCES             {{INTERFACE|PUBLIC|PRIVATE} <source>...}...])
 
   参见：
 
@@ -53,67 +57,74 @@ endif()
 function(rr_add_executable sName)
   set(zOptKws)
   set(zOneValKws)
-  set(zMutValKws COMPILE_DEFINITIONS
-                 COMPILE_FEATURES
-                 COMPILE_OPTIONS
-                 INCLUDE_DIRECTORIES
-                 LINK_DIRECTORIES
-                 LINK_LIBRARIES
-                 LINK_OPTIONS
-                 PROPERTIES
-                 SOURCES)
+  set(zMutValKws ${_rrAddExecutable_zKwdNames})
   cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
   rr_check_cmake_name("${sName}" AUTHOR_WARNING)
-  foreach(sMutValKw IN LISTS zMutValKws)
-    if(DEFINED "_${sMutValKw}")
-      list(LENGTH "_${sMutValKw}" nLen)
-      if(nLen EQUAL 0)
-        message(AUTHOR_WARNING "Keyword ${sMutValKw} is used, but without value, ignored.")
-        unset("_${sMutValKw}")
+  foreach(sKwdName xVarName IN ZIP_LISTS _rrAddExecutable_zKwdNames _rrAddExecutable_zVarNames)  # 3.17
+    unset("${xVarName}")
+    if(DEFINED "_${sKwdName}")
+      if("${_${sKwdName}}" STREQUAL "")
+        message(AUTHOR_WARNING "Keyword ${sKwdName} is used, but without value, ignored.")
+      else()
+        set("${xVarName}" ${_${sKwdName}})
       endif()
     endif()
   endforeach()
 
   add_executable("${sName}" ${_UNPARSED_ARGUMENTS})
-  if(DEFINED _PROPERTIES)
-    set_target_properties("${sName}" PROPERTIES ${_PROPERTIES})
+  if(DEFINED zProperties)
+    set_target_properties("${sName}" PROPERTIES ${zProperties})
   endif()
-  if(DEFINED _COMPILE_DEFINITIONS)
-    target_compile_definitions("${sName}" ${_COMPILE_DEFINITIONS})
+  if(DEFINED zCompileDefinitions)
+    target_compile_definitions("${sName}" ${zCompileDefinitions})
   endif()
-  if(DEFINED _COMPILE_FEATURES)
-    target_compile_features("${sName}" ${_COMPILE_FEATURES})
+  if(DEFINED zCompileFeatures)
+    target_compile_features("${sName}" ${zCompileFeatures})
   endif()
-  if(DEFINED _COMPILE_OPTIONS)
-    target_compile_options("${sName}" ${_COMPILE_OPTIONS})
+  if(DEFINED zCompileOptions)
+    target_compile_options("${sName}" ${zCompileOptions})
   endif()
-  if(DEFINED _INCLUDE_DIRECTORIES)
-    target_include_directories("${sName}" ${_INCLUDE_DIRECTORIES})
+  if(DEFINED zIncludeDirectories)
+    target_include_directories("${sName}" ${zIncludeDirectories})
   endif()
-  if(DEFINED _LINK_DIRECTORIES)
-    target_link_directories("${sName}" ${_LINK_DIRECTORIES})
+  if(DEFINED zLinkDirectories)
+    target_link_directories("${sName}" ${zLinkDirectories})
   endif()
-  if(DEFINED _LINK_LIBRARIES)
-    target_link_libraries("${sName}" ${_LINK_LIBRARIES})
+  if(DEFINED zLinkLibraries)
+    target_link_libraries("${sName}" ${zLinkLibraries})
   endif()
-  if(DEFINED _LINK_OPTIONS)
-    target_link_options("${sName}" ${_LINK_OPTIONS})
+  if(DEFINED zLinkOptions)
+    target_link_options("${sName}" ${zLinkOptions})
   endif()
-  if(DEFINED _SOURCES)
-    target_sources("${sName}" ${_SOURCES})
+  if(DEFINED zSources)
+    target_sources("${sName}" ${zSources})
   endif()
 endfunction()
 
 #[=======================================================================[.rst:
 .. command:: rr_add_executable_with_convention
 
-  类似 ``rr_add_executable`` 命令，另依据惯例进行更多配置：
+  类似 ``rr_add_executable`` 命令，并依据惯例进行更多配置：
 
   - 默认置否的构建开关
   - 在调试模式下，可执行文件以 d 后缀
   - 构建完成后，复制已知依赖到可执行文件目录
   - 安装时，将可执行文件复制到形似 bin/<tag>[d] 的目录中
+
+  .. code-block:: cmake
+
+    rr_add_executable_with_convention(
+      <name> <argument-of-"add_executable"-command>...
+      [PROPERTIES          {<property-key> <property-value>}...]
+      [COMPILE_DEFINITIONS {{INTERFACE|PUBLIC|PRIVATE} <definition>...}...]
+      [COMPILE_FEATURES    {{INTERFACE|PUBLIC|PRIVATE} <feature>...}...]
+      [COMPILE_OPTIONS     {{INTERFACE|PUBLIC|PRIVATE} <option>...}...]
+      [INCLUDE_DIRECTORIES {{INTERFACE|PUBLIC|PRIVATE} <directory>...}...]
+      [LINK_DIRECTORIES    {{INTERFACE|PUBLIC|PRIVATE} <directory>...}...]
+      [LINK_LIBRARIES      {{INTERFACE|PUBLIC|PRIVATE} <library>...}...]
+      [LINK_OPTIONS        {{INTERFACE|PUBLIC|PRIVATE} <option>...}...]
+      [SOURCES             {{INTERFACE|PUBLIC|PRIVATE} <source>...}...])
 
   参见：
 
@@ -125,24 +136,17 @@ endfunction()
 function(rr_add_executable_with_convention sName)
   set(zOptKws)
   set(zOneValKws)
-  set(zMutValKws COMPILE_DEFINITIONS
-                 COMPILE_FEATURES
-                 COMPILE_OPTIONS
-                 INCLUDE_DIRECTORIES
-                 LINK_DIRECTORIES
-                 LINK_LIBRARIES
-                 LINK_OPTIONS
-                 PROPERTIES
-                 SOURCES)
+  set(zMutValKws ${_rrAddExecutable_zKwdNames})
   cmake_parse_arguments(PARSE_ARGV 1 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
   rr_check_cmake_name("${sName}" AUTHOR_WARNING)
-  foreach(sMutValKw IN LISTS zMutValKws)
-    if(DEFINED "_${sMutValKw}")
-      list(LENGTH "_${sMutValKw}" nLen)
-      if(nLen EQUAL 0)
-        message(AUTHOR_WARNING "Keyword ${sMutValKw} is used, but without value, ignored.")
-        unset("_${sMutValKw}")
+  foreach(sKwdName xVarName IN ZIP_LISTS _rrAddExecutable_zKwdNames _rrAddExecutable_zVarNames)  # 3.17
+    unset("${xVarName}")
+    if(DEFINED "_${sKwdName}")
+      if("${_${sKwdName}}" STREQUAL "")
+        message(AUTHOR_WARNING "Keyword ${sKwdName} is used, but without value, ignored.")
+      else()
+        set("${xVarName}" ${_${sKwdName}})
       endif()
     endif()
   endforeach()
@@ -164,38 +168,26 @@ function(rr_add_executable_with_convention sName)
   endif()
 
   # 在调试模式下，可执行文件以 d 后缀
-  if(NOT DEBUG_POSTFIX IN_LIST _PROPERTIES)
-    list(APPEND _PROPERTIES DEBUG_POSTFIX "d")
+  if(NOT DEBUG_POSTFIX IN_LIST zProperties)
+    list(APPEND zProperties DEBUG_POSTFIX "d")
   endif()
 
-  add_executable("${sName}" ${_UNPARSED_ARGUMENTS})
-  if(DEFINED _PROPERTIES)
-    set_target_properties("${sName}" PROPERTIES ${_PROPERTIES})
-  endif()
-  if(DEFINED _COMPILE_DEFINITIONS)
-    target_compile_definitions("${sName}" ${_COMPILE_DEFINITIONS})
-  endif()
-  if(DEFINED _COMPILE_FEATURES)
-    target_compile_features("${sName}" ${_COMPILE_FEATURES})
-  endif()
-  if(DEFINED _COMPILE_OPTIONS)
-    target_compile_options("${sName}" ${_COMPILE_OPTIONS})
-  endif()
-  if(DEFINED _INCLUDE_DIRECTORIES)
-    target_include_directories("${sName}" ${_INCLUDE_DIRECTORIES})
-  endif()
-  if(DEFINED _LINK_DIRECTORIES)
-    target_link_directories("${sName}" ${_LINK_DIRECTORIES})
-  endif()
-  if(DEFINED _LINK_LIBRARIES)
-    target_link_libraries("${sName}" ${_LINK_LIBRARIES})
-  endif()
-  if(DEFINED _LINK_OPTIONS)
-    target_link_options("${sName}" ${_LINK_OPTIONS})
-  endif()
-  if(DEFINED _SOURCES)
-    target_sources("${sName}" ${_SOURCES})
-  endif()
+  foreach(xVarName sKwdName IN ZIP_LISTS _rrAddExecutable_zVarNames _rrAddExecutable_zKwdNames)  # 3.17
+    if(DEFINED "${xVarName}")
+      list(PREPEND "{xVarName}" "sKwdName")  # 3.15
+    endif()
+  endforeach()
+  rr_add_executable(
+    "${sName}" ${_UNPARSED_ARGUMENTS}
+    ${zProperties}
+    ${zCompileDefinitions}
+    ${zCompileFeatures}
+    ${zCompileOptions}
+    ${zIncludeDirectories}
+    ${zLinkDirectories}
+    ${zLinkLibraries}
+    ${zLinkOptions}
+    ${zSources})
 
   # 构建完成后，复制已知依赖到可执行文件目录
   rr_post_build_copy_link_library_files("${sName}" INCLUDE_ITSELF RECURSE)
