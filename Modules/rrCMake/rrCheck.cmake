@@ -1,5 +1,5 @@
 # zhengrr
-# 2017-12-18 – 2021-03-11
+# 2017-12-18 – 2021-03-15
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -177,7 +177,7 @@ function(rr_check_command sCommandName)
   if(NOT bMessageMode)
     set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
   elseif(NOT bPassed)
-    message(${oMessageModeOrVariable} "Assertion error: The name isn't a command: ${sCommandName}.")
+    message(${oMessageModeOrVariable} "Assertion error: The name is not a command: ${sCommandName}.")
   endif()
 endfunction()
 
@@ -209,7 +209,7 @@ function(rr_check_policy sPolicyId)
   if(NOT bMessageMode)
     set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
   elseif(NOT bPassed)
-    message(${oMessageModeOrVariable} "Assertion error: The identifier isn't a policy: ${sPolicyId}.")
+    message(${oMessageModeOrVariable} "Assertion error: The identifier is not a policy: ${sPolicyId}.")
   endif()
 endfunction()
 
@@ -241,7 +241,7 @@ function(rr_check_target sTargetName)
   if(NOT bMessageMode)
     set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
   elseif(NOT bPassed)
-    message(${oMessageModeOrVariable} "Assertion error: The name isn't a target: ${sTargetName}.")
+    message(${oMessageModeOrVariable} "Assertion error: The name is not a target: ${sTargetName}.")
   endif()
 endfunction()
 
@@ -260,9 +260,41 @@ endfunction()
 #
 
 #[=======================================================================[.rst:
+.. command:: rr_check_exists
+
+  检查输入路径是否为存在，输出消息或返回真假值。
+
+  .. code-block:: cmake
+
+    rr_check_exists(<path> [<message-mode> | <variable>])
+#]=======================================================================]
+function(rr_check_exists sPath)
+  if("${ARGC}" EQUAL 1)
+    set(oMessageModeOrVariable)
+  elseif("${ARGC}" EQUAL 2)
+    set(oMessageModeOrVariable "${ARGV1}")
+  else()
+    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
+  endif()
+
+  if(EXISTS "${sPath}")
+    set(bPassed "TRUE")
+  else()
+    set(bPassed "FALSE")
+  endif()
+
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  elseif(NOT bPassed)
+    message(${oMessageModeOrVariable} "Assertion error: The path dose not exist: ${sPath}.")
+  endif()
+endfunction()
+
+#[=======================================================================[.rst:
 .. command:: rr_check_directory
 
-  检查输入字符串是否为目录，输出消息或返回真假值。
+  检查输入路径是否为目录，输出消息或返回真假值。
 
   .. code-block:: cmake
 
@@ -287,9 +319,81 @@ function(rr_check_directory sDirectoryPath)
   if(NOT bMessageMode)
     set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
   elseif(NOT bPassed)
-    message(${oMessageModeOrVariable} "Assertion error: The path isn't a directory: ${sDirectoryPath}.")
+    message(${oMessageModeOrVariable} "Assertion error: The path is not a directory: ${sDirectoryPath}.")
   endif()
 endfunction()
+
+#[=======================================================================[.rst:
+.. command:: rr_check_symlink
+
+  检查输入路径是否为符号链接，输出消息或返回真假值。
+
+  .. code-block:: cmake
+
+    rr_check_symlink(<symlink-path> [<message-mode> | <variable>])
+#]=======================================================================]
+function(rr_check_symlink sSymlinkPath)
+  if("${ARGC}" EQUAL 1)
+    set(oMessageModeOrVariable)
+  elseif("${ARGC}" EQUAL 2)
+    set(oMessageModeOrVariable "${ARGV1}")
+  else()
+    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
+  endif()
+
+  if(IS_SYMLINK "${sSymlinkPath}")
+    set(bPassed "TRUE")
+  else()
+    set(bPassed "FALSE")
+  endif()
+
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  elseif(NOT bPassed)
+    message(${oMessageModeOrVariable} "Assertion error: The path is not a symbolic link: ${sSymlinkPath}.")
+  endif()
+endfunction()
+
+#[=======================================================================[.rst:
+.. command:: rr_check_absolute
+
+  检查输入路径是否为绝对路径，输出消息或返回真假值。
+
+  .. code-block:: cmake
+
+    rr_check_absolute(<absolute-path> [<message-mode> | <variable>])
+#]=======================================================================]
+function(rr_check_absolute sAbsolutePath)
+  if("${ARGC}" EQUAL 1)
+    set(oMessageModeOrVariable)
+  elseif("${ARGC}" EQUAL 2)
+    set(oMessageModeOrVariable "${ARGV1}")
+  else()
+    message(FATAL_ERROR "Incorrect number of arguments: ${ARGV} (${ARGC}).")
+  endif()
+
+  if(IS_ABSOLUTE "${sAbsolutePath}")
+    set(bPassed "TRUE")
+  else()
+    set(bPassed "FALSE")
+  endif()
+
+  _rrcheck_check_message_mode("${oMessageModeOrVariable}" bMessageMode)
+  if(NOT bMessageMode)
+    set("${oMessageModeOrVariable}" "${bPassed}" PARENT_SCOPE)
+  elseif(NOT bPassed)
+    message(${oMessageModeOrVariable} "Assertion error: The path is not a absolute: ${sAbsolutePath}.")
+  endif()
+endfunction()
+
+# ___  ___
+# |  \/  |
+# | .  . | ___  _ __ ___
+# | |\/| |/ _ \| '__/ _ \
+# | |  | | (_) | | |  __/
+# \_|  |_/\___/|_|  \___|
+#
 
 #[=======================================================================[.rst:
 .. command:: rr_check_c_name
