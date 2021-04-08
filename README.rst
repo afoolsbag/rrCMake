@@ -35,27 +35,32 @@ CMake
 风格
 ----
 
-**参数**
+命令
+^^^^
 
-给命令的参数有三种形式：
+命令名采用全小写风格；
+命令参数字面量，若用作字符串则括起，用作其它类型则只在必要时括起；
+命令参数变量见下节。
 
-- 括号参数 ``[[argument...]]``，不对转义序列和变量引用求值，被当做单个参数
-- 引号参数 ``"argument..."``，求值，被当做单个参数
-- 裸参数 ``argument...``，求值，其结果被视为列表，并据列表内容被当做任意个参数
+参见：
 
-**变量**
+- `cmake-language(7) § Command Invocations <https://cmake.org/cmake/help/latest/manual/cmake-language.7.html#command-invocations>`_
+- `cmake-language(7) § Command Arguments <https://cmake.org/cmake/help/latest/manual/cmake-language.7.html#command-arguments>`_
 
-变量名采用小驼峰、匈牙利风格（``tLowerCamelCase``）；
-除非特别说明，引用变量一般建议括上引号（``"${tLowerCamelCase}"``），以避免意外的参数位置偏移；
+变量
+^^^^
+
+变量名采用小驼峰、匈牙利风格（``xLowerCamelCase``）；
+除非特别说明，引用变量一般建议括上引号（``"${xLowerCamelCase}"``），以避免意外的参数位置偏移；
 变量名前缀一般含义如下：
 
-- 前缀 ``b`` 暗示变量值用作真假值（``bBoolean``），其值应取以下四值之一：``TRUE``、``FALSE``、``ON`` 或 ``OFF``
+- 前缀 ``b`` 暗示变量值用作真假值（``bBoolean``）
 - 前缀 ``e`` 暗示变量值用作表达式（``eExpression``）
 - 前缀 ``n`` 暗示变量值用作数字（``nNumber``）
 - 前缀 ``o`` 暗示变量值用作选项（``oOption``），若为空则应被忽略，在引用变量时不应括上引号（``${oOption}``）
+- 前缀 ``p`` 暗示变量值用作路径（``pPath``）
 - 前缀 ``r`` 暗示变量值用作正则表达式（``rRegularExpression``）
 - 前缀 ``s`` 暗示变量值用作字符串（``sString``）
-- 前缀 ``p`` 暗示变量值用作路径（``pPath``）
 - 前缀 ``t`` 暗示变量值用作目标（``tTarget``）
 - 前缀 ``v`` 暗示变量值用作版本号（``vVersion``）
 - 前缀 ``x`` 暗示变量值用作变量名（``xVariable``）
@@ -63,7 +68,8 @@ CMake
 
 任何变量值都是字符串，变量名前缀用于暗示该字符串接受的处理方式，并无强制性。
 
-**断言**
+断言
+^^^^
 
 按实践经验，CMake 中的错误不易排查，因而在公开的自定义的 CMake 命令中加入断言，牺牲性能以强化纠错能力。
 

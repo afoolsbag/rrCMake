@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2021-03-10
+# 2016-10-08 – 2021-04-07
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -54,17 +54,20 @@ function(rr_add_doxygen)
   set(zMutValKws ${zDoxMutValKws})
   cmake_parse_arguments(PARSE_ARGV 0 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
+  # FindDoxygen
   find_package(Doxygen)
   if(NOT DOXYGEN_FOUND)
     message(FATAL_ERROR "Doxygen is needed to generate doxygen documentation.")
   endif()
 
+  # <DoxValKwd> -> DOXYGEN_<DoxValKwd>
   foreach(sDoxConfName IN LISTS zDoxOneValKws zDoxMutValKws)
     if(DEFINED "_${sDoxConfName}")
       set("DOXYGEN_${sDoxConfName}" ${_${sDoxConfName}})
     endif()
   endforeach()
 
+  # FindDoxygen § doxygen_add_docs
   doxygen_add_docs(${_UNPARSED_ARGUMENTS})
 endfunction()
 
