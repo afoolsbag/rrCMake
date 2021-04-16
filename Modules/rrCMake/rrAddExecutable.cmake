@@ -1,5 +1,5 @@
 # zhengrr
-# 2017-12-18 – 2021-03-10
+# 2017-12-18 – 2021-04-16
 # Unlicense
 
 cmake_minimum_required(VERSION 3.17)
@@ -18,8 +18,8 @@ if(NOT COMMAND rr_post_build_copy_link_library_files)
 endif()
 
 # 模块变量
-set(_rrAddExecutable_zKwdNames "COMPILE_DEFINITIONS" "COMPILE_FEATURES" "COMPILE_OPTIONS" "INCLUDE_DIRECTORIES" "LINK_DIRECTORIES" "LINK_LIBRARIES" "LINK_OPTIONS" "PROPERTIES"  "SOURCES")
-set(_rrAddExecutable_zVarNames "zCompileDefinitions" "zCompileFeatures" "zCompileOptions" "zIncludeDirectories" "zLinkDirectories" "zLinkLibraries" "zLinkOptions" "zProperties" "zSources")
+set(_rrAddExecutable_zKwdNames "COMPILE_DEFINITIONS" "COMPILE_FEATURES" "COMPILE_OPTIONS" "INCLUDE_DIRECTORIES" "LINK_DIRECTORIES" "LINK_LIBRARIES" "LINK_OPTIONS" "PROPERTIES"  "SOURCES"  CACHE INTERNAL "")
+set(_rrAddExecutable_zVarNames "zCompileDefinitions" "zCompileFeatures" "zCompileOptions" "zIncludeDirectories" "zLinkDirectories" "zLinkLibraries" "zLinkOptions" "zProperties" "zSources" CACHE INTERNAL "")
 
 #[=======================================================================[.rst:
 .. command:: rr_add_executable
