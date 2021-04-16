@@ -24,11 +24,14 @@ include_guard()  # 3.10
 macro(rr_include_conan_script)
   if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
     message(CHECK_START "Downloading conan.cmake script")  # 3.17
+    # https://github.com/conan-io/cmake-conan/releases
     file(
-      DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/master/conan.cmake"
-               "${CMAKE_BINARY_DIR}/conan.cmake"
-               SHOW_PROGRESS
-      STATUS   _rr_include_conan_script_zStatus)
+      DOWNLOAD      "https://raw.githubusercontent.com/conan-io/cmake-conan/v0.16.1/conan.cmake"
+                    "${CMAKE_BINARY_DIR}/conan.cmake"
+      TLS_VERIFY    ON
+      EXPECTED_HASH SHA256=396e16d0f5eabdc6a14afddbcfff62a54a7ee75c6da23f32f7a31bc85db23484
+      SHOW_PROGRESS
+      STATUS        _rr_include_conan_script_zStatus)
     list(GET _rr_include_conan_script_zStatus 0 _rr_include_conan_script_nStatusCode)
     if(NOT _rr_include_conan_script_nStatusCode EQUAL 0)
       file(REMOVE "${CMAKE_BINARY_DIR}/conan.cmake")
@@ -82,8 +85,8 @@ macro(rr_include_hunter_gate_script)
 
   # https://github.com/cpp-pm/hunter/releases
   HunterGate(
-    URL "https://github.com/cpp-pm/hunter/archive/v0.23.291.tar.gz"
-    SHA1 "4f57243b24a02b9c7ec5ea02c09d5c77c6a97cba"
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.297.tar.gz"
+    SHA1 "3319fe6a3b08090df7df98dee75134d68e2ef5a3"
   )
 
   # 默认将 Hunter 参数隐藏到 Advanced
