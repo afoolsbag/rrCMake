@@ -194,7 +194,7 @@ function(rr_add_library_with_convention sName)
 
   foreach(xVarName sKwdName IN ZIP_LISTS _rrAddLibrary_zVarNames _rrAddLibrary_zKwdNames)  # 3.17
     if(DEFINED "${xVarName}")
-      list(PREPEND "{xVarName}" "${sKwdName}")  # 3.15
+      list(PREPEND "${xVarName}" "${sKwdName}")  # 3.15
     endif()
   endforeach()
   rr_add_library(
@@ -387,7 +387,7 @@ function(rr_add_library_with_convention_and_swig sName)
 
   foreach(xVarName sKwdName IN ZIP_LISTS _rrAddLibrary_zVarNames _rrAddLibrary_zKwdNames)  # 3.17
     if(DEFINED "${xVarName}")
-      list(PREPEND "{xVarName}" "${sKwdName}")  # 3.15
+      list(PREPEND "${xVarName}" "${sKwdName}")  # 3.15
     endif()
   endforeach()
   rr_add_library_with_convention(

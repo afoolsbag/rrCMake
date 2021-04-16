@@ -174,7 +174,7 @@ function(rr_add_executable_with_convention sName)
 
   foreach(xVarName sKwdName IN ZIP_LISTS _rrAddExecutable_zVarNames _rrAddExecutable_zKwdNames)  # 3.17
     if(DEFINED "${xVarName}")
-      list(PREPEND "{xVarName}" "${sKwdName}")  # 3.15
+      list(PREPEND "${xVarName}" "${sKwdName}")  # 3.15
     endif()
   endforeach()
   rr_add_executable(
