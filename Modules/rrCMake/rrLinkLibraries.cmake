@@ -1,5 +1,5 @@
 # zhengrr
-# 2019-04-15 – 2021-03-08
+# 2019-04-15 – 2021-04-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -13,10 +13,11 @@ if(NOT COMMAND rr_check_cmake_name OR
   include("${CMAKE_CURRENT_LIST_DIR}/rrCheck.cmake")
 endif()
 
+
 #[=======================================================================[.rst:
 .. command:: _rrlinklibraries_get_via_properties
 
-  通过（目标）的属性来获取（其链接的库）。
+  内部命令：通过（目标）的属性来获取（其链接的库）。
 
   .. code-block:: cmake
 
@@ -26,7 +27,6 @@ endif()
 
   - `INTERFACE_LINK_LIBRARIES <https://cmake.org/cmake/help/latest/prop_tgt/INTERFACE_LINK_LIBRARIES.html>`_
   - `LINK_LIBRARIES <https://cmake.org/cmake/help/latest/prop_tgt/LINK_LIBRARIES.html>`_
-
 #]=======================================================================]
 function(_rrlinklibraries_get_via_properties xVariable tTarget)
   rr_check_no_argn("${ARGN}" FATAL_ERROR)
@@ -44,6 +44,7 @@ function(_rrlinklibraries_get_via_properties xVariable tTarget)
   endif()
 endfunction()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_get_link_libraries
 
@@ -57,7 +58,6 @@ endfunction()
 
   - `INTERFACE_LINK_LIBRARIES <https://cmake.org/cmake/help/latest/prop_tgt/INTERFACE_LINK_LIBRARIES.html>`_
   - `LINK_LIBRARIES <https://cmake.org/cmake/help/latest/prop_tgt/LINK_LIBRARIES.html>`_
-
 #]=======================================================================]
 function(rr_get_link_libraries xVariable tTarget)
   set(zOptKws    INCLUDE_ITSELF
@@ -108,6 +108,7 @@ function(rr_get_link_libraries xVariable tTarget)
   set("${xVariable}" ${zItems} PARENT_SCOPE)
 endfunction()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_get_link_library_files
 
@@ -120,7 +121,6 @@ endfunction()
   参见：
 
   - `cmake-generator-expressions(7) <https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html>`_
-
 #]=======================================================================]
 function(rr_get_link_library_files xVariable tTarget)
   set(zOptKws    INCLUDE_ITSELF
@@ -168,6 +168,7 @@ function(rr_get_link_library_files xVariable tTarget)
   set("${xVariable}" ${zFiles} PARENT_SCOPE)
 endfunction()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_post_build_copy_link_library_files
 
@@ -184,7 +185,6 @@ endfunction()
   参见：
 
   - :command:`rr_get_link_library_files`
-
 #]=======================================================================]
 function(rr_post_build_copy_link_library_files tTarget)
   set(zOptKws    INCLUDE_ITSELF

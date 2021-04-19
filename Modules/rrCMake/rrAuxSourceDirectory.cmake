@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2021-03-11
+# 2016-10-08 – 2021-04-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.14)
@@ -11,6 +11,7 @@ if(NOT COMMAND rr_check_cmake_name OR
    NOT COMMAND rr_check_fext_name)
   include("${CMAKE_CURRENT_LIST_DIR}/rrCheck.cmake")
 endif()
+
 
 #[=======================================================================[.rst:
 .. command:: rr_aux_source_directory
@@ -218,6 +219,7 @@ function(rr_aux_source_directory _DIRECTORY _VARIABLE)
 
 endfunction()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_aux_source_directory_with_convention
 
@@ -237,7 +239,6 @@ endfunction()
 
   - :command:`aux_source_directory_con`
   - :command:`check_name_with_cmake_rules`
-
 #]=======================================================================]
 function(rr_aux_source_directory_with_convention _DIRECTORY _VARIABLE)
   set(zOptKws    C
