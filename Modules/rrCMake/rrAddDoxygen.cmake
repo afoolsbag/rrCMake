@@ -72,9 +72,9 @@ endfunction()
 
 
 #[=======================================================================[.rst:
-.. command:: rr_add_doxygen_with_convention
+.. command:: rr_add_doxygen_wcon
 
-  类似 ``rr_add_doxygen`` 命令，并依据惯例进行更多配置：
+  类似 ``rr_add_doxygen`` 命令，并依据惯例进行更多配置（wcon，with convention）：
 
   - 
 
@@ -84,7 +84,7 @@ endfunction()
   - `option <https://cmake.org/cmake/help/latest/command/option.html>`_
   - `install <https://cmake.org/cmake/help/latest/command/install.html>`_
 #]=======================================================================]
-function(rr_add_doxygen_with_convention _NAME)
+function(rr_add_doxygen_wcon _NAME)
   set(zDoxOneValKws DOT_PATH
                     EXTRACT_ALL
                     HTML_OUTPUT
