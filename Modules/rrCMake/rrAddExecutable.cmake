@@ -1,5 +1,5 @@
 # zhengrr
-# 2017-12-18 – 2021-04-16
+# 2017-12-18 – 2021-04-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.17)
@@ -17,12 +17,16 @@ if(NOT COMMAND rr_post_build_copy_link_library_files)
   include("${CMAKE_CURRENT_LIST_DIR}/rrLinkLibraries.cmake")
 endif()
 
+
 # 模块变量
 set(_rrAddExecutable_zKwdNames "COMPILE_DEFINITIONS" "COMPILE_FEATURES" "COMPILE_OPTIONS" "INCLUDE_DIRECTORIES" "LINK_DIRECTORIES" "LINK_LIBRARIES" "LINK_OPTIONS" "PROPERTIES"  "SOURCES"  CACHE INTERNAL "")
 set(_rrAddExecutable_zVarNames "zCompileDefinitions" "zCompileFeatures" "zCompileOptions" "zIncludeDirectories" "zLinkDirectories" "zLinkLibraries" "zLinkOptions" "zProperties" "zSources" CACHE INTERNAL "")
 
+
 #[=======================================================================[.rst:
 .. command:: rr_add_executable
+
+  添加可执行文件构建目标。
 
   基于 ``add_executeble`` 命令，提供更多选项和功能。
 
@@ -52,7 +56,6 @@ set(_rrAddExecutable_zVarNames "zCompileDefinitions" "zCompileFeatures" "zCompil
   - `target_link_libraries <https://cmake.org/cmake/help/latest/command/target_link_libraries.html>`_
   - `target_link_options <https://cmake.org/cmake/help/latest/command/target_link_options.html>`_
   - `target_sources <https://cmake.org/cmake/help/latest/command/target_sources.html>`_
-
 #]=======================================================================]
 function(rr_add_executable sName)
   set(zOptKws)
@@ -102,10 +105,11 @@ function(rr_add_executable sName)
   endif()
 endfunction()
 
-#[=======================================================================[.rst:
-.. command:: rr_add_executable_with_convention
 
-  类似 ``rr_add_executable`` 命令，并依据惯例进行更多配置：
+#[=======================================================================[.rst:
+.. command:: rr_add_executable_wcon
+
+  类似 ``rr_add_executable`` 命令，并依据惯例进行更多配置（wcon，with convention）：
 
   - 默认置否的构建开关
   - 在调试模式下，可执行文件以 d 后缀
@@ -114,7 +118,7 @@ endfunction()
 
   .. code-block:: cmake
 
-    rr_add_executable_with_convention(
+    rr_add_executable_wcon(
       <name> <argument-of-"add_executable"-command>...
       [PROPERTIES          {<property-key> <property-value>}...]
       [COMPILE_DEFINITIONS {{INTERFACE|PUBLIC|PRIVATE} <definition>...}...]
@@ -131,9 +135,8 @@ endfunction()
   - :command:`rr_add_executable`
   - `option <https://cmake.org/cmake/help/latest/command/option.html>`_
   - `install <https://cmake.org/cmake/help/latest/command/install.html>`_
-
 #]=======================================================================]
-function(rr_add_executable_with_convention sName)
+function(rr_add_executable_wcon sName)
   set(zOptKws)
   set(zOneValKws)
   set(zMutValKws ${_rrAddExecutable_zKwdNames})
