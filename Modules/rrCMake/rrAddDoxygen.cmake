@@ -11,10 +11,13 @@ if(NOT COMMAND rr_check_cmake_name)
   include("${CMAKE_CURRENT_LIST_DIR}/rrCheck.cmake")
 endif()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_add_doxygen
 
-  基于 ``doxygen_add_docs`` 命令，提供更多选项和功能。
+  添加 Doxygen 文档构建目标。
+
+  基于 ``doxygen_add_docs`` 命令，将“通过变量配置”包装为“通过参数配置”。
 
   .. code-block:: cmake
 
@@ -35,7 +38,6 @@ endif()
 
   - `FindDoxygen <https://cmake.org/cmake/help/latest/module/FindDoxygen.html>`_
   - `Configuration <http://doxygen.org/manual/config.html>`_
-
 #]=======================================================================]
 function(rr_add_doxygen)
   set(zDoxOneValKws DOT_PATH
@@ -71,8 +73,9 @@ function(rr_add_doxygen)
   doxygen_add_docs(${_UNPARSED_ARGUMENTS})
 endfunction()
 
+
 #[=======================================================================[.rst:
-.. command:: add_doxygen_with_convention
+.. command:: rr_add_doxygen_with_convention
 
   类似 ``rr_add_doxygen`` 命令，并依据惯例进行更多配置：
 
@@ -83,7 +86,6 @@ endfunction()
   - :command:`rr_add_doxygen`
   - `option <https://cmake.org/cmake/help/latest/command/option.html>`_
   - `install <https://cmake.org/cmake/help/latest/command/install.html>`_
-
 #]=======================================================================]
 function(rr_add_doxygen_with_convention _NAME)
   set(zDoxOneValKws DOT_PATH

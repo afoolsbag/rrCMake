@@ -1,5 +1,5 @@
 # zhengrr
-# 2016-10-08 – 2021-01-21
+# 2016-10-08 – 2021-04-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -10,6 +10,7 @@ include_guard()  # 3.10
 if(NOT COMMAND rr_project OR NOT COMMAND rr_project_extra)
   include("${CMAKE_CURRENT_LIST_DIR}/rrProject.cmake")
 endif()
+
 
 #[=======================================================================[.rst:
 .. command:: _rrproduct_set_product_variables
@@ -33,7 +34,6 @@ endif()
   - `PROJECT_VERSION_MINOR <https://cmake.org/cmake/help/latest/variable/PROJECT_VERSION_MINOR.html>`_
   - `PROJECT_VERSION_PATCH <https://cmake.org/cmake/help/latest/variable/PROJECT_VERSION_PATCH.html>`_
   - `PROJECT_VERSION_TWEAK <https://cmake.org/cmake/help/latest/variable/PROJECT_VERSION_TWEAK.html>`_
-
 #]=======================================================================]
 macro(_rrproduct_set_product_variables)
   set(PRODUCT_AUTHORS       ${PROJECT_AUTHORS})
@@ -52,6 +52,7 @@ macro(_rrproduct_set_product_variables)
   set(PRODUCT_VERSION_TWEAK "${PROJECT_VERSION_TWEAK}")
 endmacro()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_product
 
@@ -65,12 +66,12 @@ endmacro()
   参见：
 
   - :command:`rr_project`
-
 #]=======================================================================]
 macro(rr_product)
   rr_project(${ARGV})
   _rrproduct_set_product_variables()
 endmacro()
+
 
 #[=======================================================================[.rst:
 .. command:: rr_product_extra
@@ -105,7 +106,6 @@ endmacro()
 
   - :command:`rr_product`
   - :command:`rr_project_extra`
-
 #]=======================================================================]
 macro(rr_product_extra)
   rr_project_extra(${ARGV})

@@ -1,5 +1,5 @@
 # zhengrr
-# 2018-06-06 – 2021-03-08
+# 2018-06-06 – 2021-04-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
@@ -11,6 +11,7 @@ if(NOT COMMAND rr_check_cmake_name OR
    NOT COMMAND rr_check_no_argn)
   include("${CMAKE_CURRENT_LIST_DIR}/rrCheck.cmake")
 endif()
+
 
 #[=======================================================================[.rst:
 .. command:: rr_get_toolset_tag
@@ -25,7 +26,6 @@ endif()
 
   - `Boost Library Naming <https://boost.org/doc/libs/master/more/getting_started/windows.html#library-naming>`_
   - `FindBoost.cmake <https://gitlab.kitware.com/cmake/cmake/blob/master/Modules/FindBoost.cmake>`_
-
 #]=======================================================================]
 function(rr_get_toolset_tag xVariable)
   rr_check_no_argn("${ARGN}" FATAL_ERROR)
@@ -116,6 +116,7 @@ function(rr_get_toolset_tag xVariable)
   set("${xVariable}" "" PARENT_SCOPE)
 endfunction()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_get_architecture_tag
 
@@ -129,7 +130,6 @@ endfunction()
 
   - `Boost Library Naming <https://boost.org/doc/libs/master/more/getting_started/windows.html#library-naming>`_
   - `FindBoost.cmake <https://gitlab.kitware.com/cmake/cmake/blob/master/Modules/FindBoost.cmake>`_
-
 #]=======================================================================]
 function(rr_get_architecture_tag xVariable)
   rr_check_no_argn("${ARGN}" FATAL_ERROR)
@@ -163,6 +163,7 @@ function(rr_get_architecture_tag xVariable)
   set("${xVariable}" "" PARENT_SCOPE)
 endfunction()
 
+
 #[=======================================================================[.rst:
 .. command::rr_get_address_model_tag
 
@@ -176,7 +177,6 @@ endfunction()
 
   - `Boost Library Naming <https://boost.org/doc/libs/master/more/getting_started/windows.html#library-naming>`_
   - `FindBoost.cmake <https://gitlab.kitware.com/cmake/cmake/blob/master/Modules/FindBoost.cmake>`_
-
 #]=======================================================================]
 function(rr_get_address_model_tag xVariable)
   rr_check_no_argn("${ARGN}" FATAL_ERROR)
@@ -195,6 +195,7 @@ function(rr_get_address_model_tag xVariable)
   set("${xVariable}" "" PARENT_SCOPE)
 endfunction()
 
+
 #[=======================================================================[.rst:
 rst:
 .. command::rr_get_aa_tag
@@ -209,7 +210,6 @@ rst:
 
   - :command:`rr_get_architecture_tag`
   - :command:`rr_get_address_model_tag`
-
 #]=======================================================================]
 function(rr_get_aa_tag xVariable)
   rr_check_no_argn("${ARGN}" FATAL_ERROR)
@@ -219,6 +219,7 @@ function(rr_get_aa_tag xVariable)
   rr_get_address_model_tag(sAddr)
   set("${xVariable}" "${sArch}${sAddr}" PARENT_SCOPE)
 endfunction()
+
 
 #[=======================================================================[.rst:
 .. command::rr_get_taa_tag
@@ -234,7 +235,6 @@ endfunction()
   - :command:`rr_get_toolset_tag`
   - :command:`rr_get_architecture_tag`
   - :command:`rr_get_address_model_tag`
-
 #]=======================================================================]
 function(rr_get_taa_tag xVariable)
   rr_check_no_argn("${ARGN}" FATAL_ERROR)

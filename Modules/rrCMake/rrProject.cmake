@@ -1,11 +1,12 @@
 # zhengrr
-# 2016-10-08 – 2021-01-21
+# 2016-10-08 – 2021-04-19
 # Unlicense
 
 cmake_minimum_required(VERSION 3.10)
 cmake_policy(VERSION 3.10)
 
 include_guard()  # 3.10
+
 
 #[=======================================================================[.rst:
 .. command:: _rrproject_set_project_variable
@@ -29,7 +30,6 @@ include_guard()  # 3.10
 
   - `project <https://cmake.org/cmake/help/latest/command/project.html>`_
   - `set <https://cmake.org/cmake/help/latest/command/set.html>`_
-
 #]=======================================================================]
 macro(_rrproject_set_project_variable sNameWithoutPrefix)
   set("PROJECT_${sNameWithoutPrefix}" ${ARGN})
@@ -38,6 +38,7 @@ macro(_rrproject_set_project_variable sNameWithoutPrefix)
     set("CMAKE_PROJECT_${sNameWithoutPrefix}" ${ARGN})
   endif()
 endmacro()
+
 
 #[=======================================================================[.rst:
 .. command:: rr_project
@@ -55,7 +56,6 @@ endmacro()
   参见：
 
   - `project <https://cmake.org/cmake/help/latest/command/project.html>`_
-
 #]=======================================================================]
 macro(rr_project)
   set(_rr_project_zOptKws    TIME_AS_VERSION)
@@ -124,6 +124,7 @@ macro(rr_project)
   endforeach()
 endmacro()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_project_extra
 
@@ -158,7 +159,6 @@ endmacro()
   参见：
 
   - :command:`rr_project`
-
 #]=======================================================================]
 function(rr_project_extra)
   set(zOptKws    TIME_AS_VERSION)

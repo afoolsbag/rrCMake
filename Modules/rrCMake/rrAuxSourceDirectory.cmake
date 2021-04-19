@@ -15,6 +15,8 @@ endif()
 #[=======================================================================[.rst:
 .. command:: rr_aux_source_directory
 
+  寻找目录中的所有源文件。
+
   基于 ``aux_source_directory`` 命令，提供更多选项和功能。
 
   .. code-block:: cmake

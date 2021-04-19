@@ -1,16 +1,24 @@
 # zhengrr
-# 2017-12-18 – 2021-03-15
+# 2017-12-18 – 2021-04-19
 # Unlicense
+
+#[=======================================================================[.rst:
+rrCheck
+-------
+
+提供若干检查函数，以便利断言。
+#]=======================================================================]
 
 cmake_minimum_required(VERSION 3.10)
 cmake_policy(VERSION 3.10)
 
 include_guard()  # 3.10
 
+
 #[=======================================================================[.rst:
 .. command:: _rrcheck_check_message_mode
 
-  检查输入字符串是否符合 ``message`` 命令的 ``<mode>`` 选项，返回真假值。
+  内部函数：检查输入字符串是否符合 ``message`` 命令的 ``<mode>`` 选项，返回真假值。
 
   .. code-block:: cmake
 
@@ -31,6 +39,7 @@ function(_rrcheck_check_message_mode sString xVariable)
   set("${xVariable}" "FALSE" PARENT_SCOPE)
 endfunction()
 
+
 #   ___                                       _
 #  / _ \                                     | |
 # / /_\ \_ __ __ _ _   _ _ __ ___   ___ _ __ | |_ ___
@@ -44,7 +53,7 @@ endfunction()
 #
 # - `function <https://cmake.org/cmake/help/latest/command/function.html>`_
 # - `macro <https://cmake.org/cmake/help/latest/command/macro.html>`_
-#
+
 
 #[=======================================================================[.rst:
 .. command:: rr_check_argc
@@ -105,6 +114,7 @@ function(rr_check_argc zArgv sPlaceholder1)
   endif()
 endfunction()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_check_no_argn
 
@@ -137,6 +147,7 @@ function(rr_check_no_argn zArgn)
   endif()
 endfunction()
 
+
 #  _____     _     _                      _____ _               _
 # |  ___|   (_)   | |                    /  __ \ |             | |
 # | |____  ___ ___| |_ ___ _ __   ___ ___| /  \/ |__   ___  ___| | _____
@@ -147,7 +158,7 @@ endfunction()
 # 参见：
 #
 # - `if § Existence Checks <https://cmake.org/cmake/help/latest/command/if.html#existence-checks>`_
-#
+
 
 #[=======================================================================[.rst:
 .. command:: rr_check_command
@@ -181,6 +192,7 @@ function(rr_check_command sCommandName)
   endif()
 endfunction()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_check_policy
 
@@ -212,6 +224,7 @@ function(rr_check_policy sPolicyId)
     message(${oMessageModeOrVariable} "Assertion error: The identifier is not a policy: ${sPolicyId}.")
   endif()
 endfunction()
+
 
 #[=======================================================================[.rst:
 .. command:: rr_check_target
@@ -245,6 +258,7 @@ function(rr_check_target sTargetName)
   endif()
 endfunction()
 
+
 # ______ _ _       _____                      _   _
 # |  ___(_) |     |  _  |                    | | (_)
 # | |_   _| | ___ | | | |_ __   ___ _ __ __ _| |_ _  ___  _ __  ___ 
@@ -257,7 +271,7 @@ endfunction()
 # 参见：
 #
 # - `if § File Operations <https://cmake.org/cmake/help/latest/command/if.html#file-operations>`_
-#
+
 
 #[=======================================================================[.rst:
 .. command:: rr_check_exists
@@ -291,6 +305,7 @@ function(rr_check_exists sPath)
   endif()
 endfunction()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_check_directory
 
@@ -322,6 +337,7 @@ function(rr_check_directory sDirectoryPath)
     message(${oMessageModeOrVariable} "Assertion error: The path is not a directory: ${sDirectoryPath}.")
   endif()
 endfunction()
+
 
 #[=======================================================================[.rst:
 .. command:: rr_check_symlink
@@ -355,6 +371,7 @@ function(rr_check_symlink sSymlinkPath)
   endif()
 endfunction()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_check_absolute
 
@@ -387,6 +404,7 @@ function(rr_check_absolute sAbsolutePath)
   endif()
 endfunction()
 
+
 # ___  ___
 # |  \/  |
 # | .  . | ___  _ __ ___
@@ -394,6 +412,7 @@ endfunction()
 # | |  | | (_) | | |  __/
 # \_|  |_/\___/|_|  \___|
 #
+
 
 #[=======================================================================[.rst:
 .. command:: rr_check_c_name
@@ -436,6 +455,7 @@ function(rr_check_c_name sName)
   endif()
 endfunction()
 
+
 #[=======================================================================[.rst:
 .. command:: rr_check_cmake_name
 
@@ -461,7 +481,6 @@ endfunction()
 
   - `message <https://cmake.org/cmake/help/latest/command/message.html>`_
   - `cmake-language(7) § Variables <https://cmake.org/cmake/help/latest/manual/cmake-language.7.html#variables>`_
-
 #]=======================================================================]
 function(rr_check_cmake_name sName)
   if("${ARGC}" EQUAL 1)
@@ -485,6 +504,7 @@ function(rr_check_cmake_name sName)
     message(${oMessageModeOrVariable} "Assertion error: The name isn't meet CMake recommend variable rules: ${sName}.")
   endif()
 endfunction()
+
 
 #[=======================================================================[.rst:
 .. command:: rr_check_fext_name
@@ -514,7 +534,6 @@ endfunction()
   - `message <https://cmake.org/cmake/help/latest/command/message.html>`_
   - `Filename <https://wikipedia.org/wiki/Filename>`_
   - `List of filename extensions <https://wikipedia.org/wiki/List_of_filename_extensions>`_
-
 #]=======================================================================]
 function(rr_check_fext_name sName)
   if("${ARGC}" EQUAL 1)

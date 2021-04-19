@@ -82,6 +82,24 @@ reStructuredText
 - `reStructuredText Markup Specification <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html>`_
 - `Online reStructuredText editor <http://rst.ninjs.org/>`_
 
++--------------------------------------------------+
+| Title Symbols in reStructuredText for CMake      |
++-------+--------+---------------------------------+
+| Level | Symbol | Suitable for ...                |
++=======+========+=================================+
+|   1   | ``#``  | sections in ``index``           |
++-------+--------+---------------------------------+
+|   2   | ``*``  | title of ``manual/part``        |
++-------+--------+---------------------------------+
+|   3   | ``=``  | sections in ``manual/part``     |
++-------+--------+---------------------------------+
+|   4   | ``-``  | title of ``part/article``       |
++-------+--------+---------------------------------+
+|   5   | ``^``  | sections in ``part/article``    |
++-------+--------+---------------------------------+
+|   6   | ``"``  | subsections in ``part/article`` |
++-------+--------+---------------------------------+
+
 C/C++ 包管理工具
 ----------------
 
