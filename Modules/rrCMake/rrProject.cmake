@@ -222,21 +222,22 @@ function(rr_project_extra)
   endforeach()
 endfunction()
 
-#.rst:
-# .. command:: rr_project_debug_information
-#
-#   将 ``rr_project`` 命令相关的信息输出，以帮助调试。
-#
-#   .. code-block:: cmake
-#
-#     rr_project_debug_information()
-#
-#   参见：
-#
-#   - :command:`rr_project`
-#   - `CMAKE_MESSAGE_LOG_LEVEL <https://cmake.org/cmake/help/latest/variable/CMAKE_MESSAGE_LOG_LEVEL.html>`_
-#
-function(rr_project_debug_information)
+
+#[=======================================================================[.rst:
+.. command:: rr_project_dinfo
+
+  将 ``rr_project`` 命令相关的信息输出，以帮助调试（dinfo，debug information）。
+
+  .. code-block:: cmake
+
+    rr_project_dinfo()
+
+  参见：
+
+  - :command:`rr_project`
+  - `CMAKE_MESSAGE_LOG_LEVEL <https://cmake.org/cmake/help/latest/variable/CMAKE_MESSAGE_LOG_LEVEL.html>`_
+#]=======================================================================]
+function(rr_project_dinfo)
   # 引入 CMAKE_MESSAGE_LOG_LEVEL 选项
   if(NOT DEFINED CACHE{CMAKE_MESSAGE_LOG_LEVEL})
     set(CMAKE_MESSAGE_LOG_LEVEL "DEBUG" CACHE STRING "message() logging level.")
