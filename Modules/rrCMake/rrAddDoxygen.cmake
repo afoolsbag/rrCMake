@@ -57,12 +57,9 @@ function(rr_add_doxygen)
   cmake_parse_arguments(PARSE_ARGV 0 "" "${zOptKws}" "${zOneValKws}" "${zMutValKws}")
 
   # FindDoxygen
-  find_package(Doxygen)
-  if(NOT DOXYGEN_FOUND)
-    message(FATAL_ERROR "Doxygen is needed to generate doxygen documentation.")
-  endif()
+  find_package(Doxygen REQUIRED)
 
-  # <DoxValKwd> -> DOXYGEN_<DoxValKwd>
+  # _VARIABLE -> DOXYGEN_VARIABLE
   foreach(sDoxConfName IN LISTS zDoxOneValKws zDoxMutValKws)
     if(DEFINED "_${sDoxConfName}")
       set("DOXYGEN_${sDoxConfName}" ${_${sDoxConfName}})
